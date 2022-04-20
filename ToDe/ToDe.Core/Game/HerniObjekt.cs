@@ -132,14 +132,11 @@ namespace ToDe
         }
     }
 
-    internal class Vez : HerniObjekt
-    {
-    }
 
     public enum TypPolozkyNabidky
     {
-        Vez1,
-        Vez2,
+        VezKulomet,
+        VezRaketa,
         Text,
         Vyber, // Obdélníček značící výběr položky
     }
@@ -150,7 +147,7 @@ namespace ToDe
         public string Text { get; set; } // Pouze pro typ text
         public short PoziceVNabidce { get; private set; } // Záporná pozice = počítáno od konce
 
-        public bool Oznacen { get => viditelny && Vyber?.PoziceVNabidce == PoziceVNabidce; }
+        public bool Oznacen { get => Vyber?.viditelny == true && Vyber?.PoziceVNabidce == PoziceVNabidce; }
         bool viditelny = false;
         static PolozkaNabidky Vyber;
 
@@ -161,12 +158,12 @@ namespace ToDe
 
             UhelKorkceObrazku = 0;
 
-            if (TypPolozky == TypPolozkyNabidky.Vez1)
+            if (TypPolozky == TypPolozkyNabidky.VezKulomet)
                 Dlazdice = new[] { 
                     new DlazdiceUrceni(19,  7, 0.0f, false),
                     new DlazdiceUrceni(19, 10, 0.1f, false),
                 };
-            else if (TypPolozky == TypPolozkyNabidky.Vez2)
+            else if (TypPolozky == TypPolozkyNabidky.VezRaketa)
                 Dlazdice = new[] {
                     new DlazdiceUrceni(20, 7, 0.0f, false),
                     new DlazdiceUrceni(22, 8, 0.2f, false),
@@ -176,15 +173,17 @@ namespace ToDe
             {
                 Dlazdice = new[] { new DlazdiceUrceni(15, 0, 0.9f, false) };
             }
-            if (TypPolozky != TypPolozkyNabidky.Text)
+
+            if (TypPolozky != TypPolozkyNabidky.Text && TypPolozky != TypPolozkyNabidky.Vyber)
             {
                 Pozice = new Vector2((PoziceVNabidce + 0.5f) * Mapa.VelikostDlazdice,
                                      (Mapa.Aktualni.Radku + 0.5f) * Mapa.VelikostDlazdice);
+                Meritko = 0.75f;
             }
 
             if (Vyber == null && TypPolozky != TypPolozkyNabidky.Vyber)
             {
-                Vyber = new PolozkaNabidky(0, TypPolozkyNabidky.Vyber);
+                Vyber = new PolozkaNabidky(-1, TypPolozkyNabidky.Vyber);
             }
         }
 
@@ -243,6 +242,49 @@ namespace ToDe
                 base.Draw(sb);
         }
     }
+
+
+    internal abstract class Vez : HerniObjekt
+    {
+        public float SekundDoDalsihoVystrelu { get; set; } // Odpočet
+        public float SekundMeziVystrely { get; set; } 
+        public float DosahStrelby { get; set; } // Poloměr rádiusu kruhu dostřelu
+        public Point SouradniceNaMape { get; set; }
+
+        public Vez UmistiVez(Point souradniceNaMape)
+        {
+            SouradniceNaMape = souradniceNaMape;
+            Pozice = new Vector2((souradniceNaMape.X + 0.5f) * Mapa.VelikostDlazdice,
+                                 (souradniceNaMape.Y + 0.5f) * Mapa.VelikostDlazdice);
+            return this;
+        }
+    }
+
+    internal class VezKulomet : Vez
+    {
+        public VezKulomet()
+        {
+            UhelKorkceObrazku = 90;
+            Dlazdice = new[] {
+                new DlazdiceUrceni(19,  7, 0.1f, false),
+                new DlazdiceUrceni(19, 10, 0.2f, true),
+            };
+        }
+    }
+
+    internal class VezRaketa : Vez
+    {
+        public VezRaketa()
+        {
+            UhelKorkceObrazku = 90;
+            Dlazdice = new[] {
+                    new DlazdiceUrceni(20, 7, 0.1f, false),
+                    new DlazdiceUrceni(22, 8, 0.2f, true),
+                    new DlazdiceUrceni(22, 9, 0.5f, true),
+                };
+        }
+    }
+
 
     internal class Raketa : HerniObjekt
     {
