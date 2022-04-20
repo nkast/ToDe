@@ -21,13 +21,13 @@ namespace ToDe
         }
 
         List<Nepritel> nepratele;
-        List<Dira> diry;
+        List<MizejiciObraz> mizejiciObjekty;
         List<PolozkaNabidky> nabidka;
         List<Vez> veze;
         protected override void Initialize()
         {
             nepratele = new List<Nepritel>();
-            diry = new List<Dira>();
+            mizejiciObjekty = new List<MizejiciObraz>();
             nabidka = new List<PolozkaNabidky>();
             veze = new List<Vez>();
 
@@ -59,7 +59,7 @@ namespace ToDe
             nabidka.Add(textZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text) { Text = (zivotu*100) + "%" });
 
             nepratele.Add(new Nepritel());
-            diry.Add(new Dira()
+            mizejiciObjekty.Add(new Dira()
             {
                 Pozice = new Vector2(3 * 128 + 64, 4 * 128 + 64),
                 RychlostMizeni = 0.075f,
@@ -122,13 +122,25 @@ namespace ToDe
             // Aktualizace herních objektů
             float seconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
             nepratele.ForEach(x => x.Update(seconds));
-            diry.ForEach(x => x.Update(seconds));
-            veze.ForEach(x => x.Update(seconds));
+            mizejiciObjekty.ForEach(x => x.Update(seconds));            
             nabidka.ForEach(x => x.Update(seconds, poziceKliknuti));
+
+            // Otáčení (update) věží
+            nepratele = nepratele.OrderByDescending(x => x.VzdalenostNaCeste).ToList();
+            foreach (var vez in veze)
+            {
+                vez.Cil = nepratele.FirstOrDefault(x => Vector2.Distance(vez.Pozice, x.Pozice) < vez.DosahStrelby);
+                vez.Update(seconds);
+                if (vez.Strelba)
+                {
+                    if (vez is VezKulomet)
+                        mizejiciObjekty.Add(new PlamenStrelby(vez));
+                }
+            }
 
             // Odstraňování smazaných objektů ze seznamů
             nepratele.RemoveAll(x => x.Smazat);
-            diry.RemoveAll(x => x.Smazat);
+            mizejiciObjekty.RemoveAll(x => x.Smazat);
             base.Update(gameTime);
         }
 
@@ -156,7 +168,7 @@ namespace ToDe
 
             // Vykreslování seznamů
             nepratele.ForEach(x => x.Draw(spriteBatch));
-            diry.ForEach(x => x.Draw(spriteBatch));
+            mizejiciObjekty.ForEach(x => x.Draw(spriteBatch));
             veze.ForEach(x => x.Draw(spriteBatch));
             nabidka.ForEach(x => x.Draw(spriteBatch));
             nabidka.FirstOrDefault().DrawVyber(spriteBatch); // Vykreslení označovacího rámečku v nabídce

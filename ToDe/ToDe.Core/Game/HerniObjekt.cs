@@ -47,6 +47,7 @@ namespace ToDe
         public float Zdravi { get; set; } = 1;
         public int IndexPoziceNaTrase { get; set; }
         public Vector2 SouradniceCile { get; set; }
+        public float VzdalenostNaCeste { get; private set; } 
 
         public Nepritel()
         {
@@ -69,10 +70,14 @@ namespace ToDe
 
             if (Smazat) return;
 
-            PohniSe(elapsedSeconds);
+            UhelOtoceni = TDUtils.OtacejSeKCili(elapsedSeconds, Pozice, SouradniceCile, UhelOtoceni, RychlostRotace, out _);
+            Pozice += TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * elapsedSeconds);
 
             // Dosažení cíle (další dlaždice)?
-            if (Vector2.Distance(Pozice, SouradniceCile) < 2f)
+            var vzdalenostDoCile = Vector2.Distance(Pozice, SouradniceCile);
+            VzdalenostNaCeste = IndexPoziceNaTrase + vzdalenostDoCile / Mapa.VelikostDlazdice; // Pozice pro účely řazení
+
+            if (vzdalenostDoCile < 2f)
             {
                 IndexPoziceNaTrase++;
                 if (IndexPoziceNaTrase < Mapa.Aktualni.TrasaPochodu.Count-1)
@@ -86,50 +91,7 @@ namespace ToDe
 
             base.Update(elapsedSeconds);
         }
-
-        static float PosunPoUhlu(float uhel, float rychlost, bool x)
-        {
-            if (x) 
-                return (float)Math.Cos(Math.PI * uhel / 180.0) * rychlost;
-            return (float)Math.Sin(Math.PI * uhel / 180.0) * rychlost;
-        }
-
-        void PohniSe(float elapsedSeconds)
-        {
-            float ang = MathHelper.ToDegrees((float)Math.Atan2(SouradniceCile.Y - Pozice.Y, SouradniceCile.X - Pozice.X));
-            float rozdilUhlu = RozdilUhlu(UhelOtoceni, ang);
-
-            if (Math.Abs(rozdilUhlu) > RychlostRotace * elapsedSeconds)
-                UhelOtoceni += Math.Sign(rozdilUhlu) * (RychlostRotace * elapsedSeconds);
-            else
-                UhelOtoceni = ang;
-
-            Pozice += new Vector2(PosunPoUhlu(UhelOtoceni, RychlostPohybu * elapsedSeconds, true), 
-                PosunPoUhlu(UhelOtoceni, RychlostPohybu * elapsedSeconds, false));
-        }
-
-        static float KorekceUhlu(float angle)
-        {
-            if (angle > 360)
-                angle = angle % 360;
-            while (angle < 0)
-                angle += 360; // TODO: vypočíst bez cyklu
-            return angle;
-        }
-
-        float RozdilUhlu(float aktualniUhel, float cilovyUhel)
-        {
-            aktualniUhel = KorekceUhlu(aktualniUhel);
-            cilovyUhel = KorekceUhlu(cilovyUhel);
-
-            float rozdil = cilovyUhel - aktualniUhel;
-
-            if (rozdil > 180)
-                return -(360 - rozdil);
-            if (rozdil < -180)
-                return rozdil + 360;
-            return rozdil;
-        }
+ 
     }
 
 
@@ -247,9 +209,12 @@ namespace ToDe
     internal abstract class Vez : HerniObjekt
     {
         public float SekundDoDalsihoVystrelu { get; set; } // Odpočet
-        public float SekundMeziVystrely { get; set; } 
+        public float SekundMeziVystrely { get; set; }
+        public float SilaStrely { get; set; } 
         public float DosahStrelby { get; set; } // Poloměr rádiusu kruhu dostřelu
         public Point SouradniceNaMape { get; set; }
+        public Nepritel Cil { get; set; }
+        public bool Strelba { get; private set; }
 
         public Vez UmistiVez(Point souradniceNaMape)
         {
@@ -258,6 +223,25 @@ namespace ToDe
                                  (souradniceNaMape.Y + 0.5f) * Mapa.VelikostDlazdice);
             return this;
         }
+
+        public override void Update(float elapsedSeconds)
+        {
+            base.Update(elapsedSeconds);
+            if (Cil == null) return;
+            SekundDoDalsihoVystrelu -= elapsedSeconds;
+            UhelOtoceni = TDUtils.OtacejSeKCili(elapsedSeconds, Pozice, Cil.Pozice, UhelOtoceni, 
+                                                RychlostRotace, out bool muzeStrilet);
+            if (muzeStrilet && SekundDoDalsihoVystrelu <= 0)
+            {
+                // Výstřel
+                Vystrel();
+                Strelba = true;
+                SekundDoDalsihoVystrelu = SekundMeziVystrely;
+            } else 
+                Strelba = false;
+        }
+
+        protected abstract void Vystrel();
     }
 
     internal class VezKulomet : Vez
@@ -269,6 +253,15 @@ namespace ToDe
                 new DlazdiceUrceni(19,  7, 0.1f, false),
                 new DlazdiceUrceni(19, 10, 0.2f, true),
             };
+            DosahStrelby = Mapa.VelikostDlazdice * 2.1f;
+            RychlostRotace = 135;
+            SekundMeziVystrely = 0.5f;
+            SilaStrely = 0.01f;
+        }
+
+        protected override void Vystrel()
+        {
+            Cil.Zdravi -= SilaStrely;
         }
     }
 
@@ -282,6 +275,14 @@ namespace ToDe
                     new DlazdiceUrceni(22, 8, 0.2f, true),
                     new DlazdiceUrceni(22, 9, 0.5f, true),
                 };
+            DosahStrelby = Mapa.VelikostDlazdice * 4.1f;
+            RychlostRotace = 90;
+            SekundMeziVystrely = 1f;
+            SilaStrely = 0.75f;
+        }
+
+        protected override void Vystrel()
+        {
         }
     }
 
@@ -291,14 +292,9 @@ namespace ToDe
 
     }
 
-    internal class Dira : HerniObjekt
+    internal abstract class MizejiciObraz : HerniObjekt
     {
         public float RychlostMizeni { get; set; } // -% za s
-
-        public Dira()
-        {
-            Dlazdice = new[] { new DlazdiceUrceni(21, 0, 0.000001f) };
-        }
 
         public override void Update(float elapsedSeconds)
         {
@@ -307,6 +303,38 @@ namespace ToDe
                 Smazat = true;
 
             base.Update(elapsedSeconds);
+        }
+    }
+
+    internal class Dira : MizejiciObraz
+    {
+        public Dira()
+        {
+            Dlazdice = new[] { new DlazdiceUrceni(21, 0, 0.000001f) };
+            RychlostMizeni = 0.075f;
+        }
+    }
+
+    internal class PlamenStrelby : MizejiciObraz
+    {
+        Vez vez;
+
+        public PlamenStrelby(Vez vez)
+        {
+            this.vez = vez;
+            Dlazdice = new[] { new DlazdiceUrceni(21, 12, 0.61f) };
+            RychlostMizeni = 2.0f;
+            UhelKorkceObrazku = 90;
+            Meritko = 0.5f;
+            UhelOtoceni = vez.UhelOtoceni;
+            Pozice = vez.Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, Mapa.VelikostDlazdice * 0.55f);
+        }
+
+        public override void Update(float elapsedSeconds)
+        {
+            base.Update(elapsedSeconds);
+            UhelOtoceni = vez.UhelOtoceni;
+            Pozice = vez.Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, Mapa.VelikostDlazdice * 0.55f);
         }
     }
 }

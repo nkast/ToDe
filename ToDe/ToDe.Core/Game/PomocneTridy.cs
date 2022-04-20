@@ -76,4 +76,54 @@ namespace ToDe
             => new Rectangle(rec.Left + plusX, rec.Top + plusY, rec.Width + plusSirka, rec.Height + plusVyska);
     }
 
+    internal static class TDUtils
+    {
+        public static Vector2 PosunPoUhlu(float uhel, float rychlost)
+        {
+            var radiany = MathHelper.ToRadians(uhel);
+            return new Vector2((float)Math.Cos(radiany) * rychlost,
+                               (float)Math.Sin(radiany) * rychlost);
+        }
+
+        public static float OtacejSeKCili(float elapsedSeconds, 
+            Vector2 poziceObjektu, Vector2 poziceCile,
+            float uhelObjektu, float rychlostRotace, out bool muzeStrilet)
+        {
+            float ang = MathHelper.ToDegrees((float)Math.Atan2(poziceCile.Y - poziceObjektu.Y, 
+                                                               poziceCile.X - poziceObjektu.X));
+            float rozdilUhlu = RozdilUhlu(uhelObjektu, ang);
+
+            if (Math.Abs(rozdilUhlu) > rychlostRotace * elapsedSeconds)
+            {
+                muzeStrilet = false;
+                return uhelObjektu + Math.Sign(rozdilUhlu) * (rychlostRotace * elapsedSeconds);
+            }
+            muzeStrilet = true;
+            return ang;
+        }
+
+        static float KorekceUhlu(float angle)
+        {
+            if (angle > 360)
+                angle = angle % 360;
+            while (angle < 0)
+                angle += 360; // TODO: vypočíst bez cyklu
+            return angle;
+        }
+
+        static float RozdilUhlu(float aktualniUhel, float cilovyUhel)
+        {
+            aktualniUhel = KorekceUhlu(aktualniUhel);
+            cilovyUhel = KorekceUhlu(cilovyUhel);
+
+            float rozdil = cilovyUhel - aktualniUhel;
+
+            if (rozdil > 180)
+                return -(360 - rozdil);
+            if (rozdil < -180)
+                return rozdil + 360;
+            return rozdil;
+        }
+    }
+
 }
