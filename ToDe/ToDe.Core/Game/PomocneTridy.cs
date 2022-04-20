@@ -65,8 +65,10 @@ namespace ToDe
         public int X; // Pozice X dlaždice na textuře
         public int Y; // Pozice Y dlaždice na textuře
         public float Z; // Vrstva pro vykreslení dlaždice
+        public bool Otacet;
 
-        public DlazdiceUrceni(int x, int y, float z = 0) => (X, Y, Z) = (x, y, z);
+        public DlazdiceUrceni(int x, int y, float z = 0, bool otacet = true) 
+            => (X, Y, Z, Otacet) = (x, y, z, otacet);
     }
 
     internal static class Rozsireni {

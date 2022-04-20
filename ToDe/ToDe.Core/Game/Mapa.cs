@@ -34,6 +34,7 @@ namespace ToDe
         public static Mapa Aktualni { get; private set; }
 
         public static Texture2D Textura { get; internal set; }
+        public static SpriteFont Pismo { get; internal set; }
 
         public const int VelikostDlazdice = 128;
 
@@ -52,6 +53,7 @@ namespace ToDe
         public Point Cil { get; private set; }
         //public Point StartPred { get; private set; }
         //public Point CilZa { get; private set; }
+
         public List<Point> TrasaPochodu { get; private set; }
         public Vector2 PoziceNaTrase(int indexCilovy)
         {
