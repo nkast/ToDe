@@ -14,7 +14,7 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
     * [Platformer 2D](https://github.com/MonoGame/MonoGame.Samples/tree/develop/Platformer2D/)
 
 <p align="center">
-<img src="https://github.com/PetrVobornik/ToDe/raw/master/Soubory/texture-sample.png" alt="Ukázka použité textury" />
+<img src="https://github.com/PetrVobornik/ToDe/blob/main/Soubory/texture-sample.png?raw=true" alt="Ukázka použité textury" />
 </p>
 
 
