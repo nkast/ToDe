@@ -9,9 +9,24 @@ namespace ToDe
 {
     internal class LevelVlnaJednotka
     {
-        public TypNepratele Typ { get; set; }
+        public TypNepritele Typ { get; set; }
         public int Pocet { get; set; }
         public float Rozestup { get; set; }
+        public float Zdravi { get; set; }
+        public float Sila { get; set; } // Kolik ubere zdravi hráči, když dojde na konec
+        public float Rychlost { get; set; } // Dlaždice za sekundu
+        public float Odstup { get; set; } // Počet sekund, než se začne vypouštět tato jednotka
+
+        public DlazdiceUrceni[] Dlazdice() => DlazdiceZTypu(Typ);
+
+        public static DlazdiceUrceni[] DlazdiceZTypu(TypNepritele typ)
+        {
+            if (typ == TypNepritele.Vojak1)
+                return new[] { new DlazdiceUrceni(17, 10, 0.1f) };
+            if (typ == TypNepritele.Vojak2)
+                return new[] { new DlazdiceUrceni(15, 10, 0.1f) };
+            return null;
+        }
     }
 
     internal class LevelVlna
@@ -27,9 +42,10 @@ namespace ToDe
         public short MaxUroven { get; set; }
     }
 
-    public enum TypNepratele
+    public enum TypNepritele
     {
         Vojak1,
+        Vojak2,
     }
 
     public enum TypVeze
@@ -189,10 +205,47 @@ namespace ToDe
             => new Rectangle(j * VelikostDlazdice, i * VelikostDlazdice, VelikostDlazdice, VelikostDlazdice);
     }
 
+    internal class PolozkaPlanuVln
+    {
+        public float Cas { get; set; } // Čas od začátku hry v sekundách, kdy se má jednotka spustit
+        public LevelVlnaJednotka Jednotka { get; set; }
+
+        public static List<PolozkaPlanuVln> NactiPlanVln(LevelVlna[] vlny)
+        {
+            var plan = new List<PolozkaPlanuVln>();
+            float startDalsiVlny = 0;
+            foreach (var vlna in vlny)
+            {
+                startDalsiVlny += vlna.OdstupZacatkuVlny;
+                float maxCas = startDalsiVlny;
+                foreach (var jednotka in vlna.Jednotky)
+                {
+                    float casDalsiJednotky = startDalsiVlny + jednotka.Odstup;
+                    for (int i = 0; i < jednotka.Pocet; i++)
+                    {
+                        if (i > 0)
+                            casDalsiJednotky += jednotka.Rozestup;
+                        plan.Add(new PolozkaPlanuVln()
+                        {
+                            Cas = casDalsiJednotky,
+                            Jednotka = jednotka
+                        });
+                        if (casDalsiJednotky > maxCas)
+                            maxCas = casDalsiJednotky;
+                    }
+                }
+                startDalsiVlny = maxCas;
+            }
+            plan = plan.OrderBy(x => x.Cas).ToList();
+            return plan;
+        }
+    }
+
     internal class Level
     {
         public int Cislo { get; set; }
         public LevelVlna[] Vlny { get; set; }
+        public List<PolozkaPlanuVln> PlanPosilaniVln { get; set; }
         public LevelVez[] Veze { get; set; }
         public LevelMapa Mapa { get; set; }
 
@@ -204,21 +257,26 @@ namespace ToDe
             foreach (var eVlna in eLevel.Element("vlny").Elements())
             {
                 var vlna = new LevelVlna();
-                vlna.OdstupZacatkuVlny = (int)eVlna.Attribute("odstup");
+                vlna.OdstupZacatkuVlny = eVlna.Attribute("odstup") == null ? 0f : (float)eVlna.Attribute("odstup");
                 // Načtení jednotek
                 var jednotky = new List<LevelVlnaJednotka>();
                 foreach (var eJednotka in eVlna.Elements())
                 {
                     var jednotka = new LevelVlnaJednotka();
-                    jednotka.Typ = (TypNepratele)Enum.Parse(typeof(TypNepratele), eJednotka.Attribute("typ").Value);
+                    jednotka.Typ = (TypNepritele)Enum.Parse(typeof(TypNepritele), eJednotka.Attribute("typ").Value);
                     jednotka.Pocet = (int)eJednotka.Attribute("pocet");
                     jednotka.Rozestup = (float)eJednotka.Attribute("rozestup");
+                    jednotka.Zdravi = (float)eJednotka.Attribute("zdravi");
+                    jednotka.Sila = (float)eJednotka.Attribute("sila");
+                    jednotka.Rychlost = (float)eJednotka.Attribute("rychlost");
+                    jednotka.Odstup = eJednotka.Attribute("odstup") == null ? 0f : (float)eJednotka.Attribute("odstup");
                     jednotky.Add(jednotka);
                 }
                 vlna.Jednotky = jednotky.ToArray();
                 vlny.Add(vlna);
             }
             level.Vlny = vlny.ToArray();
+            level.PlanPosilaniVln = PolozkaPlanuVln.NactiPlanVln(level.Vlny);
 
             // Načtení věží
             var veze = new List<LevelVez>();

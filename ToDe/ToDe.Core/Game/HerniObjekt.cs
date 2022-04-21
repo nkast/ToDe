@@ -129,13 +129,18 @@ namespace ToDe
         public int IndexPoziceNaTrase { get; set; }
         public Vector2 SouradniceCile { get; set; }
         public float VzdalenostNaCeste { get; private set; } 
+        public float SilaUtoku { get; private set; }
+        public bool DosahlCile { get; private set; } = false;
 
-        public Nepritel()
+        public Nepritel(LevelVlnaJednotka jednotka)
         {
-            Dlazdice = new[] { new DlazdiceUrceni(17, 10, 0.1f) };
-            Zdravi = 1;
+            Dlazdice = jednotka.Dlazdice(); // new[] { new DlazdiceUrceni(17, 10, 0.1f) };
             UhelKorkceObrazku = 0;
-            RychlostPohybu = Zdroje.VelikostDlazdice / 2; // Půl dlaždice za sekundu
+
+            Zdravi = jednotka.Zdravi;
+            SilaUtoku = jednotka.Sila;
+            RychlostPohybu = Zdroje.VelikostDlazdice * jednotka.Rychlost; 
+            
             RychlostRotace = 90 * RychlostPohybu / (Zdroje.VelikostDlazdice / 2); // Za dobu ujití poloviny dlaždice se otočí o 90°
             Pozice = Zdroje.Aktualni.Level.Mapa.PoziceNaTrase(0);
             SouradniceCile = Zdroje.Aktualni.Level.Mapa.PoziceNaTrase(1);
@@ -145,9 +150,7 @@ namespace ToDe
 
         public override void Update(float elapsedSeconds)
         {
-            // Test není-li na SouradniceCile, pokud ano, posunout IndexPoziceNaTrase a stanovit nový cíl
-                // Je-li v konečném cíli, ubere život hráči a smaže se
-            // Natočit a posunout k cíli (otáčí se danou rychlostí ale za chůze)
+            DosahlCile = false;
 
             if (Smazat) return;
 
@@ -161,10 +164,13 @@ namespace ToDe
             if (vzdalenostDoCile < 2f)
             {
                 IndexPoziceNaTrase++;
-                if (IndexPoziceNaTrase < Zdroje.Aktualni.Level.Mapa.TrasaPochodu.Count-1)
-                    SouradniceCile = Zdroje.Aktualni.Level.Mapa.PoziceNaTrase(IndexPoziceNaTrase+1);
-                else 
+                if (IndexPoziceNaTrase < Zdroje.Aktualni.Level.Mapa.TrasaPochodu.Count - 1)
+                    SouradniceCile = Zdroje.Aktualni.Level.Mapa.PoziceNaTrase(IndexPoziceNaTrase + 1);
+                else
+                {
+                    DosahlCile = true;
                     Smazat = true;
+                }
             }
 
             if (Zdravi < 0)

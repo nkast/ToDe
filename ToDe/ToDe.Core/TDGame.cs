@@ -39,7 +39,7 @@ namespace ToDe
         }
 
         ushort pocetVeziKluomet, pocetVeziRaketa;
-        float zivotu;
+        float zdravi;
         PolozkaNabidky textPocetVeziKluomet, textPocetVeziRaketa, textZivotu;
         Zdroje aktualniMapa;
         protected override void LoadContent()
@@ -54,11 +54,11 @@ namespace ToDe
                 Pismo = Content.Load<SpriteFont>(@"Fonts/Pismo"),
             };
 
-            // Načtení mapy
-            aktualniMapa = Zdroje.NactiMapu(1);
+            // Načtení levelu
+            aktualniMapa = Zdroje.NactiLevel(1);
 
             // Nastavení hry
-            zivotu = 1;
+            zdravi = 1;
             pocetVeziKluomet = 10;
             pocetVeziRaketa = 5;
 
@@ -67,10 +67,10 @@ namespace ToDe
             nabidka.Add(textPocetVeziKluomet = new PolozkaNabidky(1, TypPolozkyNabidky.Text) { Text = pocetVeziKluomet.ToString() });
             nabidka.Add(new PolozkaNabidky(3, TypPolozkyNabidky.VezRaketa));
             nabidka.Add(textPocetVeziRaketa = new PolozkaNabidky(4, TypPolozkyNabidky.Text) { Text = pocetVeziRaketa.ToString() });
-            nabidka.Add(textZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text) { Text = (zivotu*100) + "%" });
+            nabidka.Add(textZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text) { Text = (zdravi*100) + "%" });
 
             // Testovací objekty
-            nepratele.Add(new Nepritel());          
+            //nepratele.Add(new Nepritel());          
 
 
             base.LoadContent();
@@ -78,7 +78,7 @@ namespace ToDe
 
         bool byloKliknutoMinule = false;
         protected override void Update(GameTime gameTime)
-        {
+        {            
             // Načtení kliknutí
             Vector2 poziceKliknuti = Vector2.Zero;
             // Dotyk
@@ -170,6 +170,24 @@ namespace ToDe
                 }
             }
             exploze.ForEach(x => x.Update(seconds));
+
+            // Vypouštění nepřátel
+            if (Zdroje.Aktualni.Level.PlanPosilaniVln.Count > 0)
+            {
+                if (Zdroje.Aktualni.Level.PlanPosilaniVln[0].Cas <= gameTime.TotalGameTime.TotalSeconds)
+                {
+                    nepratele.Add(new Nepritel(Zdroje.Aktualni.Level.PlanPosilaniVln[0].Jednotka));
+                    Zdroje.Aktualni.Level.PlanPosilaniVln.RemoveAt(0);
+                }
+            }
+
+            // Kontrola Vojáků, kteří došli do cíle
+            foreach (var nepritel in nepratele.Where(x => x.DosahlCile))
+            {
+                zdravi = Math.Max(zdravi - nepritel.SilaUtoku, 0);
+            }
+            textZivotu.Text = Math.Round(zdravi * 100) + "%";
+
 
             // Odstraňování smazaných objektů ze seznamů
             nepratele.RemoveAll(x => x.Smazat);

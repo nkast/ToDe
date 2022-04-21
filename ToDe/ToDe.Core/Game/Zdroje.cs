@@ -50,7 +50,7 @@ namespace ToDe
 
         private Zdroje() { }
 
-        public static Zdroje NactiMapu(int cisloMapy)
+        public static Zdroje NactiLevel(int cisloMapy)
         {
             // Načtení streamu
             string soubor = string.Format("Content/Levels/Level{0}.xml", cisloMapy);
