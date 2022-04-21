@@ -2,8 +2,8 @@
 
 Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _let's programming_ streamu v Monogame a jazyce C#.
 * Živé streamy na [Twitch kanále](https://www.twitch.tv/petrvobornik)
-* Archiv streamů v [YouTube playlistu](https://www.youtube.com/playlist?list=PLxTqV9i8bnb_BN9k_-W_CjXfumNzqiPEe)
-* Možnost diskuze k projektu mimo stream na [Discord serveru](https://discord.gg/K8HjjeQs)
+* Archiv streamů v [YouTube playlistu](http://programko.net/to-de/yt)
+* Možnost diskuze k projektu mimo stream na [Discord serveru](http://programko.net/discord)
 
 ## Použité zdroje
 * [Monogame](https://www.monogame.net)
@@ -20,6 +20,7 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 
 ## Další odkazy
 * Twitter: [@VobornikPetr](https://twitter.com/VobornikPetr)
-* YouTube: [programko.net](http://programko.net)
+* YouTube: [Programko.NET](http://programko.net)
+* GitHub: [ToDe](https://github.com/PetrVobornik/ToDe)
 * Web: [petrvobornik.cz](https://www.petrvobornik.cz)
 * Podpora: [programko.net/podpora](https://programko.net/podpora)
