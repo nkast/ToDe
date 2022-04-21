@@ -22,9 +22,9 @@ namespace ToDe
         {
             if (!dlazdice.Vykreslovat) return;
 
-            int vd = velikostDlazdice ?? Mapa.VelikostDlazdice;
+            int vd = velikostDlazdice ?? Zdroje.VelikostDlazdice;
 
-            sb.Draw(textura ?? Mapa.Textury.Zakladni,
+            sb.Draw(textura ?? Zdroje.Textury.Zakladni,
                   position: pozice,
                   sourceRectangle: new Rectangle(dlazdice.X * vd, dlazdice.Y * vd, vd, vd),
                   rotation: MathHelper.ToRadians(uhelOtoceni),
@@ -47,7 +47,7 @@ namespace ToDe
             Texture2D textura = null
             )
         {
-            sb.Draw(textura ?? Mapa.Textury.Zakladni,
+            sb.Draw(textura ?? Zdroje.Textury.Zakladni,
                   position: pozice,
                   sourceRectangle: vyrezZTextury,
                   rotation: MathHelper.ToRadians(uhelOtoceni),
@@ -71,9 +71,9 @@ namespace ToDe
         {
             if (!dlazdice.Vykreslovat) return;
            
-            int vd = velikostDlazdice ?? Mapa.VelikostDlazdice;
+            int vd = velikostDlazdice ?? Zdroje.VelikostDlazdice;
 
-            sb.Draw(textura ?? Mapa.Textury.Zakladni,
+            sb.Draw(textura ?? Zdroje.Textury.Zakladni,
                   destinationRectangle: cil,
                   sourceRectangle: new Rectangle(dlazdice.X * vd, dlazdice.Y * vd, vd, vd),
                   rotation: MathHelper.ToRadians(uhelOtoceni),

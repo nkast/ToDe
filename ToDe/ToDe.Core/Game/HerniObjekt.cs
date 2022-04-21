@@ -23,7 +23,7 @@ namespace ToDe
 
         public HerniObjekt()
         {
-            Stred = new Vector2(Mapa.VelikostDlazdice / 2f);
+            Stred = new Vector2(Zdroje.VelikostDlazdice / 2f);
         }
 
         public virtual void Update(float elapsedSeconds)
@@ -113,7 +113,7 @@ namespace ToDe
 
     internal class Exploze : AnimovanyHerniObjekt
     {
-        public Exploze(Raketa raketa) : base(Mapa.Textury.Exploze, 8, 6)
+        public Exploze(Raketa raketa) : base(Zdroje.Textury.Exploze, 8, 6)
         {
             Pozice = raketa.Pozice;
             UhelOtoceni = TDUtils.RND.Next(360);
@@ -135,12 +135,12 @@ namespace ToDe
             Dlazdice = new[] { new DlazdiceUrceni(17, 10, 0.1f) };
             Zdravi = 1;
             UhelKorkceObrazku = 0;
-            RychlostPohybu = Mapa.VelikostDlazdice / 2; // Půl dlaždice za sekundu
-            RychlostRotace = 90 * RychlostPohybu / (Mapa.VelikostDlazdice / 2); // Za dobu ujití poloviny dlaždice se otočí o 90°
-            Pozice = Mapa.Aktualni.PoziceNaTrase(0);
-            SouradniceCile = Mapa.Aktualni.PoziceNaTrase(1);
+            RychlostPohybu = Zdroje.VelikostDlazdice / 2; // Půl dlaždice za sekundu
+            RychlostRotace = 90 * RychlostPohybu / (Zdroje.VelikostDlazdice / 2); // Za dobu ujití poloviny dlaždice se otočí o 90°
+            Pozice = Zdroje.Aktualni.Level.Mapa.PoziceNaTrase(0);
+            SouradniceCile = Zdroje.Aktualni.Level.Mapa.PoziceNaTrase(1);
             IndexPoziceNaTrase = 0;
-            UhelOtoceni = (int)Mapa.Aktualni.SmerDalsiTrasy(Mapa.Aktualni.TrasaPochodu[0], Mapa.Aktualni.TrasaPochodu[1]);
+            UhelOtoceni = (int)Zdroje.Aktualni.Level.Mapa.SmerDalsiTrasy(Zdroje.Aktualni.Level.Mapa.TrasaPochodu[0], Zdroje.Aktualni.Level.Mapa.TrasaPochodu[1]);
         }
 
         public override void Update(float elapsedSeconds)
@@ -156,13 +156,13 @@ namespace ToDe
 
             // Dosažení cíle (další dlaždice)?
             var vzdalenostDoCile = Vector2.Distance(Pozice, SouradniceCile);
-            VzdalenostNaCeste = IndexPoziceNaTrase + vzdalenostDoCile / Mapa.VelikostDlazdice; // Pozice pro účely řazení
+            VzdalenostNaCeste = IndexPoziceNaTrase + vzdalenostDoCile / Zdroje.VelikostDlazdice; // Pozice pro účely řazení
 
             if (vzdalenostDoCile < 2f)
             {
                 IndexPoziceNaTrase++;
-                if (IndexPoziceNaTrase < Mapa.Aktualni.TrasaPochodu.Count-1)
-                    SouradniceCile = Mapa.Aktualni.PoziceNaTrase(IndexPoziceNaTrase+1);
+                if (IndexPoziceNaTrase < Zdroje.Aktualni.Level.Mapa.TrasaPochodu.Count-1)
+                    SouradniceCile = Zdroje.Aktualni.Level.Mapa.PoziceNaTrase(IndexPoziceNaTrase+1);
                 else 
                     Smazat = true;
             }
@@ -219,8 +219,8 @@ namespace ToDe
 
             if (TypPolozky != TypPolozkyNabidky.Text && TypPolozky != TypPolozkyNabidky.Vyber)
             {
-                Pozice = new Vector2((PoziceVNabidce + 0.5f) * Mapa.VelikostDlazdice,
-                                     (Mapa.Aktualni.Radku + 0.5f) * Mapa.VelikostDlazdice);
+                Pozice = new Vector2((PoziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
+                                     (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
                 Meritko = 0.75f;
             }
 
@@ -236,9 +236,9 @@ namespace ToDe
 
             if (TypPolozky != TypPolozkyNabidky.Text && klik != Vector2.Zero)
             {
-                if (new Rectangle(PoziceVNabidce * Mapa.VelikostDlazdice, 
-                                  Mapa.Aktualni.Radku * Mapa.VelikostDlazdice,
-                                  Mapa.VelikostDlazdice, Mapa.VelikostDlazdice).Contains(klik))
+                if (new Rectangle(PoziceVNabidce * Zdroje.VelikostDlazdice, 
+                                  Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice,
+                                  Zdroje.VelikostDlazdice, Zdroje.VelikostDlazdice).Contains(klik))
                 {
                     if (Vyber.PoziceVNabidce == PoziceVNabidce)
                         Vyber.viditelny = !Vyber.viditelny;
@@ -246,8 +246,8 @@ namespace ToDe
                     {
                         Vyber.viditelny = true;
                         Vyber.PoziceVNabidce = PoziceVNabidce;
-                        Vyber.Pozice = new Vector2((PoziceVNabidce + 0.5f) * Mapa.VelikostDlazdice,
-                                     (Mapa.Aktualni.Radku + 0.5f) * Mapa.VelikostDlazdice);
+                        Vyber.Pozice = new Vector2((PoziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
+                                     (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
                     }
                 }
             }
@@ -259,13 +259,13 @@ namespace ToDe
 
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
-                var rozmery = Mapa.Textury.Pismo.MeasureString(Text) * Meritko;
+                var rozmery = Zdroje.Textury.Pismo.MeasureString(Text) * Meritko;
                 Stred = new Vector2(PoziceVNabidce < 0 ? rozmery.X : 0, rozmery.Y * 0.5f);
                 Pozice = new Vector2((PoziceVNabidce < 0 
-                                        ? Mapa.Aktualni.Sloupcu - 0.1f 
+                                        ? Zdroje.Aktualni.Level.Mapa.Sloupcu - 0.1f 
                                         : PoziceVNabidce + 0.1f)
-                                     * Mapa.VelikostDlazdice,
-                                    (Mapa.Aktualni.Radku + 0.5f) * Mapa.VelikostDlazdice);
+                                     * Zdroje.VelikostDlazdice,
+                                    (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
             }
         }
 
@@ -279,7 +279,7 @@ namespace ToDe
         {
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
-                sb.DrawString(Mapa.Textury.Pismo, Text, Pozice, Color.White, 
+                sb.DrawString(Zdroje.Textury.Pismo, Text, Pozice, Color.White, 
                     UhelOtoceni, Stred, Meritko, SpriteEffects.None, 0);
             } else
                 base.Draw(sb);
@@ -300,8 +300,8 @@ namespace ToDe
         public Vez UmistiVez(Point souradniceNaMape)
         {
             SouradniceNaMape = souradniceNaMape;
-            Pozice = new Vector2((souradniceNaMape.X + 0.5f) * Mapa.VelikostDlazdice,
-                                 (souradniceNaMape.Y + 0.5f) * Mapa.VelikostDlazdice);
+            Pozice = new Vector2((souradniceNaMape.X + 0.5f) * Zdroje.VelikostDlazdice,
+                                 (souradniceNaMape.Y + 0.5f) * Zdroje.VelikostDlazdice);
             return this;
         }
 
@@ -337,7 +337,7 @@ namespace ToDe
                 new DlazdiceUrceni(19,  7, 0.1f, false),
                 new DlazdiceUrceni(19, 10, 0.2f, true),
             };
-            DosahStrelby = Mapa.VelikostDlazdice * 2.1f;
+            DosahStrelby = Zdroje.VelikostDlazdice * 2.1f;
             RychlostRotace = 90;
             SekundMeziVystrely = 0.5f;
             SilaStrely = 0.01f;
@@ -361,11 +361,11 @@ namespace ToDe
                     new DlazdiceUrceni(22, 8, 0.2f, true),
                     new DlazdiceUrceni(22, 9, 0.5f, true),
                 };
-            DosahStrelby = Mapa.VelikostDlazdice * 4.1f;
+            DosahStrelby = Zdroje.VelikostDlazdice * 4.1f;
             RychlostRotace = 45;
             SekundMeziVystrely = 2f;
             SilaStrely = 0.3f;
-            DosahExploze = Mapa.VelikostDlazdice * 1.5f;
+            DosahExploze = Zdroje.VelikostDlazdice * 1.5f;
         }
 
         public override void Update(float elapsedSeconds)
@@ -394,7 +394,7 @@ namespace ToDe
         {
             this.vez = vez;
             Dlazdice = new[] { new DlazdiceUrceni(22, 10, 0.4f) };
-            RychlostPohybu = Mapa.VelikostDlazdice * 2.0f;
+            RychlostPohybu = Zdroje.VelikostDlazdice * 2.0f;
             UhelKorkceObrazku = 90;
             SilaStrely = vez.SilaStrely;
             DosahExploze = vez.DosahExploze;
@@ -423,7 +423,7 @@ namespace ToDe
             {
                 Pozice = novaPozice;
                 // Když raketa vylétne z věže, posunout ji výše, aby létala nad ostatními věžemi
-                if (Dlazdice[0].Z < 0.5f && Vector2.Distance(Pozice, vez.Pozice) > Mapa.VelikostDlazdice * 0.6f)
+                if (Dlazdice[0].Z < 0.5f && Vector2.Distance(Pozice, vez.Pozice) > Zdroje.VelikostDlazdice * 0.6f)
                     Dlazdice[0].Z = 0.7f;
             }
 
@@ -471,13 +471,13 @@ namespace ToDe
             UhelKorkceObrazku = 90;
             Meritko = 0.5f;
             UhelOtoceni = vez.UhelOtoceni;
-            Pozice = vez.Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, Mapa.VelikostDlazdice * 0.55f);
+            Pozice = vez.Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, Zdroje.VelikostDlazdice * 0.55f);
         }
 
         public override void Update(float elapsedSeconds)
         {
             UhelOtoceni = vez.UhelOtoceni;
-            Pozice = vez.Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, Mapa.VelikostDlazdice * 0.55f);
+            Pozice = vez.Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, Zdroje.VelikostDlazdice * 0.55f);
             base.Update(elapsedSeconds);
         }
     }

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<level>
+	<mapa>
+...............
+....*******....
+...**.....*....
+...*......*....
+...*...****....
+...*...*.......
+.***...*.......
+S*.....*******E
+...............
+	</mapa>
+	<vlny>
+		<vlna odstup="2">
+			<jednotka typ="Vojak1" pocet="5" rozestup="2" />
+		</vlna>
+		<vlna odstup="5">
+			<jednotka typ="Vojak1" pocet="10" rozestup="1" />
+		</vlna>
+		<vlna odstup="5">
+			<jednotka typ="Vojak1" pocet="15" rozestup="0.75" />
+		</vlna>
+	</vlny>
+	<veze>
+		<vez typ="Kulomet" pocet="10" maxUroven="3" />
+		<vez typ="Raketa" pocet="6" maxUroven="3" />
+	</veze>
+</level>

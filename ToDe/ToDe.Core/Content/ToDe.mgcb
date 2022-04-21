@@ -20,8 +20,8 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Pismo.spritefont
 
-#begin Levels/Level1.txt
-/copy:Levels/Level1.txt
+#begin Levels/Level1.xml
+/copy:Levels/Level1.xml
 
 #begin Sprites/Basic.png
 /importer:TextureImporter

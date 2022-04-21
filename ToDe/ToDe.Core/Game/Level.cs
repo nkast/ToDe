@@ -1,77 +1,64 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
+using System.Xml.Linq;
+using System.Linq;
+using Microsoft.Xna.Framework;
 
 namespace ToDe
 {
-    internal enum TypDlazdice
+    internal class LevelVlnaJednotka
     {
-        Ground,
-        Road,
-        //GR_DR,
-        //GR_D,
-        //GR_DL,
-        //GR_R,
-        //GR_L,
-        //GR_TR,
-        //GR_T,
-        //GR_TL,
+        public TypNepratele Typ { get; set; }
+        public int Pocet { get; set; }
+        public float Rozestup { get; set; }
     }
 
-    public enum KamJit
+    internal class LevelVlna
     {
-        Nahoru = 270,
-        Doprava = 0,
-        Dolu = 90,
-        Doleva = 180,
+        public LevelVlnaJednotka[] Jednotky { get; set; }
+        public float OdstupZacatkuVlny { get; set; }
     }
 
-    internal class Textury
+    internal class LevelVez
     {
-        public Texture2D Zakladni { get; internal set; }
-        public Texture2D Exploze { get; internal set; }
-        public SpriteFont Pismo { get; internal set; }
+        public TypVeze Typ { get; set; }
+        public int Pocet { get; set; }
+        public short MaxUroven { get; set; }
     }
 
-    internal class Mapa
+    public enum TypNepratele
     {
-        public static Mapa Aktualni { get; private set; }
+        Vojak1,
+    }
 
-        public static Textury Textury { get; internal set; }
-        //public static Texture2D Textura { get; internal set; }
-        //public static SpriteFont Pismo { get; internal set; }
+    public enum TypVeze
+    {
+        Kulomet,
+        Raketa,
+    }
 
-        public const int VelikostDlazdice = 128;
-
-
-        public Dictionary<TypDlazdice, DlazdiceUrceni> TypNaDlazici { get; private set; } 
-            = new Dictionary<TypDlazdice, DlazdiceUrceni>() {
-                { TypDlazdice.Ground, new DlazdiceUrceni(19, 6) },
-                { TypDlazdice.Road, new DlazdiceUrceni(21, 6) },
-            };
-
+    internal class LevelMapa
+    {
         public TypDlazdice[,] Pozadi { get; private set; }
         public int Radku { get => Pozadi.GetLength(0); }
         public int Sloupcu { get => Pozadi.GetLength(1); }
 
         public Point Start { get; private set; }
         public Point Cil { get; private set; }
-        //public Point StartPred { get; private set; }
-        //public Point CilZa { get; private set; }
+
+        public int VelikostDlazdice => Zdroje.VelikostDlazdice;
 
         public List<Point> TrasaPochodu { get; private set; }
         public Vector2 PoziceNaTrase(int indexCilovy)
         {
-            if (indexCilovy <= 0 || indexCilovy >= TrasaPochodu.Count-1)
+            if (indexCilovy <= 0 || indexCilovy >= TrasaPochodu.Count - 1)
                 return new Vector2(TrasaPochodu[indexCilovy].X * VelikostDlazdice + VelikostDlazdice * 0.5f,
                                    TrasaPochodu[indexCilovy].Y * VelikostDlazdice + VelikostDlazdice * 0.5f);
-            var kam = SmerDalsiTrasy(TrasaPochodu[indexCilovy-1], TrasaPochodu[indexCilovy]);
+            var kam = SmerDalsiTrasy(TrasaPochodu[indexCilovy - 1], TrasaPochodu[indexCilovy]);
             switch (kam)
             {
-                case KamJit.Nahoru: 
+                case KamJit.Nahoru:
                     return new Vector2((TrasaPochodu[indexCilovy].X + 0.5f) * VelikostDlazdice,
                                        (TrasaPochodu[indexCilovy].Y + 1) * VelikostDlazdice);
                 case KamJit.Doprava:
@@ -100,55 +87,48 @@ namespace ToDe
                 return KamJit.Nahoru;
         }
 
-
-        int cisloMapy = 0;
-
-        private Mapa() { }
-
-        public static Mapa NactiMapu(int cisloMapy)
+        public static LevelMapa NactiMapu(XElement eMapa)
         {
-            // Načtení streamu
-            string soubor = string.Format("Content/Levels/Level{0}.txt", cisloMapy);
-            var mapa = new Mapa();
-            mapa.cisloMapy = cisloMapy;
-            Aktualni = mapa;
+            var mapa = new LevelMapa();
             var radkyMapy = new List<string>();
             int? sloupcu = null;
-            using (Stream fileStream = TitleContainer.OpenStream(soubor))
-            using (StreamReader reader = new StreamReader(fileStream))
+            // Načtení mapy
+            string mapaText = eMapa.Value.Trim();
+            var radky = mapaText.Split('\n');
+            foreach (string radek in radky)
             {
-                while (!reader.EndOfStream)
-                {
-                    string line = reader.ReadLine().Trim();
-                    if (sloupcu == null)
-                        sloupcu = line.Length;
-                    else
-                        if (line.Length != sloupcu)
-                            throw new Exception($"Mapa Level{cisloMapy} nemá na všech řádcích stejný počet znaků");
-                    radkyMapy.Add(line);
-                }
+                string line = radek.Trim();
+                if (sloupcu == null)
+                    sloupcu = line.Length;
+                else
+                    if (line.Length != sloupcu)
+                    throw new Exception($"Mapa nemá na všech řádcích stejný počet znaků");
+                radkyMapy.Add(line);
             }
+
             // Vytvoření mapy z načtených dat
             mapa.Pozadi = new TypDlazdice[radkyMapy.Count, sloupcu.Value];
             for (int i = 0; i < radkyMapy.Count; i++)
             {
                 for (int j = 0; j < sloupcu.Value; j++)
                 {
-                    mapa.Pozadi[i, j] = ZnakNaTyp(radkyMapy[i][j], i, j);
+                    mapa.Pozadi[i, j] = ZnakNaTyp(mapa, radkyMapy[i][j], i, j);
                 }
             }
+
             // Nalezení parametrů pro cestu
             mapa.NajdiCestu();
+
             return mapa;
         }
 
-        static TypDlazdice ZnakNaTyp(char tile, int i, int j)
+        static TypDlazdice ZnakNaTyp(LevelMapa mapa, char tile, int i, int j)
         {
             switch (tile)
             {
                 case '.': return TypDlazdice.Ground;
-                case 'S': Aktualni.Start = new Point(j, i); return TypDlazdice.Road;
-                case 'E': Aktualni.Cil = new Point(j, i); return TypDlazdice.Road;
+                case 'S': mapa.Start = new Point(j, i); return TypDlazdice.Road;
+                case 'E': mapa.Cil = new Point(j, i); return TypDlazdice.Road;
                 case '*': return TypDlazdice.Road;
                 default: return TypDlazdice.Ground;
             }
@@ -161,18 +141,18 @@ namespace ToDe
             TrasaPochodu = new List<Point>();
             var navstivenePozice = new List<Point>();
             if (!NajdiCestuProhledejPole(Start, navstivenePozice))
-                throw new Exception($"Mapa Level{cisloMapy} nemá cestu ze startu do cíle");
+                throw new Exception($"Mapa nemá cestu ze startu do cíle");
             TrasaPochodu.Reverse();
             // Přidání startu za okraj mapy
             if (Start.X == 0) TrasaPochodu.Insert(0, new Point(-1, Start.Y));
-            else if (Start.X == Sloupcu-1) TrasaPochodu.Insert(0, new Point(Sloupcu, Start.Y));
+            else if (Start.X == Sloupcu - 1) TrasaPochodu.Insert(0, new Point(Sloupcu, Start.Y));
             else if (Start.Y == 0) TrasaPochodu.Insert(0, new Point(Start.X, -1));
-            else if (Start.Y == Radku-1) TrasaPochodu.Insert(0, new Point(Start.X, Radku));
+            else if (Start.Y == Radku - 1) TrasaPochodu.Insert(0, new Point(Start.X, Radku));
             // Přidání cíle za okraj mapy
-            if (Cil.X == Sloupcu-1) TrasaPochodu.Add(new Point(Sloupcu, Start.Y));
+            if (Cil.X == Sloupcu - 1) TrasaPochodu.Add(new Point(Sloupcu, Start.Y));
             else if (Cil.X == 0) TrasaPochodu.Add(new Point(-1, Start.Y));
             else if (Cil.Y == 0) TrasaPochodu.Add(new Point(Start.X, -1));
-            else if (Cil.Y == Radku-1) TrasaPochodu.Add(new Point(Start.X, Radku));
+            else if (Cil.Y == Radku - 1) TrasaPochodu.Add(new Point(Start.X, Radku));
         }
         bool NajdiCestuProhledejPole(Point souradnice, List<Point> navstivenePozice)
         {
@@ -196,11 +176,66 @@ namespace ToDe
             return false;
         }
 
+        public Dictionary<TypDlazdice, DlazdiceUrceni> TypNaDlazici { get; private set; }
+            = new Dictionary<TypDlazdice, DlazdiceUrceni>() {
+                        { TypDlazdice.Ground, new DlazdiceUrceni(19, 6) },
+                        { TypDlazdice.Road, new DlazdiceUrceni(21, 6) },
+            };
 
         public DlazdiceUrceni MezeDlazdice(int i, int j)
             => TypNaDlazici[Pozadi[i, j]];
 
         public Rectangle CilDlazdice(int i, int j)
             => new Rectangle(j * VelikostDlazdice, i * VelikostDlazdice, VelikostDlazdice, VelikostDlazdice);
+    }
+
+    internal class Level
+    {
+        public int Cislo { get; set; }
+        public LevelVlna[] Vlny { get; set; }
+        public LevelVez[] Veze { get; set; }
+        public LevelMapa Mapa { get; set; }
+
+        public static Level Nacti(XElement eLevel)
+        {
+            Level level = new Level();
+            // Načtení vln
+            var vlny = new List<LevelVlna>();
+            foreach (var eVlna in eLevel.Element("vlny").Elements())
+            {
+                var vlna = new LevelVlna();
+                vlna.OdstupZacatkuVlny = (int)eVlna.Attribute("odstup");
+                // Načtení jednotek
+                var jednotky = new List<LevelVlnaJednotka>();
+                foreach (var eJednotka in eVlna.Elements())
+                {
+                    var jednotka = new LevelVlnaJednotka();
+                    jednotka.Typ = (TypNepratele)Enum.Parse(typeof(TypNepratele), eJednotka.Attribute("typ").Value);
+                    jednotka.Pocet = (int)eJednotka.Attribute("pocet");
+                    jednotka.Rozestup = (float)eJednotka.Attribute("rozestup");
+                    jednotky.Add(jednotka);
+                }
+                vlna.Jednotky = jednotky.ToArray();
+                vlny.Add(vlna);
+            }
+            level.Vlny = vlny.ToArray();
+
+            // Načtení věží
+            var veze = new List<LevelVez>();
+            foreach (var eVez in eLevel.Element("veze").Elements())
+            {
+                var vez = new LevelVez();
+                vez.Typ = (TypVeze)Enum.Parse(typeof(TypVeze), eVez.Attribute("typ").Value);
+                vez.Pocet = (int)eVez.Attribute("pocet");
+                vez.MaxUroven = (short)eVez.Attribute("maxUroven");
+                veze.Add(vez);
+            }
+            level.Veze = veze.ToArray();
+
+            // Načtení mapy
+            level.Mapa = LevelMapa.NactiMapu(eLevel.Element("mapa"));
+
+            return level;
+        }
     }
 }

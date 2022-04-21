@@ -41,21 +41,21 @@ namespace ToDe
         ushort pocetVeziKluomet, pocetVeziRaketa;
         float zivotu;
         PolozkaNabidky textPocetVeziKluomet, textPocetVeziRaketa, textZivotu;
-        Mapa aktualniMapa;
+        Zdroje aktualniMapa;
         protected override void LoadContent()
         {
             Content.RootDirectory = "Content";
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Načtení zdrojů
-            Mapa.Textury = new Textury() {
+            Zdroje.Textury = new Textury() {
                 Zakladni = Content.Load<Texture2D>(@"Sprites/Basic"),
                 Exploze = Content.Load<Texture2D>(@"Sprites/exploze"),
                 Pismo = Content.Load<SpriteFont>(@"Fonts/Pismo"),
             };
 
             // Načtení mapy
-            aktualniMapa = Mapa.NactiMapu(1);
+            aktualniMapa = Zdroje.NactiMapu(1);
 
             // Nastavení hry
             zivotu = 1;
@@ -100,14 +100,14 @@ namespace ToDe
 
             // Umístění věže na mapě
             if (poziceKliknuti != Vector2.Zero && 
-                poziceKliknuti.X < Mapa.Aktualni.Sloupcu * Mapa.VelikostDlazdice &&
-                poziceKliknuti.Y < Mapa.Aktualni.Radku * Mapa.VelikostDlazdice)
+                poziceKliknuti.X < Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice &&
+                poziceKliknuti.Y < Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice)
             {
                 Point souradniceNaMape = new Point(
-                        (int)poziceKliknuti.X / Mapa.VelikostDlazdice,
-                        (int)poziceKliknuti.Y / Mapa.VelikostDlazdice
+                        (int)poziceKliknuti.X / Zdroje.VelikostDlazdice,
+                        (int)poziceKliknuti.Y / Zdroje.VelikostDlazdice
                     );
-                if (Mapa.Aktualni.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Ground &&
+                if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Ground &&
                     !veze.Any(x => x.SouradniceNaMape == souradniceNaMape))
                 {
                     var typ = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky;
@@ -185,8 +185,8 @@ namespace ToDe
             GraphicsDevice.Clear(Color.Black); // Barva podkladu na pozadí
 
             // Matice pro měřítko (zoom) vykreslování, aby se vše vešlo do okna
-            var scaleX = (float)GraphicsDevice.Viewport.Width / (float)(aktualniMapa.Sloupcu* Mapa.VelikostDlazdice);
-            var scaleY = (float)GraphicsDevice.Viewport.Height / (float)((aktualniMapa.Radku + 1) * Mapa.VelikostDlazdice);
+            var scaleX = (float)GraphicsDevice.Viewport.Width / (float)(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice);
+            var scaleY = (float)GraphicsDevice.Viewport.Height / (float)((aktualniMapa.Level.Mapa.Radku + 1) * Zdroje.VelikostDlazdice);
             globalniMeritko = MathHelper.Min(scaleX, scaleY);
             var screenScale = new Vector3(new Vector2(globalniMeritko), 1.0f);
             var scaleMatrix = Matrix.CreateScale(screenScale);
@@ -195,10 +195,10 @@ namespace ToDe
 
 
             // Vykreslení pozadí mapy
-            for (int i = 0; i < aktualniMapa.Radku; i++)
-                for (int j = 0; j < aktualniMapa.Sloupcu; j++)
+            for (int i = 0; i < aktualniMapa.Level.Mapa.Radku; i++)
+                for (int j = 0; j < aktualniMapa.Level.Mapa.Sloupcu; j++)
                 {
-                    spriteBatch.Kresli(aktualniMapa.CilDlazdice(i, j), aktualniMapa.MezeDlazdice(i, j), Vector2.Zero);
+                    spriteBatch.Kresli(aktualniMapa.Level.Mapa.CilDlazdice(i, j), aktualniMapa.Level.Mapa.MezeDlazdice(i, j), Vector2.Zero);
                 }
 
             // Vykreslování seznamů
