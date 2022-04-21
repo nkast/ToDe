@@ -42,6 +42,87 @@ namespace ToDe
         }
     }
 
+    internal abstract class AnimovanyHerniObjekt : HerniObjekt
+    {
+        protected Texture2D textura;
+
+        public float Z { get; set; } = 0;
+
+        public int PocetObrazkuSirka { get; private set; } = 1;
+        public int PocetObrazkuVyska { get; private set; } = 1;
+        public int IndexObrazku { get; set; } = 0;
+        public float RychlostAnimace { get; set; } = 0;
+        public bool OpakovatAnimaci { get; set; } = false;
+
+        public int SirkaObrzaku { get; private set; }
+        public int VyskaObrzaku { get; private set; }
+        public Rectangle VyrezZTextury { get; set; }
+
+        private double postupAnimace = 0;
+
+        public AnimovanyHerniObjekt(Texture2D textura, int pocetObrazkuSirka = 1, int pocetObrazkuVyska = 1)
+        {
+            this.textura = textura;
+            PocetObrazkuSirka = pocetObrazkuSirka;
+            PocetObrazkuVyska = pocetObrazkuVyska;
+            SirkaObrzaku = textura.Width / PocetObrazkuSirka;
+            VyskaObrzaku = textura.Height / PocetObrazkuVyska;
+            Stred = new Vector2(SirkaObrzaku / 2.0f, VyskaObrzaku * 0.5f);
+        }
+
+        public override void Update(float elapsedSeconds)
+        {
+            base.Update(elapsedSeconds);
+
+            // Animace
+            if (RychlostAnimace > 0)
+            {
+                if (postupAnimace >= PocetObrazkuSirka * PocetObrazkuVyska)
+                {
+                    if (OpakovatAnimaci)
+                    {
+                        IndexObrazku = 0;
+                        postupAnimace = 0;
+                    }
+                    else
+                    {
+                        Smazat = true;
+                        return;
+                    }
+                }
+                else
+                    IndexObrazku = (int)postupAnimace;
+                postupAnimace += RychlostAnimace * elapsedSeconds;
+            }
+
+            // Výřez z obrázku
+            VyrezZTextury = new Rectangle(
+                SirkaObrzaku * (IndexObrazku % PocetObrazkuSirka),
+                VyskaObrzaku * (IndexObrazku / PocetObrazkuSirka),
+                SirkaObrzaku, VyskaObrzaku);
+        }
+
+        public override void Draw(SpriteBatch sb)
+        {
+            //base.Draw(sb);        
+
+            sb.Kresli(Pozice, VyrezZTextury, Stred, UhelOtoceni + UhelKorkceObrazku, Meritko, Z, SpriteEffects.None,
+                   Nepruhlednost < 1 ? Kresleni.Pruhlednost(Nepruhlednost) : (Color?)null, textura);
+        }
+    }
+
+    internal class Exploze : AnimovanyHerniObjekt
+    {
+        public Exploze(Raketa raketa) : base(Mapa.Textury.Exploze, 8, 6)
+        {
+            Pozice = raketa.Pozice;
+            UhelOtoceni = TDUtils.RND.Next(360);
+            Meritko = 0.75f;
+            Z = 0.5f;
+            RychlostAnimace = 25f;
+        }
+    }
+
     internal class Nepritel : HerniObjekt
     {
         public float Zdravi { get; set; } = 1;
@@ -178,7 +259,7 @@ namespace ToDe
 
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
-                var rozmery = Mapa.Pismo.MeasureString(Text) * Meritko;
+                var rozmery = Mapa.Textury.Pismo.MeasureString(Text) * Meritko;
                 Stred = new Vector2(PoziceVNabidce < 0 ? rozmery.X : 0, rozmery.Y * 0.5f);
                 Pozice = new Vector2((PoziceVNabidce < 0 
                                         ? Mapa.Aktualni.Sloupcu - 0.1f 
@@ -198,7 +279,7 @@ namespace ToDe
         {
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
-                sb.DrawString(Mapa.Pismo, Text, Pozice, Color.White, 
+                sb.DrawString(Mapa.Textury.Pismo, Text, Pozice, Color.White, 
                     UhelOtoceni, Stred, Meritko, SpriteEffects.None, 0);
             } else
                 base.Draw(sb);
@@ -227,8 +308,11 @@ namespace ToDe
         public override void Update(float elapsedSeconds)
         {
             base.Update(elapsedSeconds);
-            if (Cil == null) return;
-            SekundDoDalsihoVystrelu -= elapsedSeconds;
+            if (SekundDoDalsihoVystrelu > 0)
+                SekundDoDalsihoVystrelu -= elapsedSeconds;
+
+            if (Cil == null || Cil.Smazat) return;
+
             UhelOtoceni = TDUtils.OtacejSeKCili(elapsedSeconds, Pozice, Cil.Pozice, UhelOtoceni, 
                                                 RychlostRotace, out bool muzeStrilet);
             if (muzeStrilet && SekundDoDalsihoVystrelu <= 0)
@@ -254,7 +338,7 @@ namespace ToDe
                 new DlazdiceUrceni(19, 10, 0.2f, true),
             };
             DosahStrelby = Mapa.VelikostDlazdice * 2.1f;
-            RychlostRotace = 135;
+            RychlostRotace = 90;
             SekundMeziVystrely = 0.5f;
             SilaStrely = 0.01f;
         }
@@ -267,6 +351,8 @@ namespace ToDe
 
     internal class VezRaketa : Vez
     {
+        public float DosahExploze { get; set; }
+
         public VezRaketa()
         {
             UhelKorkceObrazku = 90;
@@ -276,19 +362,73 @@ namespace ToDe
                     new DlazdiceUrceni(22, 9, 0.5f, true),
                 };
             DosahStrelby = Mapa.VelikostDlazdice * 4.1f;
-            RychlostRotace = 90;
-            SekundMeziVystrely = 1f;
-            SilaStrely = 0.75f;
+            RychlostRotace = 45;
+            SekundMeziVystrely = 2f;
+            SilaStrely = 0.3f;
+            DosahExploze = Mapa.VelikostDlazdice * 1.5f;
+        }
+
+        public override void Update(float elapsedSeconds)
+        {
+            base.Update(elapsedSeconds);
+            if (!Strelba && SekundDoDalsihoVystrelu <= 0)
+                Dlazdice[1].Vykreslovat = true;
         }
 
         protected override void Vystrel()
         {
+            Dlazdice[1].Vykreslovat = false;
         }
     }
 
 
     internal class Raketa : HerniObjekt
     {
+        VezRaketa vez;
+        public Vector2 SouradniceCile { get; set; }
+        public bool Dopad { get; private set; } = false;
+        public float SilaStrely { get; set; } // Kolik ubere života v epicentru
+        public float DosahExploze { get; set; } // Jak až daleko bude zraňovat nepřátele
+
+        public Raketa(VezRaketa vez)
+        {
+            this.vez = vez;
+            Dlazdice = new[] { new DlazdiceUrceni(22, 10, 0.4f) };
+            RychlostPohybu = Mapa.VelikostDlazdice * 2.0f;
+            UhelKorkceObrazku = 90;
+            SilaStrely = vez.SilaStrely;
+            DosahExploze = vez.DosahExploze;
+            //Meritko = 0.5f;
+            UhelOtoceni = vez.UhelOtoceni;
+            SouradniceCile = vez.Cil.Pozice;
+            Pozice = vez.Pozice;
+        }
+
+        public override void Update(float elapsedSeconds)
+        {
+            Dopad = false;
+            if (Smazat) return;
+
+            var novaPozice = Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * elapsedSeconds);
+
+            // Dosažení cíle (další dlaždice)?
+            var vzdalenostDoCile = Vector2.Distance(novaPozice, SouradniceCile);
+
+            if (vzdalenostDoCile < 2f || vzdalenostDoCile > Vector2.Distance(Pozice, SouradniceCile))
+            {
+                Dopad = true;
+                Smazat = true;
+            }
+            else
+            {
+                Pozice = novaPozice;
+                // Když raketa vylétne z věže, posunout ji výše, aby létala nad ostatními věžemi
+                if (Dlazdice[0].Z < 0.5f && Vector2.Distance(Pozice, vez.Pozice) > Mapa.VelikostDlazdice * 0.6f)
+                    Dlazdice[0].Z = 0.7f;
+            }
+
+            base.Update(elapsedSeconds);
+        }
 
     }
 
@@ -300,7 +440,10 @@ namespace ToDe
         {
             Nepruhlednost -= RychlostMizeni * elapsedSeconds;
             if (Nepruhlednost <= 0)
+            {
+                Nepruhlednost = 0;
                 Smazat = true;
+            }
 
             base.Update(elapsedSeconds);
         }
@@ -311,19 +454,20 @@ namespace ToDe
         public Dira()
         {
             Dlazdice = new[] { new DlazdiceUrceni(21, 0, 0.000001f) };
-            RychlostMizeni = 0.075f;
+            RychlostMizeni = (float)(TDUtils.RND.NextDouble() * 0.4 + 0.2);
+            UhelOtoceni = TDUtils.RND.Next(360);
         }
     }
 
     internal class PlamenStrelby : MizejiciObraz
     {
-        Vez vez;
+        VezKulomet vez;
 
-        public PlamenStrelby(Vez vez)
+        public PlamenStrelby(VezKulomet vez)
         {
             this.vez = vez;
             Dlazdice = new[] { new DlazdiceUrceni(21, 12, 0.61f) };
-            RychlostMizeni = 2.0f;
+            RychlostMizeni = Math.Max(1 / vez.SekundMeziVystrely, 2.0f);
             UhelKorkceObrazku = 90;
             Meritko = 0.5f;
             UhelOtoceni = vez.UhelOtoceni;
@@ -332,9 +476,9 @@ namespace ToDe
 
         public override void Update(float elapsedSeconds)
         {
-            base.Update(elapsedSeconds);
             UhelOtoceni = vez.UhelOtoceni;
             Pozice = vez.Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, Mapa.VelikostDlazdice * 0.55f);
+            base.Update(elapsedSeconds);
         }
     }
 }

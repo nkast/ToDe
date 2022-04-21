@@ -20,9 +20,11 @@ namespace ToDe
             Texture2D textura = null
             )
         {
+            if (!dlazdice.Vykreslovat) return;
+
             int vd = velikostDlazdice ?? Mapa.VelikostDlazdice;
 
-            sb.Draw(textura ?? Mapa.Textura,
+            sb.Draw(textura ?? Mapa.Textury.Zakladni,
                   position: pozice,
                   sourceRectangle: new Rectangle(dlazdice.X * vd, dlazdice.Y * vd, vd, vd),
                   rotation: MathHelper.ToRadians(uhelOtoceni),
@@ -31,6 +33,29 @@ namespace ToDe
                   effects: efekt,
                   color: barva ?? Color.White,
                   layerDepth: dlazdice.Z);
+        }
+
+        public static void Kresli(this SpriteBatch sb,
+            Vector2 pozice,
+            Rectangle vyrezZTextury,
+            Vector2? stred = null,
+            float uhelOtoceni = 0,
+            float meritko = 1,
+            float Z = 0,
+            SpriteEffects efekt = SpriteEffects.None,
+            Color? barva = null,
+            Texture2D textura = null
+            )
+        {
+            sb.Draw(textura ?? Mapa.Textury.Zakladni,
+                  position: pozice,
+                  sourceRectangle: vyrezZTextury,
+                  rotation: MathHelper.ToRadians(uhelOtoceni),
+                  origin: stred ?? new Vector2(vyrezZTextury.Width * 0.5f, vyrezZTextury.Height * 0.5f),
+                  scale: meritko,
+                  effects: efekt,
+                  color: barva ?? Color.White,
+                  layerDepth: Z);
         }
 
         public static void Kresli(this SpriteBatch sb,
@@ -44,9 +69,11 @@ namespace ToDe
             Texture2D textura = null
             )
         {
+            if (!dlazdice.Vykreslovat) return;
+           
             int vd = velikostDlazdice ?? Mapa.VelikostDlazdice;
 
-            sb.Draw(textura ?? Mapa.Textura,
+            sb.Draw(textura ?? Mapa.Textury.Zakladni,
                   destinationRectangle: cil,
                   sourceRectangle: new Rectangle(dlazdice.X * vd, dlazdice.Y * vd, vd, vd),
                   rotation: MathHelper.ToRadians(uhelOtoceni),
@@ -66,9 +93,10 @@ namespace ToDe
         public int Y; // Pozice Y dlaždice na textuře
         public float Z; // Vrstva pro vykreslení dlaždice
         public bool Otacet;
+        public bool Vykreslovat;
 
         public DlazdiceUrceni(int x, int y, float z = 0, bool otacet = true) 
-            => (X, Y, Z, Otacet) = (x, y, z, otacet);
+            => (X, Y, Z, Otacet, Vykreslovat) = (x, y, z, otacet, true);
     }
 
     internal static class Rozsireni {
@@ -78,6 +106,8 @@ namespace ToDe
 
     internal static class TDUtils
     {
+        public static Random RND = new Random();
+
         public static Vector2 PosunPoUhlu(float uhel, float rychlost)
         {
             var radiany = MathHelper.ToRadians(uhel);

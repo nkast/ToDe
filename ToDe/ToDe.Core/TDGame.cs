@@ -24,12 +24,16 @@ namespace ToDe
         List<MizejiciObraz> mizejiciObjekty;
         List<PolozkaNabidky> nabidka;
         List<Vez> veze;
+        List<Raketa> rakety;
+        List<Exploze> exploze;
         protected override void Initialize()
         {
             nepratele = new List<Nepritel>();
             mizejiciObjekty = new List<MizejiciObraz>();
             nabidka = new List<PolozkaNabidky>();
             veze = new List<Vez>();
+            rakety = new List<Raketa>();
+            exploze = new List<Exploze>();
 
             base.Initialize();
         }
@@ -43,27 +47,30 @@ namespace ToDe
             Content.RootDirectory = "Content";
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            Mapa.Textura = Content.Load<Texture2D>(@"Sprites/Basic");
-            Mapa.Pismo = Content.Load<SpriteFont>(@"Fonts/Pismo");
+            // Načtení zdrojů
+            Mapa.Textury = new Textury() {
+                Zakladni = Content.Load<Texture2D>(@"Sprites/Basic"),
+                Exploze = Content.Load<Texture2D>(@"Sprites/exploze"),
+                Pismo = Content.Load<SpriteFont>(@"Fonts/Pismo"),
+            };
 
+            // Načtení mapy
             aktualniMapa = Mapa.NactiMapu(1);
 
+            // Nastavení hry
             zivotu = 1;
             pocetVeziKluomet = 10;
             pocetVeziRaketa = 5;
 
+            // Sestavení panelu nabídky
             nabidka.Add(new PolozkaNabidky(0, TypPolozkyNabidky.VezKulomet));
             nabidka.Add(textPocetVeziKluomet = new PolozkaNabidky(1, TypPolozkyNabidky.Text) { Text = pocetVeziKluomet.ToString() });
             nabidka.Add(new PolozkaNabidky(3, TypPolozkyNabidky.VezRaketa));
             nabidka.Add(textPocetVeziRaketa = new PolozkaNabidky(4, TypPolozkyNabidky.Text) { Text = pocetVeziRaketa.ToString() });
             nabidka.Add(textZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text) { Text = (zivotu*100) + "%" });
 
-            nepratele.Add(new Nepritel());
-            mizejiciObjekty.Add(new Dira()
-            {
-                Pozice = new Vector2(3 * 128 + 64, 4 * 128 + 64),
-                RychlostMizeni = 0.075f,
-            }); ;
+            // Testovací objekty
+            nepratele.Add(new Nepritel());          
 
 
             base.LoadContent();
@@ -72,6 +79,7 @@ namespace ToDe
         bool byloKliknutoMinule = false;
         protected override void Update(GameTime gameTime)
         {
+            // Načtení kliknutí
             Vector2 poziceKliknuti = Vector2.Zero;
             // Dotyk
             poziceKliknuti = TouchPanel.GetState().FirstOrDefault(tl => tl.State == TouchLocationState.Pressed).Position;
@@ -90,7 +98,7 @@ namespace ToDe
             else
                 byloKliknutoMinule = poziceKliknuti != Vector2.Zero;
 
-            // Umístění věže
+            // Umístění věže na mapě
             if (poziceKliknuti != Vector2.Zero && 
                 poziceKliknuti.X < Mapa.Aktualni.Sloupcu * Mapa.VelikostDlazdice &&
                 poziceKliknuti.Y < Mapa.Aktualni.Radku * Mapa.VelikostDlazdice)
@@ -131,16 +139,43 @@ namespace ToDe
             {
                 vez.Cil = nepratele.FirstOrDefault(x => Vector2.Distance(vez.Pozice, x.Pozice) < vez.DosahStrelby);
                 vez.Update(seconds);
+                // Výstřel
                 if (vez.Strelba)
                 {
                     if (vez is VezKulomet)
-                        mizejiciObjekty.Add(new PlamenStrelby(vez));
+                    {
+                        mizejiciObjekty.Add(new PlamenStrelby((VezKulomet)vez));
+                    }
+                    else if (vez is VezRaketa)
+                    {
+                        rakety.Add(new Raketa((VezRaketa)vez));
+                    }
                 }
             }
+
+            // Rakety
+            foreach (var raketa in rakety)
+            {
+                raketa.Update(seconds);
+                if (raketa.Dopad)
+                {
+                    mizejiciObjekty.Add(new Dira() { Pozice = raketa.Pozice });
+                    exploze.Add(new Exploze(raketa));
+                    // Ubrání života nepřátelům v okolí
+                    var cile = nepratele
+                        .Select(x => new { Vzdalenost = Vector2.Distance(raketa.Pozice, x.Pozice), Nepritel = x })
+                        .Where(x => x.Vzdalenost < raketa.DosahExploze);
+                    foreach (var cil in cile)
+                        cil.Nepritel.Zdravi -= raketa.SilaStrely * (raketa.DosahExploze - cil.Vzdalenost) / raketa.DosahExploze;
+                }
+            }
+            exploze.ForEach(x => x.Update(seconds));
 
             // Odstraňování smazaných objektů ze seznamů
             nepratele.RemoveAll(x => x.Smazat);
             mizejiciObjekty.RemoveAll(x => x.Smazat);
+            rakety.RemoveAll(x => x.Smazat);
+            exploze.RemoveAll(x => x.Smazat);
             base.Update(gameTime);
         }
 
@@ -170,6 +205,8 @@ namespace ToDe
             nepratele.ForEach(x => x.Draw(spriteBatch));
             mizejiciObjekty.ForEach(x => x.Draw(spriteBatch));
             veze.ForEach(x => x.Draw(spriteBatch));
+            rakety.ForEach(x => x.Draw(spriteBatch));
+            exploze.ForEach(x => x.Draw(spriteBatch));
             nabidka.ForEach(x => x.Draw(spriteBatch));
             nabidka.FirstOrDefault().DrawVyber(spriteBatch); // Vykreslení označovacího rámečku v nabídce
 

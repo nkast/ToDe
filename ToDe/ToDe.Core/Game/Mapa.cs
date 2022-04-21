@@ -29,12 +29,20 @@ namespace ToDe
         Doleva = 180,
     }
 
+    internal class Textury
+    {
+        public Texture2D Zakladni { get; internal set; }
+        public Texture2D Exploze { get; internal set; }
+        public SpriteFont Pismo { get; internal set; }
+    }
+
     internal class Mapa
     {
         public static Mapa Aktualni { get; private set; }
 
-        public static Texture2D Textura { get; internal set; }
-        public static SpriteFont Pismo { get; internal set; }
+        public static Textury Textury { get; internal set; }
+        //public static Texture2D Textura { get; internal set; }
+        //public static SpriteFont Pismo { get; internal set; }
 
         public const int VelikostDlazdice = 128;
 
