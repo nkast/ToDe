@@ -1,11 +1,11 @@
 ﻿# ToDe - Tower Defense hra v Monogame (C#)
 
 Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _let's programming_ streamu v Monogame a jazyce C#.
-* Živé streamy na ([Twitch kanále](https://www.twitch.tv/petrvobornik), 
-* Archiv streamů v [YouTube playlistu](https://www.youtube.com/playlist?list=PLxTqV9i8bnb_BN9k_-W_CjXfumNzqiPEe)).
-* Možnost diskuze k projektu mimo stream na [Discord serveru](https://discord.gg/K8HjjeQs).
+* Živé streamy na [Twitch kanále](https://www.twitch.tv/petrvobornik)
+* Archiv streamů v [YouTube playlistu](https://www.youtube.com/playlist?list=PLxTqV9i8bnb_BN9k_-W_CjXfumNzqiPEe)
+* Možnost diskuze k projektu mimo stream na [Discord serveru](https://discord.gg/K8HjjeQs)
 
-### Použité zdroje
+## Použité zdroje
 * [Monogame](https://www.monogame.net)
 * Textura: Kenney Tower Defense assets: [opengameart.org](https://opengameart.org/content/tower-defense-300-tilessprites), [kenney.nl](https://www.kenney.nl/assets/tower-defense-top-down)
 * Inspirace projekty
