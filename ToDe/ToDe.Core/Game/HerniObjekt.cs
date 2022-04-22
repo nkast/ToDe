@@ -201,9 +201,9 @@ namespace ToDe
         public string Text { get; set; } // Pouze pro typ text
         public short PoziceVNabidce { get; private set; } // Záporná pozice = počítáno od konce
 
-        public bool Oznacen { get => Vyber?.Viditelny == true && Vyber?.PoziceVNabidce == PoziceVNabidce; }
-        public bool Viditelny { get; set; } = false;
         public static PolozkaNabidky Vyber { get; private set; }
+        public bool Oznacen { get => Vyber?.Viditelny == true && Vyber?.PoziceVNabidce == PoziceVNabidce; }
+        public bool Viditelny { get; set; } = false; // Platí jen pro Vyber
 
         public PolozkaNabidky(short poziceVNabidce, TypPolozkyNabidky typPolozky)
         {
@@ -231,8 +231,11 @@ namespace ToDe
                 Dlazdice = new[] { new DlazdiceUrceni(15, 0, 0.9f, false) };
             }
 
+            // Nastavení měřítka textu a výběrovému políčku
             if (TypPolozky == TypPolozkyNabidky.Text)
                 Meritko = 0.5f;
+            else if (TypPolozky != TypPolozkyNabidky.Vyber)
+                Meritko = 0.75f;
 
             // Výběrové označovátko
             if (Vyber == null && TypPolozky != TypPolozkyNabidky.Vyber)
@@ -245,23 +248,23 @@ namespace ToDe
         {
             Update(elapsedSeconds);
 
-            short poziceVNabidce = PoziceVNabidce;
-            if (poziceVNabidce < 0)
-                poziceVNabidce = (short)(Zdroje.Aktualni.Level.Mapa.Sloupcu + poziceVNabidce);
+            if (TypPolozky == TypPolozkyNabidky.Text) return; // Text se řeší v předchozím příkazu
 
-            // Pozice netextových položek nabídky
-            if (TypPolozky != TypPolozkyNabidky.Text)
-            {
-                Pozice = new Vector2((poziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
-                                     (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
-                Meritko = 0.75f;
-            }
+            //short poziceVNabidce = PoziceVNabidce;
+            //if (poziceVNabidce < 0)
+            //    poziceVNabidce = (short)(Zdroje.Aktualni.Level.Mapa.Sloupcu + poziceVNabidce);
 
-            if (TypPolozky != TypPolozkyNabidky.Text && klik != Vector2.Zero)
+            // Pozice - levý horní roh dlaždice
+            var pozice = new Point((PoziceVNabidce >= 0 ? PoziceVNabidce :
+                                Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce) * Zdroje.VelikostDlazdice,
+                                Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
+
+            // Pozice netextových položek nabídky - střed dlaždice
+            Pozice = new Vector2(pozice.X + 0.5f * Zdroje.VelikostDlazdice, pozice.Y + 0.5f * Zdroje.VelikostDlazdice);
+
+            if (klik != Vector2.Zero)
             {
-                if (new Rectangle(poziceVNabidce * Zdroje.VelikostDlazdice, 
-                                  Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice,
-                                  Zdroje.VelikostDlazdice, Zdroje.VelikostDlazdice).Contains(klik))
+                if (new Rectangle(pozice.X, pozice.Y, Zdroje.VelikostDlazdice, Zdroje.VelikostDlazdice).Contains(klik))
                 {
                     if (Vyber.PoziceVNabidce == PoziceVNabidce)
                         Vyber.Viditelny = !Vyber.Viditelny;
@@ -269,14 +272,16 @@ namespace ToDe
                     {
                         Vyber.Viditelny = true;
                         Vyber.PoziceVNabidce = PoziceVNabidce;
-                        poziceVNabidce = PoziceVNabidce;
-                        if (poziceVNabidce < 0)
-                            poziceVNabidce = (short)(Zdroje.Aktualni.Level.Mapa.Sloupcu + poziceVNabidce);
-                        Vyber.Pozice = new Vector2((poziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
-                                     (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
+                        Vyber.Pozice = Pozice;
+                        //poziceVNabidce = PoziceVNabidce;
+                        //if (poziceVNabidce < 0)
+                        //    poziceVNabidce = (short)(Zdroje.Aktualni.Level.Mapa.Sloupcu + poziceVNabidce);
+                        //Vyber.Pozice = new Vector2((poziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
+                        //                (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
                     }
                 }
             }
+            
         }
 
         public override void Update(float elapsedSeconds)

@@ -70,7 +70,7 @@ namespace ToDe
             nabidka.Add(new PolozkaNabidky(-3, TypPolozkyNabidky.Pauza));
             nabidka.Add(textZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text));
 
-            NastavTexty();
+            NastavTexty(true);
 
             base.LoadContent();
         }
@@ -96,13 +96,23 @@ namespace ToDe
             pauza = false;
         }
 
-        void NastavTexty()
+        void NastavTexty(bool novyLevel = false)
         {
             // Texty do nabídky
             textPocetVeziKluomet.Text = pocetVeziKluomet.ToString();
             textPocetVeziRaketa.Text = pocetVeziRaketa.ToString();
-            textZivotu.Text = (zdravi * 100) + "%";
-            PolozkaNabidky.Vyber.Viditelny = false;
+            
+            int zbytekZivota = (int)Math.Round(zdravi * 100);
+            if (zdravi < 0)
+                zbytekZivota = 0;
+            else if (zbytekZivota > 100)
+                zbytekZivota = 100;
+            else if (zbytekZivota == 0 && zdravi > 0)
+                zbytekZivota = 1;
+
+            textZivotu.Text = zbytekZivota + "%";
+            if (novyLevel)
+                PolozkaNabidky.Vyber.Viditelny = false;
         }
 
         void AkutalizovatPlanUtoku(double oKolik)
@@ -151,7 +161,7 @@ namespace ToDe
                 {
                     SpustitHru();
                     //ResetElapsedTime();
-                    NastavTexty();
+                    NastavTexty(true);
                     AkutalizovatPlanUtoku(gameTime.TotalGameTime.TotalSeconds);
                 }
                 base.Update(gameTime);
@@ -168,7 +178,7 @@ namespace ToDe
                 if (poziceKliknuti != Vector2.Zero)
                 {
                     SpustitHru();
-                    NastavTexty();
+                    NastavTexty(true);
                     AkutalizovatPlanUtoku(gameTime.TotalGameTime.TotalSeconds);
                 }
             }
@@ -280,7 +290,7 @@ namespace ToDe
                 {
                     zdravi = Math.Max(zdravi - nepritel.SilaUtoku, 0);
                 }
-                textZivotu.Text = Math.Round(zdravi * 100) + "%";
+                NastavTexty();                
 
 
                 // Odstraňování smazaných objektů ze seznamů
