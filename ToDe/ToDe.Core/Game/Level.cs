@@ -171,10 +171,10 @@ namespace ToDe
             else if (Start.Y == 0) TrasaPochodu.Insert(0, new Point(Start.X, -1));
             else if (Start.Y == Radku - 1) TrasaPochodu.Insert(0, new Point(Start.X, Radku));
             // Přidání cíle za okraj mapy
-            if (Cil.X == Sloupcu - 1) TrasaPochodu.Add(new Point(Sloupcu, Start.Y));
-            else if (Cil.X == 0) TrasaPochodu.Add(new Point(-1, Start.Y));
-            else if (Cil.Y == 0) TrasaPochodu.Add(new Point(Start.X, -1));
-            else if (Cil.Y == Radku - 1) TrasaPochodu.Add(new Point(Start.X, Radku));
+            if (Cil.X == Sloupcu - 1) TrasaPochodu.Add(new Point(Sloupcu, Cil.Y));
+            else if (Cil.X == 0) TrasaPochodu.Add(new Point(-1, Cil.Y));
+            else if (Cil.Y == 0) TrasaPochodu.Add(new Point(Cil.X, -1));
+            else if (Cil.Y == Radku - 1) TrasaPochodu.Add(new Point(Cil.X, Radku));
         }
         bool NajdiCestuProhledejPole(Point souradnice, List<Point> navstivenePozice)
         {

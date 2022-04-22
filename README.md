@@ -17,6 +17,8 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
     * [Exploze rakety](https://freesound.org/people/derplayer/sounds/587194/)
     * [Střelba](https://freesound.org/people/timgormly/sounds/170167/)
     * [Otáčení věže](https://freesound.org/people/KieranKeegan/sounds/418881/)
+    * [Výhra](https://freesound.org/people/LittleRobotSoundFactory/sounds/270402/)
+    * [Prohra](https://freesound.org/people/LittleRobotSoundFactory/sounds/270466/)
 
 
 

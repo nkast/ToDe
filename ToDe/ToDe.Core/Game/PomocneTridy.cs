@@ -85,6 +85,15 @@ namespace ToDe
 
         public static Color Pruhlednost(float nepruhlednost)
             => new Color(255, 255, 255, (int)(255 * nepruhlednost));
+
+        public static void KresliTextDoprostred(this SpriteBatch sb, string text)
+        {
+            var textSize = Zdroje.Obsah.Pismo.MeasureString(text);
+            sb.DrawString(Zdroje.Obsah.Pismo, text,
+                new Vector2(Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice * 0.5f,
+                            Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice * 0.5f),
+                Color.White, 0, new Vector2(textSize.X * 0.5f, textSize.Y * 0.5f), 1, SpriteEffects.None, 1);
+        }
     }
 
     internal struct DlazdiceUrceni

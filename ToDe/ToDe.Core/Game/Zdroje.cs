@@ -66,6 +66,8 @@ namespace ToDe
         public Zvuk ZvukRaketaStart { get; internal set; }
         public Zvuk ZvukRaketaDopad { get; internal set; }
         public Zvuk ZvukKulomet { get; internal set; }
+        public Zvuk ZvukKonecVyhra { get; internal set; }
+        public Zvuk ZvukKonecProhra { get; internal set; }
     }
 
     internal class Zdroje 
@@ -75,6 +77,8 @@ namespace ToDe
         public static Obsah Obsah { get; internal set; }
 
         public const int VelikostDlazdice = 128;
+        
+        public static int CisloLevelu = 1;
 
         public Level Level { get; private set; }
 

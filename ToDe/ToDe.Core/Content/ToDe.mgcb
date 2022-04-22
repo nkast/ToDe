@@ -23,6 +23,21 @@
 #begin Levels/Level1.xml
 /copy:Levels/Level1.xml
 
+#begin Levels/Level2.xml
+/copy:Levels/Level2.xml
+
+#begin Sounds/konec_prohra.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/konec_prohra.wav
+
+#begin Sounds/konec_vyhra.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/konec_vyhra.wav
+
 #begin Sounds/raketa_dopad.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

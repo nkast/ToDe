@@ -201,9 +201,9 @@ namespace ToDe
         public string Text { get; set; } // Pouze pro typ text
         public short PoziceVNabidce { get; private set; } // Záporná pozice = počítáno od konce
 
-        public bool Oznacen { get => Vyber?.viditelny == true && Vyber?.PoziceVNabidce == PoziceVNabidce; }
-        bool viditelny = false;
-        static PolozkaNabidky Vyber;
+        public bool Oznacen { get => Vyber?.Viditelny == true && Vyber?.PoziceVNabidce == PoziceVNabidce; }
+        public bool Viditelny { get; set; } = false;
+        public static PolozkaNabidky Vyber { get; private set; }
 
         public PolozkaNabidky(short poziceVNabidce, TypPolozkyNabidky typPolozky)
         {
@@ -231,17 +231,6 @@ namespace ToDe
                 Dlazdice = new[] { new DlazdiceUrceni(15, 0, 0.9f, false) };
             }
 
-            // Pozice netextových položek nabídky
-            if (TypPolozky != TypPolozkyNabidky.Text && TypPolozky != TypPolozkyNabidky.Vyber)
-            {
-                if (PoziceVNabidce < 0)
-                    PoziceVNabidce = (short)(Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce);
-
-                Pozice = new Vector2((PoziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
-                                     (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
-                Meritko = 0.75f;
-            }
-
             if (TypPolozky == TypPolozkyNabidky.Text)
                 Meritko = 0.5f;
 
@@ -256,19 +245,34 @@ namespace ToDe
         {
             Update(elapsedSeconds);
 
+            short poziceVNabidce = PoziceVNabidce;
+            if (poziceVNabidce < 0)
+                poziceVNabidce = (short)(Zdroje.Aktualni.Level.Mapa.Sloupcu + poziceVNabidce);
+
+            // Pozice netextových položek nabídky
+            if (TypPolozky != TypPolozkyNabidky.Text)
+            {
+                Pozice = new Vector2((poziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
+                                     (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
+                Meritko = 0.75f;
+            }
+
             if (TypPolozky != TypPolozkyNabidky.Text && klik != Vector2.Zero)
             {
-                if (new Rectangle(PoziceVNabidce * Zdroje.VelikostDlazdice, 
+                if (new Rectangle(poziceVNabidce * Zdroje.VelikostDlazdice, 
                                   Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice,
                                   Zdroje.VelikostDlazdice, Zdroje.VelikostDlazdice).Contains(klik))
                 {
                     if (Vyber.PoziceVNabidce == PoziceVNabidce)
-                        Vyber.viditelny = !Vyber.viditelny;
+                        Vyber.Viditelny = !Vyber.Viditelny;
                     else
                     {
-                        Vyber.viditelny = true;
+                        Vyber.Viditelny = true;
                         Vyber.PoziceVNabidce = PoziceVNabidce;
-                        Vyber.Pozice = new Vector2((PoziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
+                        poziceVNabidce = PoziceVNabidce;
+                        if (poziceVNabidce < 0)
+                            poziceVNabidce = (short)(Zdroje.Aktualni.Level.Mapa.Sloupcu + poziceVNabidce);
+                        Vyber.Pozice = new Vector2((poziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
                                      (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
                     }
                 }
@@ -291,14 +295,12 @@ namespace ToDe
             }
         }
 
-        public void DrawVyber(SpriteBatch sb)
-        {
-            if (Vyber.viditelny)
-                Vyber.Draw(sb);
-        }
 
         public override void Draw(SpriteBatch sb)
         {
+            if (TypPolozky == TypPolozkyNabidky.Vyber && !Viditelny)
+                return;
+
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
                 sb.DrawString(Zdroje.Obsah.Pismo, Text, Pozice, Color.White, 

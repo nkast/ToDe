@@ -56,6 +56,8 @@ namespace ToDe
                 ZvukKulomet = new Zvuk(Content.Load<SoundEffect>(@"Sounds/vez_kulomet"), 2),
                 ZvukRaketaStart = new Zvuk(Content.Load<SoundEffect>(@"Sounds/raketa_start"), 3, 0.75f),
                 ZvukRaketaDopad = new Zvuk(Content.Load<SoundEffect>(@"Sounds/raketa_dopad"), 3, 0.5f),
+                ZvukKonecVyhra = new Zvuk(Content.Load<SoundEffect>(@"Sounds/konec_vyhra"), 1),
+                ZvukKonecProhra = new Zvuk(Content.Load<SoundEffect>(@"Sounds/konec_prohra"), 1),
             };
 
             SpustitHru();
@@ -83,12 +85,15 @@ namespace ToDe
             exploze.Clear();
 
             // Načtení levelu
-            aktualniMapa = Zdroje.NactiLevel(1);
+            aktualniMapa = Zdroje.NactiLevel(Zdroje.CisloLevelu);
 
             // Nastavení hry
             zdravi = 1;
             pocetVeziKluomet = (ushort)(aktualniMapa.Level.Veze.FirstOrDefault(x => x.Typ == TypVeze.Kulomet)?.Pocet ?? 0);
-            pocetVeziRaketa = (ushort)(aktualniMapa.Level.Veze.FirstOrDefault(x => x.Typ == TypVeze.Raketa)?.Pocet ?? 0);           
+            pocetVeziRaketa = (ushort)(aktualniMapa.Level.Veze.FirstOrDefault(x => x.Typ == TypVeze.Raketa)?.Pocet ?? 0);
+
+            jeKonecHry = false;
+            pauza = false;
         }
 
         void NastavTexty()
@@ -97,6 +102,7 @@ namespace ToDe
             textPocetVeziKluomet.Text = pocetVeziKluomet.ToString();
             textPocetVeziRaketa.Text = pocetVeziRaketa.ToString();
             textZivotu.Text = (zdravi * 100) + "%";
+            PolozkaNabidky.Vyber.Viditelny = false;
         }
 
         void AkutalizovatPlanUtoku(double oKolik)
@@ -105,7 +111,7 @@ namespace ToDe
         }
 
         bool byloKliknutoMinule = false;
-        bool pauza = false;
+        bool pauza = false, jeKonecHry = false;
         double casPriPauznuti;
         protected override void Update(GameTime gameTime)
         {
@@ -128,9 +134,19 @@ namespace ToDe
             else
                 byloKliknutoMinule = poziceKliknuti != Vector2.Zero;
 
+            float celkovyHerniCas = (float)gameTime.TotalGameTime.TotalSeconds;
+            float casOdMinule = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             // Konec hry - čekání na klik pro zahájení nové hry
             if (zdravi <= 0)
             {
+                if (!jeKonecHry)
+                {
+                    jeKonecHry = true;
+                    Zdroje.CisloLevelu = 1;
+                    Zdroje.Obsah.ZvukKonecProhra.HrajZvuk(celkovyHerniCas);
+                }
+
                 if (poziceKliknuti != Vector2.Zero)
                 {
                     SpustitHru();
@@ -140,10 +156,23 @@ namespace ToDe
                 }
                 base.Update(gameTime);
                 return;
+            } 
+            else if (nepratele.Count == 0 && Zdroje.Aktualni.Level.PlanPosilaniVln.Count == 0) // Konec hry výhrou
+            {
+                if (!jeKonecHry)
+                {
+                    jeKonecHry = true;
+                    Zdroje.CisloLevelu++;
+                    Zdroje.Obsah.ZvukKonecVyhra.HrajZvuk(celkovyHerniCas);
+                }
+                if (poziceKliknuti != Vector2.Zero)
+                {
+                    SpustitHru();
+                    NastavTexty();
+                    AkutalizovatPlanUtoku(gameTime.TotalGameTime.TotalSeconds);
+                }
             }
 
-            float celkovyHerniCas = (float)gameTime.TotalGameTime.TotalSeconds;
-            float casOdMinule = (float)gameTime.ElapsedGameTime.TotalSeconds;
             nabidka.ForEach(x => x.Update(casOdMinule, poziceKliknuti));
 
             // Pauzování
@@ -292,17 +321,17 @@ namespace ToDe
             rakety.ForEach(x => x.Draw(spriteBatch));
             exploze.ForEach(x => x.Draw(spriteBatch));
             nabidka.ForEach(x => x.Draw(spriteBatch));
-            nabidka.FirstOrDefault().DrawVyber(spriteBatch); // Vykreslení označovacího rámečku v nabídce
+            PolozkaNabidky.Vyber.Draw(spriteBatch); // Vykreslení označovacího rámečku v nabídce
+            //nabidka.FirstOrDefault().DrawVyber(spriteBatch); // Vykreslení označovacího rámečku v nabídce
 
             // Game Over
             if (zdravi <= 0)
             {
-                string text = "GAME OVER";
-                var textSize = Zdroje.Obsah.Pismo.MeasureString(text);
-                spriteBatch.DrawString(Zdroje.Obsah.Pismo, text,
-                    new Vector2(Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice * 0.5f,
-                                Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice * 0.5f),
-                    Color.White, 0, new Vector2(textSize.X * 0.5f, textSize.Y * 0.5f), 1, SpriteEffects.None, 1);
+                spriteBatch.KresliTextDoprostred("GAME OVER");
+            } 
+            else if (jeKonecHry) // Výhra
+            {
+                spriteBatch.KresliTextDoprostred("VICTORY");
             }
 
 
