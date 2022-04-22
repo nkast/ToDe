@@ -5,6 +5,38 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * Archiv streamů v [YouTube playlistu](http://programko.net/tode/yt)
 * Možnost diskuze k projektu mimo stream na [Discord serveru](http://programko.net/discord)
 
+## Roadmap
+* ~~Projekt s NuGety (bez šablony) s VS kompilovaným obsahem~~
+* ~~Vykreslování mapy~~
+* ~~Průchod nepřátel po automaticky vypočtené cestě~~
+* ~~Nabídka a umísťování věží~~
+* ~~Otáčení a střelba věží~~
+* ~~Načítání parametrů levelů a vln ze souboru~~
+* ~~Tankové jednotky~~
+* ~~Zvuky~~
+* ~~Pauza~~
+* ~~Prohra (GameOver)~~
+* ~~Načtení 2 a dalších levlů (výhra)~~
+* V Level.xml možnost definovat i parametry raket
+* Přepínání textur u levelů
+* Upravit texturu, aby každá dlaždice měla okolo sebe z každé strany 1px navíc
+* Další typy jednotek
+* Ukazatel zdraví nepřátel
+* Hudba
+* Postupně zpřístupňované věže (počty)
+* Možnost upgrade věží
+* Pozadí u panelu s nabídkou
+* Lepší ovládací prvek pro panel nabídky
+* Jiná textura na explozi
+* Další typy věží
+* Store
+
+
+<p align="center">
+<img src="https://github.com/PetrVobornik/ToDe/blob/main/Soubory/texture-sample.png?raw=true" alt="Ukázka použité textury" />
+</p>
+
+
 ## Použité zdroje
 * [Monogame](https://www.monogame.net)
 * Textura: Kenney Tower Defense assets: [opengameart.org](https://opengameart.org/content/tower-defense-300-tilessprites), [kenney.nl](https://www.kenney.nl/assets/tower-defense-top-down)
@@ -19,11 +51,6 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
     * [Otáčení věže](https://freesound.org/people/KieranKeegan/sounds/418881/)
     * [Výhra](https://freesound.org/people/LittleRobotSoundFactory/sounds/270402/)
     * [Prohra](https://freesound.org/people/LittleRobotSoundFactory/sounds/270466/)
-
-
-<p align="center">
-<img src="https://github.com/PetrVobornik/ToDe/blob/main/Soubory/texture-sample.png?raw=true" alt="Ukázka použité textury" />
-</p>
 
 
 ## Další odkazy
