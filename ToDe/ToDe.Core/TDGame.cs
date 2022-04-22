@@ -58,33 +58,59 @@ namespace ToDe
                 ZvukRaketaDopad = new Zvuk(Content.Load<SoundEffect>(@"Sounds/raketa_dopad"), 3, 0.5f),
             };
 
+            SpustitHru();
+           
+            // Sestavení panelu nabídky
+            nabidka.Add(new PolozkaNabidky(0, TypPolozkyNabidky.VezKulomet));
+            nabidka.Add(textPocetVeziKluomet = new PolozkaNabidky(1, TypPolozkyNabidky.Text));
+            nabidka.Add(new PolozkaNabidky(3, TypPolozkyNabidky.VezRaketa));
+            nabidka.Add(textPocetVeziRaketa = new PolozkaNabidky(4, TypPolozkyNabidky.Text));
+            nabidka.Add(new PolozkaNabidky(-3, TypPolozkyNabidky.Pauza));
+            nabidka.Add(textZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text));
+
+            NastavTexty();
+
+            base.LoadContent();
+        }
+
+        private void SpustitHru()
+        {
+            nepratele.Clear();
+            mizejiciObjekty.Clear();
+            //nabidka.Clear();
+            veze.Clear();
+            rakety.Clear();
+            exploze.Clear();
+
             // Načtení levelu
             aktualniMapa = Zdroje.NactiLevel(1);
 
             // Nastavení hry
             zdravi = 1;
             pocetVeziKluomet = (ushort)(aktualniMapa.Level.Veze.FirstOrDefault(x => x.Typ == TypVeze.Kulomet)?.Pocet ?? 0);
-            pocetVeziRaketa = (ushort)(aktualniMapa.Level.Veze.FirstOrDefault(x => x.Typ == TypVeze.Raketa)?.Pocet ?? 0);
+            pocetVeziRaketa = (ushort)(aktualniMapa.Level.Veze.FirstOrDefault(x => x.Typ == TypVeze.Raketa)?.Pocet ?? 0);           
+        }
 
-            // Sestavení panelu nabídky
-            nabidka.Add(new PolozkaNabidky(0, TypPolozkyNabidky.VezKulomet));
-            nabidka.Add(textPocetVeziKluomet = new PolozkaNabidky(1, TypPolozkyNabidky.Text) { Text = pocetVeziKluomet.ToString() });
-            nabidka.Add(new PolozkaNabidky(3, TypPolozkyNabidky.VezRaketa));
-            nabidka.Add(textPocetVeziRaketa = new PolozkaNabidky(4, TypPolozkyNabidky.Text) { Text = pocetVeziRaketa.ToString() });
-            nabidka.Add(textZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text) { Text = (zdravi*100) + "%" });
+        void NastavTexty()
+        {
+            // Texty do nabídky
+            textPocetVeziKluomet.Text = pocetVeziKluomet.ToString();
+            textPocetVeziRaketa.Text = pocetVeziRaketa.ToString();
+            textZivotu.Text = (zdravi * 100) + "%";
+        }
 
-            // Testovací objekty
-            //nepratele.Add(new Nepritel());          
-
-
-            base.LoadContent();
+        void AkutalizovatPlanUtoku(double oKolik)
+        {
+            Zdroje.Aktualni.Level.PlanPosilaniVln.ForEach(x => x.Cas = x.Cas + (float)oKolik);
         }
 
         bool byloKliknutoMinule = false;
+        bool pauza = false;
+        double casPriPauznuti;
         protected override void Update(GameTime gameTime)
         {
-           // Načtení kliknutí
-           Vector2 poziceKliknuti = Vector2.Zero;
+            // Načtení kliknutí
+            Vector2 poziceKliknuti = Vector2.Zero;
             // Dotyk
             poziceKliknuti = TouchPanel.GetState().FirstOrDefault(tl => tl.State == TouchLocationState.Pressed).Position;
             // Myš
@@ -102,106 +128,138 @@ namespace ToDe
             else
                 byloKliknutoMinule = poziceKliknuti != Vector2.Zero;
 
-            // Umístění věže na mapě
-            if (poziceKliknuti != Vector2.Zero && 
-                poziceKliknuti.X < Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice &&
-                poziceKliknuti.Y < Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice)
+            // Konec hry - čekání na klik pro zahájení nové hry
+            if (zdravi <= 0)
             {
-                Point souradniceNaMape = new Point(
-                        (int)poziceKliknuti.X / Zdroje.VelikostDlazdice,
-                        (int)poziceKliknuti.Y / Zdroje.VelikostDlazdice
-                    );
-                if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Ground &&
-                    !veze.Any(x => x.SouradniceNaMape == souradniceNaMape))
+                if (poziceKliknuti != Vector2.Zero)
                 {
-                    var typ = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky;
-
-                    if (typ == TypPolozkyNabidky.VezKulomet && pocetVeziKluomet > 0)
-                    {
-                        veze.Add((new VezKulomet()).UmistiVez(souradniceNaMape));
-                        pocetVeziKluomet--;
-                        textPocetVeziKluomet.Text = pocetVeziKluomet.ToString();
-                    }
-                    else if (typ == TypPolozkyNabidky.VezRaketa && pocetVeziRaketa > 0)
-                    {
-                        veze.Add((new VezRaketa()).UmistiVez(souradniceNaMape));
-                        pocetVeziRaketa--;
-                        textPocetVeziRaketa.Text = pocetVeziRaketa.ToString();
-                    }
+                    SpustitHru();
+                    //ResetElapsedTime();
+                    NastavTexty();
+                    AkutalizovatPlanUtoku(gameTime.TotalGameTime.TotalSeconds);
                 }
+                base.Update(gameTime);
+                return;
             }
 
-            // Aktualizace herních objektů
             float celkovyHerniCas = (float)gameTime.TotalGameTime.TotalSeconds;
             float casOdMinule = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            nepratele.ForEach(x => x.Update(casOdMinule));
-            mizejiciObjekty.ForEach(x => x.Update(casOdMinule));            
             nabidka.ForEach(x => x.Update(casOdMinule, poziceKliknuti));
 
-            // Otáčení (update) věží
-            nepratele = nepratele.OrderByDescending(x => x.VzdalenostNaCeste).ToList();
-            foreach (var vez in veze)
+            // Pauzování
+            var oznacenaPolozkaNabidky = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky;
+            if (oznacenaPolozkaNabidky == TypPolozkyNabidky.Pauza && !pauza)
             {
-                vez.Cil = nepratele.FirstOrDefault(x => Vector2.Distance(vez.Pozice, x.Pozice) < vez.DosahStrelby);
-                vez.Update(casOdMinule);
-                // Výstřel
-                if (vez.Strelba)
+                pauza = true;
+                casPriPauznuti = gameTime.TotalGameTime.TotalSeconds;
+            } else if (oznacenaPolozkaNabidky != TypPolozkyNabidky.Pauza && pauza)
+            { 
+                pauza = false;
+                // Přepočítat plán útoku
+                AkutalizovatPlanUtoku(gameTime.TotalGameTime.TotalSeconds - casPriPauznuti);
+            }
+
+
+            if (!pauza)
+            {
+                // Umístění věže na mapě
+                if (poziceKliknuti != Vector2.Zero &&
+                    poziceKliknuti.X < Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice &&
+                    poziceKliknuti.Y < Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice)
                 {
-                    if (vez is VezKulomet)
+                    Point souradniceNaMape = new Point(
+                            (int)poziceKliknuti.X / Zdroje.VelikostDlazdice,
+                            (int)poziceKliknuti.Y / Zdroje.VelikostDlazdice
+                        );
+                    if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Ground &&
+                        !veze.Any(x => x.SouradniceNaMape == souradniceNaMape))
                     {
-                        Zdroje.Obsah.ZvukKulomet.HrajZvuk(celkovyHerniCas);
-                        mizejiciObjekty.Add(new PlamenStrelby((VezKulomet)vez));
+                        var typ = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky;
+
+                        if (typ == TypPolozkyNabidky.VezKulomet && pocetVeziKluomet > 0)
+                        {
+                            veze.Add((new VezKulomet()).UmistiVez(souradniceNaMape));
+                            pocetVeziKluomet--;
+                            textPocetVeziKluomet.Text = pocetVeziKluomet.ToString();
+                        }
+                        else if (typ == TypPolozkyNabidky.VezRaketa && pocetVeziRaketa > 0)
+                        {
+                            veze.Add((new VezRaketa()).UmistiVez(souradniceNaMape));
+                            pocetVeziRaketa--;
+                            textPocetVeziRaketa.Text = pocetVeziRaketa.ToString();
+                        }
                     }
-                    else if (vez is VezRaketa)
+                }
+
+                // Aktualizace herních objektů
+                nepratele.ForEach(x => x.Update(casOdMinule));
+                mizejiciObjekty.ForEach(x => x.Update(casOdMinule));
+
+                // Otáčení (update) věží
+                nepratele = nepratele.OrderByDescending(x => x.VzdalenostNaCeste).ToList();
+                foreach (var vez in veze)
+                {
+                    vez.Cil = nepratele.FirstOrDefault(x => Vector2.Distance(vez.Pozice, x.Pozice) < vez.DosahStrelby);
+                    vez.Update(casOdMinule);
+                    // Výstřel
+                    if (vez.Strelba)
                     {
-                        Zdroje.Obsah.ZvukRaketaStart.HrajZvuk(celkovyHerniCas);
-                        rakety.Add(new Raketa((VezRaketa)vez));
+                        if (vez is VezKulomet)
+                        {
+                            Zdroje.Obsah.ZvukKulomet.HrajZvuk(celkovyHerniCas);
+                            mizejiciObjekty.Add(new PlamenStrelby((VezKulomet)vez));
+                        }
+                        else if (vez is VezRaketa)
+                        {
+                            Zdroje.Obsah.ZvukRaketaStart.HrajZvuk(celkovyHerniCas);
+                            rakety.Add(new Raketa((VezRaketa)vez));
+                        }
                     }
                 }
-            }
 
-            // Rakety
-            foreach (var raketa in rakety)
-            {
-                raketa.Update(casOdMinule);
-                if (raketa.Dopad)
+                // Rakety
+                foreach (var raketa in rakety)
                 {
-                    Zdroje.Obsah.ZvukRaketaDopad.HrajZvuk(celkovyHerniCas);
-                    mizejiciObjekty.Add(new Dira() { Pozice = raketa.Pozice });
-                    exploze.Add(new Exploze(raketa));
-                    // Ubrání života nepřátelům v okolí
-                    var cile = nepratele
-                        .Select(x => new { Vzdalenost = Vector2.Distance(raketa.Pozice, x.Pozice), Nepritel = x })
-                        .Where(x => x.Vzdalenost < raketa.DosahExploze);
-                    foreach (var cil in cile)
-                        cil.Nepritel.Zdravi -= raketa.SilaStrely * (raketa.DosahExploze - cil.Vzdalenost) / raketa.DosahExploze;
+                    raketa.Update(casOdMinule);
+                    if (raketa.Dopad)
+                    {
+                        Zdroje.Obsah.ZvukRaketaDopad.HrajZvuk(celkovyHerniCas);
+                        mizejiciObjekty.Add(new Dira() { Pozice = raketa.Pozice });
+                        exploze.Add(new Exploze(raketa));
+                        // Ubrání života nepřátelům v okolí
+                        var cile = nepratele
+                            .Select(x => new { Vzdalenost = Vector2.Distance(raketa.Pozice, x.Pozice), Nepritel = x })
+                            .Where(x => x.Vzdalenost < raketa.DosahExploze);
+                        foreach (var cil in cile)
+                            cil.Nepritel.Zdravi -= raketa.SilaStrely * (raketa.DosahExploze - cil.Vzdalenost) / raketa.DosahExploze;
+                    }
                 }
-            }
-            exploze.ForEach(x => x.Update(casOdMinule));
+                exploze.ForEach(x => x.Update(casOdMinule));
 
-            // Vypouštění nepřátel
-            if (Zdroje.Aktualni.Level.PlanPosilaniVln.Count > 0)
-            {
-                if (Zdroje.Aktualni.Level.PlanPosilaniVln[0].Cas <= celkovyHerniCas)
+                // Vypouštění nepřátel
+                if (Zdroje.Aktualni.Level.PlanPosilaniVln.Count > 0)
                 {
-                    nepratele.Add(new Nepritel(Zdroje.Aktualni.Level.PlanPosilaniVln[0].Jednotka));
-                    Zdroje.Aktualni.Level.PlanPosilaniVln.RemoveAt(0);
+                    if (Zdroje.Aktualni.Level.PlanPosilaniVln[0].Cas <= celkovyHerniCas)
+                    {
+                        nepratele.Add(new Nepritel(Zdroje.Aktualni.Level.PlanPosilaniVln[0].Jednotka));
+                        Zdroje.Aktualni.Level.PlanPosilaniVln.RemoveAt(0);
+                    }
                 }
+
+                // Kontrola Vojáků, kteří došli do cíle
+                foreach (var nepritel in nepratele.Where(x => x.DosahlCile))
+                {
+                    zdravi = Math.Max(zdravi - nepritel.SilaUtoku, 0);
+                }
+                textZivotu.Text = Math.Round(zdravi * 100) + "%";
+
+
+                // Odstraňování smazaných objektů ze seznamů
+                nepratele.RemoveAll(x => x.Smazat);
+                mizejiciObjekty.RemoveAll(x => x.Smazat);
+                rakety.RemoveAll(x => x.Smazat);
+                exploze.RemoveAll(x => x.Smazat);
             }
-
-            // Kontrola Vojáků, kteří došli do cíle
-            foreach (var nepritel in nepratele.Where(x => x.DosahlCile))
-            {
-                zdravi = Math.Max(zdravi - nepritel.SilaUtoku, 0);
-            }
-            textZivotu.Text = Math.Round(zdravi * 100) + "%";
-
-
-            // Odstraňování smazaných objektů ze seznamů
-            nepratele.RemoveAll(x => x.Smazat);
-            mizejiciObjekty.RemoveAll(x => x.Smazat);
-            rakety.RemoveAll(x => x.Smazat);
-            exploze.RemoveAll(x => x.Smazat);
             base.Update(gameTime);
         }
 
@@ -235,6 +293,18 @@ namespace ToDe
             exploze.ForEach(x => x.Draw(spriteBatch));
             nabidka.ForEach(x => x.Draw(spriteBatch));
             nabidka.FirstOrDefault().DrawVyber(spriteBatch); // Vykreslení označovacího rámečku v nabídce
+
+            // Game Over
+            if (zdravi <= 0)
+            {
+                string text = "GAME OVER";
+                var textSize = Zdroje.Obsah.Pismo.MeasureString(text);
+                spriteBatch.DrawString(Zdroje.Obsah.Pismo, text,
+                    new Vector2(Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice * 0.5f,
+                                Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice * 0.5f),
+                    Color.White, 0, new Vector2(textSize.X * 0.5f, textSize.Y * 0.5f), 1, SpriteEffects.None, 1);
+            }
+
 
             // Konec vykreslování
             spriteBatch.End(); 

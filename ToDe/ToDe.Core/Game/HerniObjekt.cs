@@ -158,10 +158,13 @@ namespace ToDe
             Pozice += TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * elapsedSeconds);
 
             // Dosažení cíle (další dlaždice)?
-            var vzdalenostDoCile = Vector2.Distance(Pozice, SouradniceCile);
+            var novaPozice = Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * elapsedSeconds);
+            var vzdalenostDoCile = Vector2.Distance(novaPozice, SouradniceCile);
+            //var vzdalenostDoCile = Vector2.Distance(Pozice, SouradniceCile);
             VzdalenostNaCeste = IndexPoziceNaTrase + vzdalenostDoCile / Zdroje.VelikostDlazdice; // Pozice pro účely řazení
 
-            if (vzdalenostDoCile < 2f)
+
+            if (vzdalenostDoCile < 2f || vzdalenostDoCile > Vector2.Distance(Pozice, SouradniceCile))
             {
                 IndexPoziceNaTrase++;
                 if (IndexPoziceNaTrase < Zdroje.Aktualni.Level.Mapa.TrasaPochodu.Count - 1)
@@ -172,6 +175,7 @@ namespace ToDe
                     Smazat = true;
                 }
             }
+            Pozice = novaPozice;
 
             if (Zdravi < 0)
                 Smazat = true;
@@ -186,6 +190,7 @@ namespace ToDe
     {
         VezKulomet,
         VezRaketa,
+        Pauza,
         Text,
         Vyber, // Obdélníček značící výběr položky
     }
@@ -207,6 +212,7 @@ namespace ToDe
 
             UhelKorkceObrazku = 0;
 
+            // Grafika netextových typů
             if (TypPolozky == TypPolozkyNabidky.VezKulomet)
                 Dlazdice = new[] { 
                     new DlazdiceUrceni(19,  7, 0.0f, false),
@@ -218,18 +224,28 @@ namespace ToDe
                     new DlazdiceUrceni(22, 8, 0.2f, false),
                     new DlazdiceUrceni(22, 9, 0.5f, false),
                 };
+            else if (TypPolozky == TypPolozkyNabidky.Pauza)
+                Dlazdice = new[] { new DlazdiceUrceni(18, 0, 0.0f, false), };
             else if (TypPolozky == TypPolozkyNabidky.Vyber)
             {
                 Dlazdice = new[] { new DlazdiceUrceni(15, 0, 0.9f, false) };
             }
 
+            // Pozice netextových položek nabídky
             if (TypPolozky != TypPolozkyNabidky.Text && TypPolozky != TypPolozkyNabidky.Vyber)
             {
+                if (PoziceVNabidce < 0)
+                    PoziceVNabidce = (short)(Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce);
+
                 Pozice = new Vector2((PoziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
                                      (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
                 Meritko = 0.75f;
             }
 
+            if (TypPolozky == TypPolozkyNabidky.Text)
+                Meritko = 0.5f;
+
+            // Výběrové označovátko
             if (Vyber == null && TypPolozky != TypPolozkyNabidky.Vyber)
             {
                 Vyber = new PolozkaNabidky(-1, TypPolozkyNabidky.Vyber);
@@ -265,7 +281,7 @@ namespace ToDe
 
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
-                var rozmery = Zdroje.Obsah.Pismo.MeasureString(Text) * Meritko;
+                var rozmery = Zdroje.Obsah.Pismo.MeasureString(Text);
                 Stred = new Vector2(PoziceVNabidce < 0 ? rozmery.X : 0, rozmery.Y * 0.5f);
                 Pozice = new Vector2((PoziceVNabidce < 0 
                                         ? Zdroje.Aktualni.Level.Mapa.Sloupcu - 0.1f 
@@ -461,7 +477,7 @@ namespace ToDe
         public Dira()
         {
             Dlazdice = new[] { new DlazdiceUrceni(21, 0, 0.000001f) };
-            RychlostMizeni = (float)(TDUtils.RND.NextDouble() * 0.4 + 0.2);
+            RychlostMizeni = (float)(TDUtils.RND.NextDouble() * 0.3 + 0.1);
             UhelOtoceni = TDUtils.RND.Next(360);
         }
     }
