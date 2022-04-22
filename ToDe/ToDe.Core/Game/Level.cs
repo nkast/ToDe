@@ -24,7 +24,12 @@ namespace ToDe
             if (typ == TypNepritele.Vojak1)
                 return new[] { new DlazdiceUrceni(17, 10, 0.1f) };
             if (typ == TypNepritele.Vojak2)
-                return new[] { new DlazdiceUrceni(15, 10, 0.1f) };
+                return new[] { new DlazdiceUrceni(15, 10, 0.101f) };
+            if (typ == TypNepritele.Tank1)
+                return new[] { 
+                    new DlazdiceUrceni(15, 11, 0.11f),
+                    new DlazdiceUrceni(15, 12, 0.111f),
+                };
             return null;
         }
     }
@@ -46,6 +51,7 @@ namespace ToDe
     {
         Vojak1,
         Vojak2,
+        Tank1,
     }
 
     public enum TypVeze

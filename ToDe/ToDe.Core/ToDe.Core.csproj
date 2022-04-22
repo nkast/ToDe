@@ -14,4 +14,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Content\bin\Sounds\" />
+    <Folder Include="Content\Sounds\" />
+  </ItemGroup>
+
 </Project>

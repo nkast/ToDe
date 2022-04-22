@@ -23,6 +23,24 @@
 #begin Levels/Level1.xml
 /copy:Levels/Level1.xml
 
+#begin Sounds/raketa_dopad.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/raketa_dopad.wav
+
+#begin Sounds/raketa_start.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/raketa_start.wav
+
+#begin Sounds/vez_kulomet.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/vez_kulomet.wav
+
 #begin Sprites/Basic.png
 /importer:TextureImporter
 /processor:TextureProcessor

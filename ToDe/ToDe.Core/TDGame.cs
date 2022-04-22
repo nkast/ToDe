@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
@@ -48,10 +49,13 @@ namespace ToDe
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Načtení zdrojů
-            Zdroje.Textury = new Textury() {
+            Zdroje.Obsah = new Obsah() {
                 Zakladni = Content.Load<Texture2D>(@"Sprites/Basic"),
                 Exploze = Content.Load<Texture2D>(@"Sprites/exploze"),
                 Pismo = Content.Load<SpriteFont>(@"Fonts/Pismo"),
+                ZvukKulomet = new Zvuk(Content.Load<SoundEffect>(@"Sounds/vez_kulomet"), 2),
+                ZvukRaketaStart = new Zvuk(Content.Load<SoundEffect>(@"Sounds/raketa_start"), 3, 0.75f),
+                ZvukRaketaDopad = new Zvuk(Content.Load<SoundEffect>(@"Sounds/raketa_dopad"), 3, 0.5f),
             };
 
             // Načtení levelu
@@ -59,8 +63,8 @@ namespace ToDe
 
             // Nastavení hry
             zdravi = 1;
-            pocetVeziKluomet = 10;
-            pocetVeziRaketa = 5;
+            pocetVeziKluomet = (ushort)(aktualniMapa.Level.Veze.FirstOrDefault(x => x.Typ == TypVeze.Kulomet)?.Pocet ?? 0);
+            pocetVeziRaketa = (ushort)(aktualniMapa.Level.Veze.FirstOrDefault(x => x.Typ == TypVeze.Raketa)?.Pocet ?? 0);
 
             // Sestavení panelu nabídky
             nabidka.Add(new PolozkaNabidky(0, TypPolozkyNabidky.VezKulomet));
@@ -78,9 +82,9 @@ namespace ToDe
 
         bool byloKliknutoMinule = false;
         protected override void Update(GameTime gameTime)
-        {            
-            // Načtení kliknutí
-            Vector2 poziceKliknuti = Vector2.Zero;
+        {
+           // Načtení kliknutí
+           Vector2 poziceKliknuti = Vector2.Zero;
             // Dotyk
             poziceKliknuti = TouchPanel.GetState().FirstOrDefault(tl => tl.State == TouchLocationState.Pressed).Position;
             // Myš
@@ -128,26 +132,29 @@ namespace ToDe
             }
 
             // Aktualizace herních objektů
-            float seconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            nepratele.ForEach(x => x.Update(seconds));
-            mizejiciObjekty.ForEach(x => x.Update(seconds));            
-            nabidka.ForEach(x => x.Update(seconds, poziceKliknuti));
+            float celkovyHerniCas = (float)gameTime.TotalGameTime.TotalSeconds;
+            float casOdMinule = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            nepratele.ForEach(x => x.Update(casOdMinule));
+            mizejiciObjekty.ForEach(x => x.Update(casOdMinule));            
+            nabidka.ForEach(x => x.Update(casOdMinule, poziceKliknuti));
 
             // Otáčení (update) věží
             nepratele = nepratele.OrderByDescending(x => x.VzdalenostNaCeste).ToList();
             foreach (var vez in veze)
             {
                 vez.Cil = nepratele.FirstOrDefault(x => Vector2.Distance(vez.Pozice, x.Pozice) < vez.DosahStrelby);
-                vez.Update(seconds);
+                vez.Update(casOdMinule);
                 // Výstřel
                 if (vez.Strelba)
                 {
                     if (vez is VezKulomet)
                     {
+                        Zdroje.Obsah.ZvukKulomet.HrajZvuk(celkovyHerniCas);
                         mizejiciObjekty.Add(new PlamenStrelby((VezKulomet)vez));
                     }
                     else if (vez is VezRaketa)
                     {
+                        Zdroje.Obsah.ZvukRaketaStart.HrajZvuk(celkovyHerniCas);
                         rakety.Add(new Raketa((VezRaketa)vez));
                     }
                 }
@@ -156,9 +163,10 @@ namespace ToDe
             // Rakety
             foreach (var raketa in rakety)
             {
-                raketa.Update(seconds);
+                raketa.Update(casOdMinule);
                 if (raketa.Dopad)
                 {
+                    Zdroje.Obsah.ZvukRaketaDopad.HrajZvuk(celkovyHerniCas);
                     mizejiciObjekty.Add(new Dira() { Pozice = raketa.Pozice });
                     exploze.Add(new Exploze(raketa));
                     // Ubrání života nepřátelům v okolí
@@ -169,12 +177,12 @@ namespace ToDe
                         cil.Nepritel.Zdravi -= raketa.SilaStrely * (raketa.DosahExploze - cil.Vzdalenost) / raketa.DosahExploze;
                 }
             }
-            exploze.ForEach(x => x.Update(seconds));
+            exploze.ForEach(x => x.Update(casOdMinule));
 
             // Vypouštění nepřátel
             if (Zdroje.Aktualni.Level.PlanPosilaniVln.Count > 0)
             {
-                if (Zdroje.Aktualni.Level.PlanPosilaniVln[0].Cas <= gameTime.TotalGameTime.TotalSeconds)
+                if (Zdroje.Aktualni.Level.PlanPosilaniVln[0].Cas <= celkovyHerniCas)
                 {
                     nepratele.Add(new Nepritel(Zdroje.Aktualni.Level.PlanPosilaniVln[0].Jednotka));
                     Zdroje.Aktualni.Level.PlanPosilaniVln.RemoveAt(0);

@@ -13,9 +13,10 @@ S*.....*******E
 	</mapa>
 	<vlny>
 		<vlna odstup="2">
-			<jednotka typ="Vojak1" pocet="5" rozestup="3" zdravi="1" rychlost="0.33" sila="0.05" />
-		</vlna>
-		<vlna odstup="10">
+      <jednotka typ="Vojak1" pocet="5" rozestup="5" zdravi="1" rychlost="0.33" sila="0.05" />
+      <jednotka typ="Tank1" pocet="4" rozestup="5" zdravi="2" rychlost="0.33" sila="0.05" odstup="2.5" />
+    </vlna>
+    <vlna odstup="10">
 			<jednotka typ="Vojak1" pocet="5" rozestup="4" zdravi="1.1" rychlost="0.5" sila="0.07" odstup="0" />
 			<jednotka typ="Vojak2" pocet="5" rozestup="4" zdravi="1.1" rychlost="0.5" sila="0.07" odstup="2" />
 		</vlna>
@@ -24,7 +25,7 @@ S*.....*******E
 		</vlna>
 	</vlny>
 	<veze>
-		<vez typ="Kulomet" pocet="10" maxUroven="3" />
+		<vez typ="Kulomet" pocet="9" maxUroven="3" />
 		<vez typ="Raketa" pocet="6" maxUroven="3" />
 	</veze>
 </level>

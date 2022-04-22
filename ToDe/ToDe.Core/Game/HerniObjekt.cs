@@ -113,7 +113,7 @@ namespace ToDe
 
     internal class Exploze : AnimovanyHerniObjekt
     {
-        public Exploze(Raketa raketa) : base(Zdroje.Textury.Exploze, 8, 6)
+        public Exploze(Raketa raketa) : base(Zdroje.Obsah.Exploze, 8, 6)
         {
             Pozice = raketa.Pozice;
             UhelOtoceni = TDUtils.RND.Next(360);
@@ -265,7 +265,7 @@ namespace ToDe
 
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
-                var rozmery = Zdroje.Textury.Pismo.MeasureString(Text) * Meritko;
+                var rozmery = Zdroje.Obsah.Pismo.MeasureString(Text) * Meritko;
                 Stred = new Vector2(PoziceVNabidce < 0 ? rozmery.X : 0, rozmery.Y * 0.5f);
                 Pozice = new Vector2((PoziceVNabidce < 0 
                                         ? Zdroje.Aktualni.Level.Mapa.Sloupcu - 0.1f 
@@ -285,7 +285,7 @@ namespace ToDe
         {
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
-                sb.DrawString(Zdroje.Textury.Pismo, Text, Pozice, Color.White, 
+                sb.DrawString(Zdroje.Obsah.Pismo, Text, Pozice, Color.White, 
                     UhelOtoceni, Stred, Meritko, SpriteEffects.None, 0);
             } else
                 base.Draw(sb);
@@ -308,12 +308,14 @@ namespace ToDe
             SouradniceNaMape = souradniceNaMape;
             Pozice = new Vector2((souradniceNaMape.X + 0.5f) * Zdroje.VelikostDlazdice,
                                  (souradniceNaMape.Y + 0.5f) * Zdroje.VelikostDlazdice);
+            UhelOtoceni = TDUtils.RND.Next(360);
             return this;
         }
 
         public override void Update(float elapsedSeconds)
         {
             base.Update(elapsedSeconds);
+            Strelba = false;
             if (SekundDoDalsihoVystrelu > 0)
                 SekundDoDalsihoVystrelu -= elapsedSeconds;
 
@@ -327,8 +329,7 @@ namespace ToDe
                 Vystrel();
                 Strelba = true;
                 SekundDoDalsihoVystrelu = SekundMeziVystrely;
-            } else 
-                Strelba = false;
+            }
         }
 
         protected abstract void Vystrel();

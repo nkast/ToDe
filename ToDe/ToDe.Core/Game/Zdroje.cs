@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -30,18 +31,48 @@ namespace ToDe
         Doleva = 180,
     }
 
-    internal class Textury
+    internal class Zvuk
+    {
+        public SoundEffect ZvukovyEfekt { get; private set; }
+        public ushort PocetSoubeznychPrehrani { get; internal set; }
+        public float ChranenaCastZvuku { get; internal set; } // Část zvuku (%) po kterou nesmí začít hrát další zvuk
+
+        List<float> ZacatkyPrehravani;
+
+        public Zvuk(SoundEffect zvukovyEfekt, ushort pocetSoubeznychPrehrani = 3, float chranenaCastZvuku = 1)
+        {
+            ZvukovyEfekt = zvukovyEfekt;
+            ChranenaCastZvuku = chranenaCastZvuku;
+            PocetSoubeznychPrehrani = pocetSoubeznychPrehrani;
+            ZacatkyPrehravani = new List<float>();
+        }
+
+        public void HrajZvuk(float aktualniCasHry)
+        {
+            ZacatkyPrehravani.RemoveAll(x => x + ZvukovyEfekt.Duration.TotalSeconds * ChranenaCastZvuku < aktualniCasHry);
+            if (ZacatkyPrehravani.Count < PocetSoubeznychPrehrani)
+            {
+                ZvukovyEfekt.Play();
+                ZacatkyPrehravani.Add(aktualniCasHry);
+            }
+        }
+    }
+
+    internal class Obsah
     {
         public Texture2D Zakladni { get; internal set; }
         public Texture2D Exploze { get; internal set; }
         public SpriteFont Pismo { get; internal set; }
+        public Zvuk ZvukRaketaStart { get; internal set; }
+        public Zvuk ZvukRaketaDopad { get; internal set; }
+        public Zvuk ZvukKulomet { get; internal set; }
     }
 
-    internal class Zdroje // TODO: přejmenovat
+    internal class Zdroje 
     {
         public static Zdroje Aktualni { get; private set; }
 
-        public static Textury Textury { get; internal set; }
+        public static Obsah Obsah { get; internal set; }
 
         public const int VelikostDlazdice = 128;
 

@@ -5,7 +5,12 @@ VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDe.UWP", "ToDe.UWP\ToDe.UWP.csproj", "{006562EF-287A-4A01-9DDF-7F6F6F8E2A90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDe.Core", "ToDe.Core\ToDe.Core.csproj", "{D60F827A-6168-43BA-88AE-05FA56C61FF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToDe.Core", "ToDe.Core\ToDe.Core.csproj", "{D60F827A-6168-43BA-88AE-05FA56C61FF5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6812CF14-0501-45E2-B318-FBE842E4D071}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
