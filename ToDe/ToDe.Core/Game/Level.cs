@@ -21,14 +21,23 @@ namespace ToDe
 
         public static DlazdiceUrceni[] DlazdiceZTypu(TypNepritele typ)
         {
-            if (typ == TypNepritele.Vojak1)
-                return new[] { new DlazdiceUrceni(17, 10, 0.1f) };
-            if (typ == TypNepritele.Vojak2)
+            if (typ == TypNepritele.Parasutista)
                 return new[] { new DlazdiceUrceni(15, 10, 0.101f) };
-            if (typ == TypNepritele.Tank1)
+            if (typ == TypNepritele.Robot)
+                return new[] { new DlazdiceUrceni(16, 10, 0.101f) };
+            if (typ == TypNepritele.Vojak)
+                return new[] { new DlazdiceUrceni(17, 10, 0.1f) };
+            if (typ == TypNepritele.Ufon)
+                return new[] { new DlazdiceUrceni(18, 10, 0.1f) };
+            if (typ == TypNepritele.Tank)
                 return new[] { 
                     new DlazdiceUrceni(15, 11, 0.11f),
                     new DlazdiceUrceni(15, 12, 0.111f),
+                };
+            if (typ == TypNepritele.TankPoustni)
+                return new[] {
+                    new DlazdiceUrceni(16, 11, 0.11f),
+                    new DlazdiceUrceni(16, 12, 0.111f),
                 };
             return null;
         }
@@ -49,9 +58,12 @@ namespace ToDe
 
     public enum TypNepritele
     {
-        Vojak1,
-        Vojak2,
-        Tank1,
+        Parasutista,
+        Robot,
+        Vojak,
+        Ufon,
+        Tank,
+        TankPoustni,
     }
 
     public enum TypVeze
@@ -65,6 +77,9 @@ namespace ToDe
         public TypDlazdice[,] Pozadi { get; private set; }
         public int Radku { get => Pozadi.GetLength(0); }
         public int Sloupcu { get => Pozadi.GetLength(1); }
+
+        public GrafikaDlazdice TexturaPlochy { get; set; }
+        public GrafikaDlazdice TexturaCesty { get; set; }
 
         public Point Start { get; private set; }
         public Point Cil { get; private set; }
@@ -112,6 +127,11 @@ namespace ToDe
         public static LevelMapa NactiMapu(XElement eMapa)
         {
             var mapa = new LevelMapa();
+            mapa.TexturaPlochy = (GrafikaDlazdice)Enum.Parse(typeof(GrafikaDlazdice),
+                eMapa.Attribute("texturaPlochy") == null ? nameof(GrafikaDlazdice.Trava) : eMapa.Attribute("texturaPlochy").Value);
+            mapa.TexturaCesty = (GrafikaDlazdice)Enum.Parse(typeof(GrafikaDlazdice),
+                eMapa.Attribute("texturaCesty") == null ? nameof(GrafikaDlazdice.Kameni) : eMapa.Attribute("texturaCesty").Value);
+
             var radkyMapy = new List<string>();
             int? sloupcu = null;
             // Načtení mapy
@@ -148,11 +168,11 @@ namespace ToDe
         {
             switch (tile)
             {
-                case '.': return TypDlazdice.Ground;
-                case 'S': mapa.Start = new Point(j, i); return TypDlazdice.Road;
-                case 'E': mapa.Cil = new Point(j, i); return TypDlazdice.Road;
-                case '*': return TypDlazdice.Road;
-                default: return TypDlazdice.Ground;
+                case '.': return TypDlazdice.Plocha;
+                case 'S': mapa.Start = new Point(j, i); return TypDlazdice.Cesta;
+                case 'E': mapa.Cil = new Point(j, i); return TypDlazdice.Cesta;
+                case '*': return TypDlazdice.Cesta;
+                default: return TypDlazdice.Plocha;
             }
         }
 
@@ -179,7 +199,7 @@ namespace ToDe
         bool NajdiCestuProhledejPole(Point souradnice, List<Point> navstivenePozice)
         {
             if (souradnice.X < 0 || souradnice.Y < 0 || souradnice.X >= Sloupcu || souradnice.Y >= Radku ||
-                navstivenePozice.Contains(souradnice) || Pozadi[souradnice.Y, souradnice.X] != TypDlazdice.Road)
+                navstivenePozice.Contains(souradnice) || Pozadi[souradnice.Y, souradnice.X] != TypDlazdice.Cesta)
                 return false;
 
             navstivenePozice.Add(souradnice);
@@ -198,11 +218,22 @@ namespace ToDe
             return false;
         }
 
-        public Dictionary<TypDlazdice, DlazdiceUrceni> TypNaDlazici { get; private set; }
-            = new Dictionary<TypDlazdice, DlazdiceUrceni>() {
-                        { TypDlazdice.Ground, new DlazdiceUrceni(19, 6) },
-                        { TypDlazdice.Road, new DlazdiceUrceni(21, 6) },
+
+        static Dictionary<GrafikaDlazdice, DlazdiceUrceni> grafikaNaDlazdici =
+            new Dictionary<GrafikaDlazdice, DlazdiceUrceni>() {
+                { GrafikaDlazdice.Trava, new DlazdiceUrceni(19, 6)  },
+                { GrafikaDlazdice.Hlina, new DlazdiceUrceni(20, 6)  },
+                { GrafikaDlazdice.Kameni, new DlazdiceUrceni(21, 6)  },
+                { GrafikaDlazdice.Pisek, new DlazdiceUrceni(22, 6)  },
             };
+
+        Dictionary<TypDlazdice, DlazdiceUrceni> typNaDlazici;
+        public Dictionary<TypDlazdice, DlazdiceUrceni> TypNaDlazici { get => typNaDlazici ??
+            (typNaDlazici = new Dictionary<TypDlazdice, DlazdiceUrceni>() {
+                        { TypDlazdice.Plocha, grafikaNaDlazdici[TexturaPlochy] },
+                        { TypDlazdice.Cesta, grafikaNaDlazdici[TexturaCesty] },
+            });
+        }
 
         public DlazdiceUrceni MezeDlazdice(int i, int j)
             => TypNaDlazici[Pozadi[i, j]];

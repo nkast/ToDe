@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <level>
-	<mapa>
+  <mapa texturaPlochy="Trava" texturaCesty="Hlina">
 ...............
 ....*******....
 ...**.....*....
@@ -13,15 +13,15 @@ S*.....*******E
 	</mapa>
 	<vlny>
 		<vlna odstup="2">
-      <jednotka typ="Vojak1" pocet="1" rozestup="5" zdravi="1" rychlost="0.4" sila="0.05" />
-      <jednotka typ="Tank1" pocet="4" rozestup="5" zdravi="2" rychlost="0.4" sila="0.2" odstup="2.5" />
+      <jednotka typ="Vojak" pocet="1" rozestup="5" zdravi="1" rychlost="0.4" sila="0.05" />
+      <jednotka typ="Tank" pocet="4" rozestup="5" zdravi="2" rychlost="0.4" sila="0.2" odstup="2.5" />
     </vlna>
     <vlna odstup="10">
-			<jednotka typ="Vojak1" pocet="5" rozestup="4" zdravi="1.1" rychlost="0.5" sila="0.07" odstup="0" />
-			<jednotka typ="Vojak2" pocet="5" rozestup="4" zdravi="1.1" rychlost="0.5" sila="0.07" odstup="2" />
+			<jednotka typ="Vojak" pocet="5" rozestup="4" zdravi="1.1" rychlost="0.5" sila="0.07" odstup="0" />
+			<jednotka typ="Parasutista" pocet="5" rozestup="4" zdravi="1.1" rychlost="0.5" sila="0.07" odstup="2" />
 		</vlna>
 		<vlna odstup="15">
-			<jednotka typ="Vojak1" pocet="15" rozestup="1" zdravi="1.5" rychlost="0.7" sila="0.1" />
+			<jednotka typ="Robot" pocet="15" rozestup="1" zdravi="1.5" rychlost="0.7" sila="0.1" />
 		</vlna>
 	</vlny>
 	<veze>

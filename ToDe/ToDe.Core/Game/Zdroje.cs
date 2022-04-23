@@ -11,8 +11,8 @@ namespace ToDe
 {
     internal enum TypDlazdice
     {
-        Ground,
-        Road,
+        Plocha,
+        Cesta,
         //GR_DR,
         //GR_D,
         //GR_DL,
@@ -21,6 +21,14 @@ namespace ToDe
         //GR_TR,
         //GR_T,
         //GR_TL,
+    }
+
+    internal enum GrafikaDlazdice
+    {
+       Trava,
+       Hlina,
+       Kameni,
+       Pisek,
     }
 
     public enum KamJit
@@ -85,19 +93,28 @@ namespace ToDe
 
         private Zdroje() { }
 
-        public static Zdroje NactiLevel(int cisloMapy)
+        public static Zdroje NactiLevel(ref int cisloMapy)
         {
             // Načtení streamu
             string soubor = string.Format("Content/Levels/Level{0}.xml", cisloMapy);
+
             var mapa = new Zdroje();
             mapa.Level = new Level();
             mapa.Level.Cislo = cisloMapy;
             Aktualni = mapa;
 
             XDocument doc;
-            using (Stream fileStream = TitleContainer.OpenStream(soubor))
+            try
+            {
+                using (Stream fileStream = TitleContainer.OpenStream(soubor))
                     doc = XDocument.Load(fileStream);
-            mapa.Level = Level.Nacti(doc.Root);
+                mapa.Level = Level.Nacti(doc.Root);
+            }
+            catch (Exception)
+            {
+                cisloMapy = 1;
+                mapa = NactiLevel(ref cisloMapy);
+            }
 
             return mapa;
         }

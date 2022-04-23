@@ -85,7 +85,7 @@ namespace ToDe
             exploze.Clear();
 
             // Načtení levelu
-            aktualniMapa = Zdroje.NactiLevel(Zdroje.CisloLevelu);
+            aktualniMapa = Zdroje.NactiLevel(ref Zdroje.CisloLevelu);
 
             // Nastavení hry
             zdravi = 1;
@@ -210,7 +210,7 @@ namespace ToDe
                             (int)poziceKliknuti.X / Zdroje.VelikostDlazdice,
                             (int)poziceKliknuti.Y / Zdroje.VelikostDlazdice
                         );
-                    if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Ground &&
+                    if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Plocha &&
                         !veze.Any(x => x.SouradniceNaMape == souradniceNaMape))
                     {
                         var typ = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky;

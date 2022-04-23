@@ -17,14 +17,13 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * ~~Pauza~~
 * ~~Prohra (GameOver)~~
 * ~~Načtení 2 a dalších levlů (výhra)~~
-* V Level.xml možnost definovat i parametry raket
-* Přepínání textur u levelů
+* ~~Přepínání textur u levelů~~
+* ~~Další typy jednotek~~
 * Upravit texturu, aby každá dlaždice měla okolo sebe z každé strany 1px navíc
-* Další typy jednotek
 * Ukazatel zdraví nepřátel
 * Hudba
-* Postupně zpřístupňované věže (počty)
-* Možnost upgrade věží
+* Postupně zpřístupňované věže (počty) / ekonomika
+* Možnost upgrade věží, možnost definovat i parametry raket
 * Pozadí u panelu s nabídkou
 * Lepší ovládací prvek pro panel nabídky
 * Jiná textura na explozi

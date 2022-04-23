@@ -250,10 +250,6 @@ namespace ToDe
 
             if (TypPolozky == TypPolozkyNabidky.Text) return; // Text se řeší v předchozím příkazu
 
-            //short poziceVNabidce = PoziceVNabidce;
-            //if (poziceVNabidce < 0)
-            //    poziceVNabidce = (short)(Zdroje.Aktualni.Level.Mapa.Sloupcu + poziceVNabidce);
-
             // Pozice - levý horní roh dlaždice
             var pozice = new Point((PoziceVNabidce >= 0 ? PoziceVNabidce :
                                 Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce) * Zdroje.VelikostDlazdice,
@@ -273,11 +269,6 @@ namespace ToDe
                         Vyber.Viditelny = true;
                         Vyber.PoziceVNabidce = PoziceVNabidce;
                         Vyber.Pozice = Pozice;
-                        //poziceVNabidce = PoziceVNabidce;
-                        //if (poziceVNabidce < 0)
-                        //    poziceVNabidce = (short)(Zdroje.Aktualni.Level.Mapa.Sloupcu + poziceVNabidce);
-                        //Vyber.Pozice = new Vector2((poziceVNabidce + 0.5f) * Zdroje.VelikostDlazdice,
-                        //                (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
                     }
                 }
             }
@@ -370,7 +361,7 @@ namespace ToDe
             DosahStrelby = Zdroje.VelikostDlazdice * 2.1f;
             RychlostRotace = 90;
             SekundMeziVystrely = 0.5f;
-            SilaStrely = 0.01f;
+            SilaStrely = 0.05f;
         }
 
         protected override void Vystrel()
@@ -394,7 +385,7 @@ namespace ToDe
             DosahStrelby = Zdroje.VelikostDlazdice * 4.1f;
             RychlostRotace = 45;
             SekundMeziVystrely = 2f;
-            SilaStrely = 0.3f;
+            SilaStrely = 0.34f;
             DosahExploze = Zdroje.VelikostDlazdice * 1.5f;
         }
 
