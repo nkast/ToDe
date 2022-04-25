@@ -113,7 +113,7 @@ namespace ToDe
 
     internal class Exploze : AnimovanyHerniObjekt
     {
-        public Exploze(Raketa raketa) : base(Zdroje.Obsah.Exploze, 8, 6)
+        public Exploze(Raketa raketa) : base(Zdroje.Obsah.Exploze.Grafika, 8, 6)
         {
             Pozice = raketa.Pozice;
             UhelOtoceni = TDUtils.RND.Next(360);
@@ -215,20 +215,20 @@ namespace ToDe
             // Grafika netextových typů
             if (TypPolozky == TypPolozkyNabidky.VezKulomet)
                 Dlazdice = new[] { 
-                    new DlazdiceUrceni(19,  7, 0.0f, false),
-                    new DlazdiceUrceni(19, 10, 0.1f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Zakladna_1, 0.0f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Kulomet_1, 0.1f, false),
                 };
             else if (TypPolozky == TypPolozkyNabidky.VezRaketa)
                 Dlazdice = new[] {
-                    new DlazdiceUrceni(20, 7, 0.0f, false),
-                    new DlazdiceUrceni(22, 8, 0.2f, false),
-                    new DlazdiceUrceni(22, 9, 0.5f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Zakladna_2, 0.0f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Stred, 0.2f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Vrsek, 0.5f, false),
                 };
             else if (TypPolozky == TypPolozkyNabidky.Pauza)
-                Dlazdice = new[] { new DlazdiceUrceni(18, 0, 0.0f, false), };
+                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Pauza, 0.0f, false), };
             else if (TypPolozky == TypPolozkyNabidky.Vyber)
             {
-                Dlazdice = new[] { new DlazdiceUrceni(15, 0, 0.9f, false) };
+                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Vyber, 0.9f, false) };
             }
 
             // Nastavení měřítka textu a výběrovému políčku
@@ -355,8 +355,8 @@ namespace ToDe
         {
             UhelKorkceObrazku = 90;
             Dlazdice = new[] {
-                new DlazdiceUrceni(19,  7, 0.1f, false),
-                new DlazdiceUrceni(19, 10, 0.2f, true),
+                new DlazdiceUrceni(ZakladniDlazdice.Vez_Zakladna_1, 0.1f, false),
+                new DlazdiceUrceni(ZakladniDlazdice.Vez_Kulomet_1, 0.2f, true),
             };
             DosahStrelby = Zdroje.VelikostDlazdice * 2.1f;
             RychlostRotace = 90;
@@ -378,9 +378,9 @@ namespace ToDe
         {
             UhelKorkceObrazku = 90;
             Dlazdice = new[] {
-                    new DlazdiceUrceni(20, 7, 0.1f, false),
-                    new DlazdiceUrceni(22, 8, 0.2f, true),
-                    new DlazdiceUrceni(22, 9, 0.5f, true),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Zakladna_2, 0.1f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Stred, 0.2f, true),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Vrsek, 0.5f, true),
                 };
             DosahStrelby = Zdroje.VelikostDlazdice * 4.1f;
             RychlostRotace = 45;
@@ -414,7 +414,7 @@ namespace ToDe
         public Raketa(VezRaketa vez)
         {
             this.vez = vez;
-            Dlazdice = new[] { new DlazdiceUrceni(22, 10, 0.4f) };
+            Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Raketa_1, 0.4f) };
             RychlostPohybu = Zdroje.VelikostDlazdice * 2.0f;
             UhelKorkceObrazku = 90;
             SilaStrely = vez.SilaStrely;
@@ -474,7 +474,7 @@ namespace ToDe
     {
         public Dira()
         {
-            Dlazdice = new[] { new DlazdiceUrceni(21, 0, 0.000001f) };
+            Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Dira, 0.000001f) };
             RychlostMizeni = (float)(TDUtils.RND.NextDouble() * 0.3 + 0.1);
             UhelOtoceni = TDUtils.RND.Next(360);
         }
@@ -487,7 +487,7 @@ namespace ToDe
         public PlamenStrelby(VezKulomet vez)
         {
             this.vez = vez;
-            Dlazdice = new[] { new DlazdiceUrceni(21, 12, 0.61f) };
+            Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Ohen_Kulomet, 0.61f) };
             RychlostMizeni = Math.Max(1 / vez.SekundMeziVystrely, 2.0f);
             UhelKorkceObrazku = 90;
             Meritko = 0.5f;

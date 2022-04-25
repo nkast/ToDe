@@ -22,22 +22,22 @@ namespace ToDe
         public static DlazdiceUrceni[] DlazdiceZTypu(TypNepritele typ)
         {
             if (typ == TypNepritele.Parasutista)
-                return new[] { new DlazdiceUrceni(15, 10, 0.101f) };
+                return new[] { new DlazdiceUrceni(ZakladniDlazdice.Vojak_Parasutista, 0.101f) };
             if (typ == TypNepritele.Robot)
-                return new[] { new DlazdiceUrceni(16, 10, 0.101f) };
+                return new[] { new DlazdiceUrceni(ZakladniDlazdice.Vojak_Robot, 0.101f) };
             if (typ == TypNepritele.Vojak)
-                return new[] { new DlazdiceUrceni(17, 10, 0.1f) };
+                return new[] { new DlazdiceUrceni(ZakladniDlazdice.Vojak_Vojak, 0.1f) };
             if (typ == TypNepritele.Ufon)
-                return new[] { new DlazdiceUrceni(18, 10, 0.1f) };
+                return new[] { new DlazdiceUrceni(ZakladniDlazdice.Vojak_Ufon, 0.1f) };
             if (typ == TypNepritele.Tank)
                 return new[] { 
-                    new DlazdiceUrceni(15, 11, 0.11f),
-                    new DlazdiceUrceni(15, 12, 0.111f),
+                    new DlazdiceUrceni(ZakladniDlazdice.Tank_Spodek, 0.11f),
+                    new DlazdiceUrceni(ZakladniDlazdice.Tank_Vrsek, 0.111f),
                 };
             if (typ == TypNepritele.TankPoustni)
                 return new[] {
-                    new DlazdiceUrceni(16, 11, 0.11f),
-                    new DlazdiceUrceni(16, 12, 0.111f),
+                    new DlazdiceUrceni(ZakladniDlazdice.Tank_Poustni_Spodek, 0.11f),
+                    new DlazdiceUrceni(ZakladniDlazdice.Tank_Poustni_Vrsek, 0.111f),
                 };
             return null;
         }
@@ -85,6 +85,7 @@ namespace ToDe
         public Point Cil { get; private set; }
 
         public int VelikostDlazdice => Zdroje.VelikostDlazdice;
+        public int OkrajDlazdice => Zdroje.Obsah.Zakladni.Okraj;
 
         public List<Point> TrasaPochodu { get; private set; }
         public Vector2 PoziceNaTrase(int indexCilovy)
@@ -221,10 +222,10 @@ namespace ToDe
 
         static Dictionary<GrafikaDlazdice, DlazdiceUrceni> grafikaNaDlazdici =
             new Dictionary<GrafikaDlazdice, DlazdiceUrceni>() {
-                { GrafikaDlazdice.Trava, new DlazdiceUrceni(19, 6)  },
-                { GrafikaDlazdice.Hlina, new DlazdiceUrceni(20, 6)  },
-                { GrafikaDlazdice.Kameni, new DlazdiceUrceni(21, 6)  },
-                { GrafikaDlazdice.Pisek, new DlazdiceUrceni(22, 6)  },
+                { GrafikaDlazdice.Trava, new DlazdiceUrceni(ZakladniDlazdice.Mapa_Trava)  },
+                { GrafikaDlazdice.Hlina, new DlazdiceUrceni(ZakladniDlazdice.Mapa_Hlina)  },
+                { GrafikaDlazdice.Kameni, new DlazdiceUrceni(ZakladniDlazdice.Mapa_Kameni)  },
+                { GrafikaDlazdice.Pisek, new DlazdiceUrceni(ZakladniDlazdice.Mapa_Pisek)  },
             };
 
         Dictionary<TypDlazdice, DlazdiceUrceni> typNaDlazici;
@@ -239,7 +240,7 @@ namespace ToDe
             => TypNaDlazici[Pozadi[i, j]];
 
         public Rectangle CilDlazdice(int i, int j)
-            => new Rectangle(j * VelikostDlazdice, i * VelikostDlazdice, VelikostDlazdice, VelikostDlazdice);
+            => new Rectangle(j* VelikostDlazdice, i* VelikostDlazdice, VelikostDlazdice, VelikostDlazdice);           
     }
 
     internal class PolozkaPlanuVln

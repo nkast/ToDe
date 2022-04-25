@@ -50,8 +50,6 @@ namespace ToDe
 
             // Načtení zdrojů
             Zdroje.Obsah = new Obsah() {
-                Zakladni = Content.Load<Texture2D>(@"Sprites/Basic"),
-                Exploze = Content.Load<Texture2D>(@"Sprites/exploze"),
                 Pismo = Content.Load<SpriteFont>(@"Fonts/Pismo"),
                 ZvukKulomet = new Zvuk(Content.Load<SoundEffect>(@"Sounds/vez_kulomet"), 2),
                 ZvukRaketaStart = new Zvuk(Content.Load<SoundEffect>(@"Sounds/raketa_start"), 3, 0.75f),
@@ -59,6 +57,8 @@ namespace ToDe
                 ZvukKonecVyhra = new Zvuk(Content.Load<SoundEffect>(@"Sounds/konec_vyhra"), 1),
                 ZvukKonecProhra = new Zvuk(Content.Load<SoundEffect>(@"Sounds/konec_prohra"), 1),
             };
+            Zdroje.Obsah.Zakladni.Grafika = Content.Load<Texture2D>(@"Sprites/textura-vyber");
+            Zdroje.Obsah.Exploze.Grafika = Content.Load<Texture2D>(@"Sprites/exploze");
 
             SpustitHru();
            
@@ -320,9 +320,8 @@ namespace ToDe
             // Vykreslení pozadí mapy
             for (int i = 0; i < aktualniMapa.Level.Mapa.Radku; i++)
                 for (int j = 0; j < aktualniMapa.Level.Mapa.Sloupcu; j++)
-                {
-                    spriteBatch.Kresli(aktualniMapa.Level.Mapa.CilDlazdice(i, j), aktualniMapa.Level.Mapa.MezeDlazdice(i, j), Vector2.Zero);
-                }
+                    spriteBatch.Kresli(aktualniMapa.Level.Mapa.CilDlazdice(i, j), 
+                                       aktualniMapa.Level.Mapa.MezeDlazdice(i, j), Vector2.Zero);
 
             // Vykreslování seznamů
             nepratele.ForEach(x => x.Draw(spriteBatch));

@@ -24,9 +24,9 @@ namespace ToDe
 
             int vd = velikostDlazdice ?? Zdroje.VelikostDlazdice;
 
-            sb.Draw(textura ?? Zdroje.Obsah.Zakladni,
+            sb.Draw(textura ?? Zdroje.Obsah.Zakladni.Grafika,
                   position: pozice,
-                  sourceRectangle: new Rectangle(dlazdice.X * vd, dlazdice.Y * vd, vd, vd),
+                  sourceRectangle: dlazdice.VyrezTextury(), //new Rectangle(dlazdice.X * vd, dlazdice.Y * vd, vd, vd),
                   rotation: MathHelper.ToRadians(uhelOtoceni),
                   origin: stred ?? new Vector2(vd * 0.5f),
                   scale: meritko,
@@ -47,7 +47,7 @@ namespace ToDe
             Texture2D textura = null
             )
         {
-            sb.Draw(textura ?? Zdroje.Obsah.Zakladni,
+            sb.Draw(textura ?? Zdroje.Obsah.Zakladni.Grafika,
                   position: pozice,
                   sourceRectangle: vyrezZTextury,
                   rotation: MathHelper.ToRadians(uhelOtoceni),
@@ -73,9 +73,9 @@ namespace ToDe
            
             int vd = velikostDlazdice ?? Zdroje.VelikostDlazdice;
 
-            sb.Draw(textura ?? Zdroje.Obsah.Zakladni,
+            sb.Draw(textura ?? Zdroje.Obsah.Zakladni.Grafika,
                   destinationRectangle: cil,
-                  sourceRectangle: new Rectangle(dlazdice.X * vd, dlazdice.Y * vd, vd, vd),
+                  sourceRectangle: dlazdice.VyrezTextury(), //new Rectangle(dlazdice.X * vd, dlazdice.Y * vd, vd, vd),
                   rotation: MathHelper.ToRadians(uhelOtoceni),
                   origin: stred ?? new Vector2(vd * 0.5f),
                   effects: efekt,
@@ -106,6 +106,18 @@ namespace ToDe
 
         public DlazdiceUrceni(int x, int y, float z = 0, bool otacet = true) 
             => (X, Y, Z, Otacet, Vykreslovat) = (x, y, z, otacet, true);
+        public DlazdiceUrceni(Point souradnice, float z = 0, bool otacet = true)
+            => (X, Y, Z, Otacet, Vykreslovat) = (souradnice.X, souradnice.Y, z, otacet, true);
+        public DlazdiceUrceni(ZakladniDlazdice zd, float z = 0, bool otacet = true)
+        {
+            var souradnice = Zdroje.Obsah.Zakladni.SouradniceDlazdice(zd);
+            (X, Y, Z, Otacet, Vykreslovat) = (souradnice.X, souradnice.Y, z, otacet, true);
+        }
+
+        public Rectangle VyrezTextury()
+            => new Rectangle(X * (Zdroje.Obsah.Zakladni.VelikostDlazdice + 2 * Zdroje.Obsah.Zakladni.Okraj) + Zdroje.Obsah.Zakladni.Okraj,
+                             Y * (Zdroje.Obsah.Zakladni.VelikostDlazdice + 2 * Zdroje.Obsah.Zakladni.Okraj) + Zdroje.Obsah.Zakladni.Okraj,
+                             Zdroje.Obsah.Zakladni.VelikostDlazdice, Zdroje.Obsah.Zakladni.VelikostDlazdice);
     }
 
     internal static class Rozsireni {

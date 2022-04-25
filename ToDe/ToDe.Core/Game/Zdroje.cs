@@ -66,25 +66,15 @@ namespace ToDe
         }
     }
 
-    internal class Obsah
-    {
-        public Texture2D Zakladni { get; internal set; }
-        public Texture2D Exploze { get; internal set; }
-        public SpriteFont Pismo { get; internal set; }
-        public Zvuk ZvukRaketaStart { get; internal set; }
-        public Zvuk ZvukRaketaDopad { get; internal set; }
-        public Zvuk ZvukKulomet { get; internal set; }
-        public Zvuk ZvukKonecVyhra { get; internal set; }
-        public Zvuk ZvukKonecProhra { get; internal set; }
-    }
 
-    internal class Zdroje 
+
+    internal class Zdroje
     {
         public static Zdroje Aktualni { get; private set; }
 
         public static Obsah Obsah { get; internal set; }
 
-        public const int VelikostDlazdice = 128;
+        public static int VelikostDlazdice { get => (int)Obsah.Zakladni.VelikostDlazdice; }
         
         public static int CisloLevelu = 1;
 

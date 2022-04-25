@@ -19,15 +19,16 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * ~~Načtení 2 a dalších levlů (výhra)~~
 * ~~Přepínání textur u levelů~~
 * ~~Další typy jednotek~~
-* Upravit texturu, aby každá dlaždice měla okolo sebe z každé strany 1px navíc
+* ~~Upravit texturu, aby každá dlaždice měla okolo sebe z každé strany 1px navíc~~
 * Ukazatel zdraví nepřátel
-* Hudba
 * Postupně zpřístupňované věže (počty) / ekonomika
+* Hudba
 * Možnost upgrade věží, možnost definovat i parametry raket
 * Pozadí u panelu s nabídkou
 * Lepší ovládací prvek pro panel nabídky
 * Jiná textura na explozi
 * Další typy věží
+* Letadlo pouští parašutisty v půlce cesty
 * Store
 
 
@@ -39,6 +40,7 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 ## Použité zdroje
 * [Monogame](https://www.monogame.net)
 * Textura: Kenney Tower Defense assets: [opengameart.org](https://opengameart.org/content/tower-defense-300-tilessprites), [kenney.nl](https://www.kenney.nl/assets/tower-defense-top-down)
+* Úprava textur: [SpriteSheetPacker](https://github.com/PetrVobornik/SpriteSheetPacker), upraveno od [Kelly Gravelyn](https://github.com/kellygravelyn/SpriteSheetPacker)
 * Inspirace projekty
     * [Hra Asteroidy](https://github.com/PetrVobornik/prednasky/tree/master/Xamarin.Forms/09-Hra)
     * [Herní smyčka ve WPF](https://www.youtube.com/playlist?list=PLxTqV9i8bnb_jTFqFLAE2cnB6ec6u6N5T)
