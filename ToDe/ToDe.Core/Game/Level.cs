@@ -65,6 +65,14 @@ namespace ToDe
         TankPoustni,
     }
 
+    public enum KamJit
+    {
+        Nahoru = 270,
+        Doprava = 0,
+        Dolu = 90,
+        Doleva = 180,
+    }
+
     internal class LevelMapa
     {
         public TypDlazdice[,] Pozadi { get; private set; }

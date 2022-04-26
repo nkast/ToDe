@@ -9,65 +9,6 @@ using System.Xml.Linq;
 
 namespace ToDe
 {
-    internal enum TypDlazdice
-    {
-        Plocha,
-        Cesta,
-        //GR_DR,
-        //GR_D,
-        //GR_DL,
-        //GR_R,
-        //GR_L,
-        //GR_TR,
-        //GR_T,
-        //GR_TL,
-    }
-
-    internal enum GrafikaDlazdice
-    {
-       Trava,
-       Hlina,
-       Kameni,
-       Pisek,
-    }
-
-    public enum KamJit
-    {
-        Nahoru = 270,
-        Doprava = 0,
-        Dolu = 90,
-        Doleva = 180,
-    }
-
-    internal class Zvuk
-    {
-        public SoundEffect ZvukovyEfekt { get; private set; }
-        public ushort PocetSoubeznychPrehrani { get; internal set; }
-        public float ChranenaCastZvuku { get; internal set; } // Část zvuku (%) po kterou nesmí začít hrát další zvuk
-
-        List<float> ZacatkyPrehravani;
-
-        public Zvuk(SoundEffect zvukovyEfekt, ushort pocetSoubeznychPrehrani = 3, float chranenaCastZvuku = 1)
-        {
-            ZvukovyEfekt = zvukovyEfekt;
-            ChranenaCastZvuku = chranenaCastZvuku;
-            PocetSoubeznychPrehrani = pocetSoubeznychPrehrani;
-            ZacatkyPrehravani = new List<float>();
-        }
-
-        public void HrajZvuk(float aktualniCasHry)
-        {
-            ZacatkyPrehravani.RemoveAll(x => x + ZvukovyEfekt.Duration.TotalSeconds * ChranenaCastZvuku < aktualniCasHry);
-            if (ZacatkyPrehravani.Count < PocetSoubeznychPrehrani)
-            {
-                ZvukovyEfekt.Play();
-                ZacatkyPrehravani.Add(aktualniCasHry);
-            }
-        }
-    }
-
-
-
     internal class Zdroje
     {
         public static Zdroje Aktualni { get; private set; }
@@ -108,7 +49,6 @@ namespace ToDe
 
             return mapa;
         }
-
       
     }
 }

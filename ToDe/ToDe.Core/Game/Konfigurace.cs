@@ -11,7 +11,7 @@ namespace ToDe
         Raketa,
     }
 
-    internal class Konfigurace
+    internal abstract class Konfigurace
     {
         public float SekundMeziVystrely { get; set; }
         public float RychlostRotace { get; set; }

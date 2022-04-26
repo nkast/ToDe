@@ -120,10 +120,10 @@ namespace ToDe
                              Zdroje.Obsah.Zakladni.VelikostDlazdice, Zdroje.Obsah.Zakladni.VelikostDlazdice);
     }
 
-    internal static class Rozsireni {
-        public static Rectangle Plus(this Rectangle rec, int plusX, int plusY, int plusSirka, int plusVyska)
-            => new Rectangle(rec.Left + plusX, rec.Top + plusY, rec.Width + plusSirka, rec.Height + plusVyska);
-    }
+    //internal static class Rozsireni {
+    //    public static Rectangle Plus(this Rectangle rec, int plusX, int plusY, int plusSirka, int plusVyska)
+    //        => new Rectangle(rec.Left + plusX, rec.Top + plusY, rec.Width + plusSirka, rec.Height + plusVyska);
+    //}
 
     internal static class TDUtils
     {
