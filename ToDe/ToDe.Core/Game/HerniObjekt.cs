@@ -279,16 +279,15 @@ namespace ToDe
         {
             base.Update(elapsedSeconds);
 
-            if (TypPolozky == TypPolozkyNabidky.Text)
-            {
-                var rozmery = Zdroje.Obsah.Pismo.MeasureString(Text);
-                Stred = new Vector2(PoziceVNabidce < 0 ? rozmery.X : 0, rozmery.Y * 0.5f);
-                Pozice = new Vector2((PoziceVNabidce < 0 
-                                        ? Zdroje.Aktualni.Level.Mapa.Sloupcu - 0.1f 
-                                        : PoziceVNabidce + 0.1f)
-                                     * Zdroje.VelikostDlazdice,
-                                    (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
-            }
+            if (TypPolozky != TypPolozkyNabidky.Text) return;
+
+            var rozmery = Zdroje.Obsah.Pismo.MeasureString(Text);
+            Stred = new Vector2(PoziceVNabidce < 0 ? rozmery.X : 0, rozmery.Y * 0.5f);
+            Pozice = new Vector2((PoziceVNabidce < 0 
+                                    ? Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce + 1 - 0.1f 
+                                    : PoziceVNabidce + 0.1f)
+                                    * Zdroje.VelikostDlazdice,
+                                (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
         }
 
 
@@ -316,6 +315,7 @@ namespace ToDe
         public Point SouradniceNaMape { get; set; }
         public Nepritel Cil { get; set; }
         public bool Strelba { get; private set; }
+        public ushort Uroven { get; private set; } = 1;
 
         public Vez UmistiVez(Point souradniceNaMape)
         {
@@ -358,10 +358,11 @@ namespace ToDe
                 new DlazdiceUrceni(ZakladniDlazdice.Vez_Zakladna_1, 0.1f, false),
                 new DlazdiceUrceni(ZakladniDlazdice.Vez_Kulomet_1, 0.2f, true),
             };
-            DosahStrelby = Zdroje.VelikostDlazdice * 2.1f;
-            RychlostRotace = 90;
-            SekundMeziVystrely = 0.5f;
-            SilaStrely = 0.05f;
+            var cfg = KonfiguraceVezKulomet.VychoziParametry;
+            DosahStrelby = cfg.DosahStrelby;
+            RychlostRotace = cfg.RychlostRotace;
+            SekundMeziVystrely = cfg.SekundMeziVystrely;
+            SilaStrely = cfg.SilaStrely;
         }
 
         protected override void Vystrel()
@@ -373,6 +374,7 @@ namespace ToDe
     internal class VezRaketa : Vez
     {
         public float DosahExploze { get; set; }
+        public float RychlostRakety { get; set; }
 
         public VezRaketa()
         {
@@ -382,11 +384,13 @@ namespace ToDe
                     new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Stred, 0.2f, true),
                     new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Vrsek, 0.5f, true),
                 };
-            DosahStrelby = Zdroje.VelikostDlazdice * 4.1f;
-            RychlostRotace = 45;
-            SekundMeziVystrely = 2f;
-            SilaStrely = 0.34f;
-            DosahExploze = Zdroje.VelikostDlazdice * 1.5f;
+            var cfg = KonfiguraceVezRaketa.VychoziParametry;
+            DosahStrelby = cfg.DosahStrelby;
+            RychlostRotace = cfg.RychlostRotace;
+            SekundMeziVystrely = cfg.SekundMeziVystrely;
+            SilaStrely = cfg.SilaStrely;
+            DosahExploze = cfg.DosahExploze;
+            RychlostRakety = cfg.RychlostRakety;
         }
 
         public override void Update(float elapsedSeconds)
@@ -413,10 +417,10 @@ namespace ToDe
 
         public Raketa(VezRaketa vez)
         {
+            UhelKorkceObrazku = 90;
             this.vez = vez;
             Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Raketa_1, 0.4f) };
-            RychlostPohybu = Zdroje.VelikostDlazdice * 2.0f;
-            UhelKorkceObrazku = 90;
+            RychlostPohybu = vez.RychlostRakety;
             SilaStrely = vez.SilaStrely;
             DosahExploze = vez.DosahExploze;
             //Meritko = 0.5f;

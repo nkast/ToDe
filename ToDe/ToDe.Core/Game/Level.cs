@@ -52,7 +52,6 @@ namespace ToDe
     internal class LevelVez
     {
         public TypVeze Typ { get; set; }
-        public int Pocet { get; set; }
         public short MaxUroven { get; set; }
     }
 
@@ -64,12 +63,6 @@ namespace ToDe
         Ufon,
         Tank,
         TankPoustni,
-    }
-
-    public enum TypVeze
-    {
-        Kulomet,
-        Raketa,
     }
 
     internal class LevelMapa
@@ -286,10 +279,16 @@ namespace ToDe
         public List<PolozkaPlanuVln> PlanPosilaniVln { get; set; }
         public LevelVez[] Veze { get; set; }
         public LevelMapa Mapa { get; set; }
+        public float Konto { get; set; }
+        public float RychlostBohatnuti { get; set; } // +$/s
 
         public static Level Nacti(XElement eLevel)
         {
             Level level = new Level();
+            // Finance
+            var eFin = eLevel.Element("finance");
+            level.Konto = (float)eFin.Attribute("vychozi");
+            level.RychlostBohatnuti = (float)eFin.Attribute("prirustek");
             // Načtení vln
             var vlny = new List<LevelVlna>();
             foreach (var eVlna in eLevel.Element("vlny").Elements())
@@ -322,7 +321,6 @@ namespace ToDe
             {
                 var vez = new LevelVez();
                 vez.Typ = (TypVeze)Enum.Parse(typeof(TypVeze), eVez.Attribute("typ").Value);
-                vez.Pocet = (int)eVez.Attribute("pocet");
                 vez.MaxUroven = (short)eVez.Attribute("maxUroven");
                 veze.Add(vez);
             }

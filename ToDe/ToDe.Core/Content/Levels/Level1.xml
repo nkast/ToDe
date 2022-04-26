@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <level>
+  <finance vychozi="1000" prirustek="8" />
   <mapa texturaPlochy="Trava" texturaCesty="Hlina">
 ...............
 ....*******....
@@ -25,7 +26,7 @@ S*.....*******E
 		</vlna>
 	</vlny>
 	<veze>
-		<vez typ="Kulomet" pocet="9" maxUroven="3" />
-		<vez typ="Raketa" pocet="6" maxUroven="3" />
+		<vez typ="Kulomet" maxUroven="3" />
+		<vez typ="Raketa" maxUroven="3" />
 	</veze>
 </level>

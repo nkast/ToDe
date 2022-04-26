@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <Folder Include="Content\bin\Sounds\" />
+    <Folder Include="Content\Data\" />
     <Folder Include="Content\Sounds\" />
   </ItemGroup>
 

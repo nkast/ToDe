@@ -39,9 +39,8 @@ namespace ToDe
             base.Initialize();
         }
 
-        ushort pocetVeziKluomet, pocetVeziRaketa;
         float zdravi;
-        PolozkaNabidky textPocetVeziKluomet, textPocetVeziRaketa, textZivotu;
+        PolozkaNabidky textPocetVeziKluomet, textPocetVeziRaketa, textZivotu, textFinance;
         Zdroje aktualniMapa;
         protected override void LoadContent()
         {
@@ -68,7 +67,11 @@ namespace ToDe
             nabidka.Add(new PolozkaNabidky(3, TypPolozkyNabidky.VezRaketa));
             nabidka.Add(textPocetVeziRaketa = new PolozkaNabidky(4, TypPolozkyNabidky.Text));
             nabidka.Add(new PolozkaNabidky(-3, TypPolozkyNabidky.Pauza));
+            nabidka.Add(textFinance = new PolozkaNabidky(-4, TypPolozkyNabidky.Text));
             nabidka.Add(textZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text));
+
+            textPocetVeziKluomet.Text = "$" + KonfiguraceVezKulomet.VychoziParametry.Cena.ToString();
+            textPocetVeziRaketa.Text = "$" + KonfiguraceVezRaketa.VychoziParametry.Cena.ToString();
 
             NastavTexty(true);
 
@@ -89,8 +92,6 @@ namespace ToDe
 
             // Nastavení hry
             zdravi = 1;
-            pocetVeziKluomet = (ushort)(aktualniMapa.Level.Veze.FirstOrDefault(x => x.Typ == TypVeze.Kulomet)?.Pocet ?? 0);
-            pocetVeziRaketa = (ushort)(aktualniMapa.Level.Veze.FirstOrDefault(x => x.Typ == TypVeze.Raketa)?.Pocet ?? 0);
 
             jeKonecHry = false;
             pauza = false;
@@ -99,9 +100,10 @@ namespace ToDe
         void NastavTexty(bool novyLevel = false)
         {
             // Texty do nabídky
-            textPocetVeziKluomet.Text = pocetVeziKluomet.ToString();
-            textPocetVeziRaketa.Text = pocetVeziRaketa.ToString();
-            
+            //textPocetVeziKluomet.Text = pocetVeziKluomet.ToString();
+            //textPocetVeziRaketa.Text = pocetVeziRaketa.ToString();
+            textFinance.Text = "$" + (Math.Floor(Zdroje.Aktualni.Level.Konto / 10.0)*10).ToString();
+
             int zbytekZivota = (int)Math.Round(zdravi * 100);
             if (zdravi < 0)
                 zbytekZivota = 0;
@@ -201,6 +203,7 @@ namespace ToDe
 
             if (!pauza)
             {
+                Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.RychlostBohatnuti * casOdMinule;
                 // Umístění věže na mapě
                 if (poziceKliknuti != Vector2.Zero &&
                     poziceKliknuti.X < Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice &&
@@ -215,17 +218,17 @@ namespace ToDe
                     {
                         var typ = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky;
 
-                        if (typ == TypPolozkyNabidky.VezKulomet && pocetVeziKluomet > 0)
+                        if (typ == TypPolozkyNabidky.VezKulomet &&  
+                            KonfiguraceVezKulomet.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
                         {
                             veze.Add((new VezKulomet()).UmistiVez(souradniceNaMape));
-                            pocetVeziKluomet--;
-                            textPocetVeziKluomet.Text = pocetVeziKluomet.ToString();
+                            Zdroje.Aktualni.Level.Konto -= KonfiguraceVezKulomet.VychoziParametry.Cena;
                         }
-                        else if (typ == TypPolozkyNabidky.VezRaketa && pocetVeziRaketa > 0)
+                        else if (typ == TypPolozkyNabidky.VezRaketa && 
+                                 KonfiguraceVezRaketa.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
                         {
                             veze.Add((new VezRaketa()).UmistiVez(souradniceNaMape));
-                            pocetVeziRaketa--;
-                            textPocetVeziRaketa.Text = pocetVeziRaketa.ToString();
+                            Zdroje.Aktualni.Level.Konto -= KonfiguraceVezRaketa.VychoziParametry.Cena;
                         }
                     }
                 }
@@ -298,6 +301,7 @@ namespace ToDe
                 mizejiciObjekty.RemoveAll(x => x.Smazat);
                 rakety.RemoveAll(x => x.Smazat);
                 exploze.RemoveAll(x => x.Smazat);
+                nabidka.ForEach(x => x.Update(casOdMinule));
             }
             base.Update(gameTime);
         }
