@@ -21,7 +21,7 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * ~~Další typy jednotek~~
 * ~~Upravit texturu, aby každá dlaždice měla okolo sebe z každé strany 1px navíc~~
 * ~~Postupně zpřístupňované věže (počty) / ekonomika~~
-* Ukazatel zdraví nepřátel
+* ~~Ukazatel zdraví nepřátel~~
 * Hudba
 * Možnost upgrade věží, možnost definovat i parametry raket
 * Pozadí u panelu s nabídkou

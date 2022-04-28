@@ -56,17 +56,25 @@ namespace ToDe
     {
         public Textura Zakladni { get; internal set; } = new Textura()
         {
-            VelikostDlazdice = 128,
+            VelikostDlazdice = new Point(128),
             Okraj = 1,
             Sloupcu = 8,
             Radku = 5,
         };
         public Textura Exploze { get; internal set; } = new Textura()
         {
-            VelikostDlazdice = 256,
+            VelikostDlazdice = new Point(256),
             Okraj = 0,
             Sloupcu = 8,
             Radku = 6,
+        };
+
+        public Textura Ukazatel { get; internal set; } = new Textura()
+        {
+            VelikostDlazdice = new Point(128, 13),
+            Okraj = 1,
+            Sloupcu = 1,
+            Radku = 2,
         };
         public SpriteFont Pismo { get; internal set; }
         public Zvuk ZvukRaketaStart { get; internal set; }
@@ -78,7 +86,7 @@ namespace ToDe
 
     internal class Textura
     {
-        public ushort VelikostDlazdice { get; set; }
+        public Point VelikostDlazdice { get; set; }
         public ushort Okraj { get; set; }
         public ushort Sloupcu { get; set; }
         public ushort Radku { get; set; }

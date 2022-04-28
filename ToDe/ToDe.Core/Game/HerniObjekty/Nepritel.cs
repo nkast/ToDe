@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,18 +9,25 @@ namespace ToDe
     internal class Nepritel : HerniObjekt
     {
         public float Zdravi { get; set; } = 1;
+        public float MaxZdravi { get; set; } = 1;
         public int IndexPoziceNaTrase { get; set; }
         public Vector2 SouradniceCile { get; set; }
         public float VzdalenostNaCeste { get; private set; }
         public float SilaUtoku { get; private set; }
         public bool DosahlCile { get; private set; } = false;
+        public TypNepritele Typ { get; set; }
+        public UkazatelZdravi Ukazatel { get; set; }
+        public float ProcentoZdravi { get; private set; }
 
         public Nepritel(LevelVlnaJednotka jednotka)
         {
             Dlazdice = jednotka.Dlazdice(); // new[] { new DlazdiceUrceni(17, 10, 0.1f) };
             UhelKorkceObrazku = 0;
 
+            Typ = jednotka.Typ;
             Zdravi = jednotka.Zdravi;
+            MaxZdravi = jednotka.Zdravi;
+            ProcentoZdravi = 1;
             SilaUtoku = jednotka.Sila;
             RychlostPohybu = Zdroje.VelikostDlazdice * jednotka.Rychlost;
 
@@ -28,6 +36,8 @@ namespace ToDe
             SouradniceCile = Zdroje.Aktualni.Level.Mapa.PoziceNaTrase(1);
             IndexPoziceNaTrase = 0;
             UhelOtoceni = (int)Zdroje.Aktualni.Level.Mapa.SmerDalsiTrasy(Zdroje.Aktualni.Level.Mapa.TrasaPochodu[0], Zdroje.Aktualni.Level.Mapa.TrasaPochodu[1]);
+
+            Ukazatel = new UkazatelZdravi(this);
         }
 
         public override void Update(float elapsedSeconds)
@@ -62,7 +72,16 @@ namespace ToDe
             if (Zdravi < 0)
                 Smazat = true;
 
+            ProcentoZdravi = MathHelper.Clamp(Zdravi / MaxZdravi, 0, 1);
+
             base.Update(elapsedSeconds);
+            Ukazatel.Update(elapsedSeconds);
+        }
+
+        public override void Draw(SpriteBatch sb)
+        {
+            base.Draw(sb);
+            Ukazatel.Draw(sb);
         }
 
     }

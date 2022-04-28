@@ -58,6 +58,7 @@ namespace ToDe
             };
             Zdroje.Obsah.Zakladni.Grafika = Content.Load<Texture2D>(@"Sprites/textura-vyber");
             Zdroje.Obsah.Exploze.Grafika = Content.Load<Texture2D>(@"Sprites/exploze");
+            Zdroje.Obsah.Ukazatel.Grafika = Content.Load<Texture2D>(@"Sprites/ukazatel");
 
             SpustitHru();
            
@@ -302,7 +303,7 @@ namespace ToDe
                 // Kontrola Vojáků, kteří došli do cíle
                 foreach (var nepritel in nepratele.Where(x => x.DosahlCile))
                 {
-                    zdravi = Math.Max(zdravi - nepritel.SilaUtoku, 0); // Ubrat hráči zdraví
+                    zdravi = Math.Max(zdravi - nepritel.SilaUtoku * nepritel.ProcentoZdravi, 0); // Ubrat hráči zdraví
                 }
                 
                 // Aktualizace textů v nabídce

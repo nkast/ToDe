@@ -15,7 +15,7 @@ namespace ToDe
 
         public static Obsah Obsah { get; internal set; }
 
-        public static int VelikostDlazdice { get => (int)Obsah.Zakladni.VelikostDlazdice; }
+        public static int VelikostDlazdice { get => (int)Obsah.Zakladni.VelikostDlazdice.X; }
         
         public static int CisloLevelu = 1;
 

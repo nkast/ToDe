@@ -8,7 +8,7 @@ namespace ToDe
 {
     internal abstract class AnimovanyHerniObjekt : HerniObjekt
     {
-        protected Texture2D textura;
+        protected Textura textura;
 
         public float Z { get; set; } = 0;
 
@@ -24,13 +24,13 @@ namespace ToDe
 
         private double postupAnimace = 0;
 
-        public AnimovanyHerniObjekt(Texture2D textura, int pocetObrazkuSirka = 1, int pocetObrazkuVyska = 1)
+        public AnimovanyHerniObjekt(Textura textura, int pocetObrazkuSirka = 1, int pocetObrazkuVyska = 1)
         {
             this.textura = textura;
             PocetObrazkuSirka = pocetObrazkuSirka;
             PocetObrazkuVyska = pocetObrazkuVyska;
-            SirkaObrzaku = textura.Width / PocetObrazkuSirka;
-            VyskaObrzaku = textura.Height / PocetObrazkuVyska;
+            SirkaObrzaku = textura.Grafika.Width / PocetObrazkuSirka;
+            VyskaObrzaku = textura.Grafika.Height / PocetObrazkuVyska;
             Stred = new Vector2(SirkaObrzaku / 2.0f, VyskaObrzaku * 0.5f);
         }
 
@@ -77,7 +77,7 @@ namespace ToDe
 
     internal class Exploze : AnimovanyHerniObjekt
     {
-        public Exploze(Raketa raketa) : base(Zdroje.Obsah.Exploze.Grafika, 8, 6)
+        public Exploze(Raketa raketa) : base(Zdroje.Obsah.Exploze, 8, 6)
         {
             Pozice = raketa.Pozice;
             UhelOtoceni = TDUtils.RND.Next(360);

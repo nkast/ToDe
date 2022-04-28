@@ -16,19 +16,19 @@ namespace ToDe
             float meritko = 1,
             SpriteEffects efekt = SpriteEffects.None,
             Color? barva = null,
-            int? velikostDlazdice = null,
-            Texture2D textura = null
+            Point? velikostDlazdice = null,
+            Textura textura = null
             )
         {
             if (!dlazdice.Vykreslovat) return;
 
-            int vd = velikostDlazdice ?? Zdroje.VelikostDlazdice;
+            Point vd = velikostDlazdice ?? textura?.VelikostDlazdice ?? new Point(Zdroje.VelikostDlazdice);
 
-            sb.Draw(textura ?? Zdroje.Obsah.Zakladni.Grafika,
+            sb.Draw(textura?.Grafika ?? Zdroje.Obsah.Zakladni.Grafika,
                   position: pozice,
-                  sourceRectangle: dlazdice.VyrezTextury(), //new Rectangle(dlazdice.X * vd, dlazdice.Y * vd, vd, vd),
+                  sourceRectangle: textura == null ? dlazdice.VyrezZeZakladniTextury() : dlazdice.VyrezTextury(textura),
                   rotation: MathHelper.ToRadians(uhelOtoceni),
-                  origin: stred ?? new Vector2(vd * 0.5f),
+                  origin: stred ?? new Vector2(vd.X, vd.Y) * 0.5f,
                   scale: meritko,
                   effects: efekt,
                   color: barva ?? Color.White,
@@ -44,10 +44,10 @@ namespace ToDe
             float Z = 0,
             SpriteEffects efekt = SpriteEffects.None,
             Color? barva = null,
-            Texture2D textura = null
+            Textura textura = null
             )
         {
-            sb.Draw(textura ?? Zdroje.Obsah.Zakladni.Grafika,
+            sb.Draw(textura?.Grafika ?? Zdroje.Obsah.Zakladni.Grafika,
                   position: pozice,
                   sourceRectangle: vyrezZTextury,
                   rotation: MathHelper.ToRadians(uhelOtoceni),
@@ -65,19 +65,19 @@ namespace ToDe
             float uhelOtoceni = 0,
             SpriteEffects efekt = SpriteEffects.None,
             Color? barva = null,
-            int? velikostDlazdice = null,
-            Texture2D textura = null
+            Point? velikostDlazdice = null,
+            Textura textura = null
             )
         {
             if (!dlazdice.Vykreslovat) return;
            
-            int vd = velikostDlazdice ?? Zdroje.VelikostDlazdice;
+            Point vd = velikostDlazdice ?? textura?.VelikostDlazdice ?? new Point(Zdroje.VelikostDlazdice);
 
-            sb.Draw(textura ?? Zdroje.Obsah.Zakladni.Grafika,
+            sb.Draw(textura?.Grafika ?? Zdroje.Obsah.Zakladni.Grafika,
                   destinationRectangle: cil,
-                  sourceRectangle: dlazdice.VyrezTextury(), //new Rectangle(dlazdice.X * vd, dlazdice.Y * vd, vd, vd),
+                  sourceRectangle: textura == null ? dlazdice.VyrezZeZakladniTextury() : dlazdice.VyrezTextury(textura), 
                   rotation: MathHelper.ToRadians(uhelOtoceni),
-                  origin: stred ?? new Vector2(vd * 0.5f),
+                  origin: stred ?? new Vector2(vd.X, vd.Y) * 0.5f,
                   effects: efekt,
                   color: barva ?? Color.White,
                   layerDepth: dlazdice.Z);
@@ -114,10 +114,15 @@ namespace ToDe
             (X, Y, Z, Otacet, Vykreslovat) = (souradnice.X, souradnice.Y, z, otacet, true);
         }
 
-        public Rectangle VyrezTextury()
-            => new Rectangle(X * (Zdroje.Obsah.Zakladni.VelikostDlazdice + 2 * Zdroje.Obsah.Zakladni.Okraj) + Zdroje.Obsah.Zakladni.Okraj,
-                             Y * (Zdroje.Obsah.Zakladni.VelikostDlazdice + 2 * Zdroje.Obsah.Zakladni.Okraj) + Zdroje.Obsah.Zakladni.Okraj,
-                             Zdroje.Obsah.Zakladni.VelikostDlazdice, Zdroje.Obsah.Zakladni.VelikostDlazdice);
+        public Rectangle VyrezZeZakladniTextury()
+            => new Rectangle(X * (Zdroje.VelikostDlazdice + 2 * Zdroje.Obsah.Zakladni.Okraj) + Zdroje.Obsah.Zakladni.Okraj,
+                             Y * (Zdroje.VelikostDlazdice + 2 * Zdroje.Obsah.Zakladni.Okraj) + Zdroje.Obsah.Zakladni.Okraj,
+                             Zdroje.VelikostDlazdice, Zdroje.VelikostDlazdice);
+
+        public Rectangle VyrezTextury(Textura textura)
+            => new Rectangle(X * (textura.VelikostDlazdice.X + 2 * textura.Okraj) + textura.Okraj,
+                             Y * (textura.VelikostDlazdice.Y + 2 * textura.Okraj) + textura.Okraj,
+                             textura.VelikostDlazdice.X, textura.VelikostDlazdice.Y);
     }
 
     //internal static class Rozsireni {
