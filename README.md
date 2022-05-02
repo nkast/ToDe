@@ -49,6 +49,13 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 </p>
 
 
+## Otevření projektu
+Stáhněte si celý repozitář k sobě na počítač. Otevřete ToDe.sln ve Visual Studiu 2022. 
+Otevřete okno terminálu (Ctrl+;), a zadejte následující příkazy, které nainstalují a zaregistrují MGCB (MonoGame Content Builder) kompilátor obsahu (zdrojových obrázků, zvuků atd.):
+* dotnet tool install -g dotnet-mgcb-editor
+* mgcb-editor --register
+
+
 ## Použité zdroje
 * [Monogame](https://www.monogame.net)
 * Textura: Kenney Tower Defense assets: [opengameart.org](https://opengameart.org/content/tower-defense-300-tilessprites), [kenney.nl](https://www.kenney.nl/assets/tower-defense-top-down)
