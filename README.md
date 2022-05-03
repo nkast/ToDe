@@ -24,18 +24,18 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * ~~Ukazatel zdraví nepřátel~~
 * ~~Zdraví nepřátel se pomalu obnovuje~~
 * ~~Při prohře opakovat kolo, ne celou hru~~
-* Transpozice mapy při překlopení displeje
+* ~~Transpozice mapy při překlopení displeje~~
+* Lepší ovládací prvek pro panel nabídky
+* Menu s dalšími možnostmi (např. restart levlu, konec hry, hlasitost...)
+* Pozadí u panelu s nabídkou
 * Překážky na ploše (+ možnost je za $ odstranit)
 * Možnost zbořit věž
 * Možnost upgrade věží, možnost definovat i parametry raket
 * Možnost nějak zobrazit dosah věží
 * Další typy věží
-* Pozadí u panelu s nabídkou
-* Lepší ovládací prvek pro panel nabídky
 * Letadlo pouští parašutisty v půlce cesty
 * Protiútok jednotek (tanky střílí na věže, nálety...)
 * Mapa levelů
-* Menu s dalšími možnostmi (např. restart levlu, konec hry, hlasitost...)
 * Zvyšovat max. dostupný level věží nákupy mimo levley za ušetřené a vyhrané $
 * Jiná textura na explozi
 * Ozdobné okraje cesty

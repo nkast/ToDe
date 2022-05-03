@@ -195,6 +195,7 @@ namespace ToDe
 
             // Aktualizace nabídky (ještě před pauzou, aby se dala odpauzovat)
             nabidka.ForEach(x => x.Update(casOdMinule, poziceKliknuti));
+            PolozkaNabidky.Vyber.Update(casOdMinule, Vector2.Zero);
 
             // Pauzování (zapnout/vyponout pauzu)
             var oznacenaPolozkaNabidky = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky;
