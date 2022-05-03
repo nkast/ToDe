@@ -40,5 +40,11 @@ namespace ToDe
                     barva: Nepruhlednost < 1 ? Kresleni.Pruhlednost(Nepruhlednost) : (Color?)null);
             }
         }
+
+        public virtual void TranspozicePozice()
+        {
+            Pozice = new Vector2(Pozice.Y, Pozice.X);
+            UhelOtoceni = TDUtils.KorekceUhlu(90 - UhelOtoceni);
+        }
     }
 }

@@ -128,6 +128,8 @@ namespace ToDe
         double casPriPauznuti;
         protected override void Update(GameTime gameTime)
         {
+            VypocetMeritka();
+
             // Kliknutí
             Vector2 poziceKliknuti = Vector2.Zero;
             // Dotyk
@@ -207,128 +209,155 @@ namespace ToDe
                 AkutalizovatPlanUtoku(gameTime.TotalGameTime.TotalSeconds - casPriPauznuti);
             }
 
+            if (pauza) // Pokud je pauza, čas od minule dáme na 0, tzn. nic se nebude hýbat
+                casOdMinule = 0;
 
-            if (!pauza) // Další objekty se aktualizují pouze pokud není zapnutá pauza
+            // Navýšení konta o finance, které nám přibývají za sekundu
+            Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.RychlostBohatnuti * casOdMinule;
+
+            // Umístění věže na mapě
+            if (poziceKliknuti != Vector2.Zero &&
+                poziceKliknuti.X < Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice &&
+                poziceKliknuti.Y < Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice) // Kliknuto do prostoru mapy
             {
-                // Navýšení konta o finance, které nám přibývají za sekundu
-                Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.RychlostBohatnuti * casOdMinule;
-
-                // Umístění věže na mapě
-                if (poziceKliknuti != Vector2.Zero &&
-                    poziceKliknuti.X < Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice &&
-                    poziceKliknuti.Y < Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice) // Kliknuto do prostoru mapy
+                Point souradniceNaMape = new Point(
+                        (int)poziceKliknuti.X / Zdroje.VelikostDlazdice,
+                        (int)poziceKliknuti.Y / Zdroje.VelikostDlazdice
+                    );
+                if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Plocha &&
+                    !veze.Any(x => x.SouradniceNaMape == souradniceNaMape)) // Kliklo se mimo silnici a není tam už věž
                 {
-                    Point souradniceNaMape = new Point(
-                            (int)poziceKliknuti.X / Zdroje.VelikostDlazdice,
-                            (int)poziceKliknuti.Y / Zdroje.VelikostDlazdice
-                        );
-                    if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Plocha &&
-                        !veze.Any(x => x.SouradniceNaMape == souradniceNaMape)) // Kliklo se mimo silnici a není tam už věž
-                    {
-                        var typ = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky; // Vybraný typ věže ve spodní nabídce
+                    var typ = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky; // Vybraný typ věže ve spodní nabídce
 
-                        // Umístnění kulometné věže
-                        if (typ == TypPolozkyNabidky.VezKulomet &&  
-                            KonfiguraceVezKulomet.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
-                        {
-                            veze.Add((new VezKulomet()).UmistiVez(souradniceNaMape));
-                            Zdroje.Aktualni.Level.Konto -= KonfiguraceVezKulomet.VychoziParametry.Cena;
-                        }
-                        // Umístění raketové věže
-                        else if (typ == TypPolozkyNabidky.VezRaketa && 
-                                 KonfiguraceVezRaketa.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
-                        {
-                            veze.Add((new VezRaketa()).UmistiVez(souradniceNaMape));
-                            Zdroje.Aktualni.Level.Konto -= KonfiguraceVezRaketa.VychoziParametry.Cena;
-                        }
+                    // Umístnění kulometné věže
+                    if (typ == TypPolozkyNabidky.VezKulomet &&  
+                        KonfiguraceVezKulomet.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
+                    {
+                        veze.Add((new VezKulomet()).UmistiVez(souradniceNaMape));
+                        Zdroje.Aktualni.Level.Konto -= KonfiguraceVezKulomet.VychoziParametry.Cena;
+                    }
+                    // Umístění raketové věže
+                    else if (typ == TypPolozkyNabidky.VezRaketa && 
+                                KonfiguraceVezRaketa.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
+                    {
+                        veze.Add((new VezRaketa()).UmistiVez(souradniceNaMape));
+                        Zdroje.Aktualni.Level.Konto -= KonfiguraceVezRaketa.VychoziParametry.Cena;
                     }
                 }
-
-                // Aktualizace ostatních herních objektů
-                nepratele.ForEach(x => x.Update(casOdMinule));
-                mizejiciObjekty.ForEach(x => x.Update(casOdMinule));
-
-                // Otáčení (update) věží (řeší se zvlášť)
-                nepratele = nepratele.OrderByDescending(x => x.VzdalenostNaCeste).ToList(); // Seřazení seznamu nepřátel, aby ti nejvíce vepředu byli první
-                foreach (var vez in veze)
-                {
-                    vez.Cil = nepratele.FirstOrDefault(x => Vector2.Distance(vez.Pozice, x.Pozice) < vez.DosahStrelby); // Vybrat cíl věži, na který dostane a je nejvíce vepředu
-                    vez.Update(casOdMinule);
-                    // Výstřel
-                    if (vez.Strelba)
-                    {
-                        if (vez is VezKulomet)
-                        {
-                            Zdroje.Obsah.ZvukKulomet.HrajZvuk(celkovyHerniCas);
-                            mizejiciObjekty.Add(new PlamenStrelby((VezKulomet)vez));
-                        }
-                        else if (vez is VezRaketa)
-                        {
-                            Zdroje.Obsah.ZvukRaketaStart.HrajZvuk(celkovyHerniCas);
-                            rakety.Add(new Raketa((VezRaketa)vez));
-                        }
-                    }
-                }
-
-                // Rakety
-                foreach (var raketa in rakety)
-                {
-                    raketa.Update(casOdMinule);
-                    // Dopad (výbuch) rakety
-                    if (raketa.Dopad)
-                    {
-                        Zdroje.Obsah.ZvukRaketaDopad.HrajZvuk(celkovyHerniCas);
-                        mizejiciObjekty.Add(new Dira() { Pozice = raketa.Pozice }); // Vykreslit díru na cestě
-                        exploze.Add(new Exploze(raketa));
-                        // Ubrání života nepřátelům v okolí
-                        var cile = nepratele
-                            .Select(x => new { Vzdalenost = Vector2.Distance(raketa.Pozice, x.Pozice), Nepritel = x })
-                            .Where(x => x.Vzdalenost < raketa.DosahExploze);
-                        foreach (var cil in cile)
-                            cil.Nepritel.Zdravi -= raketa.SilaStrely * (raketa.DosahExploze - cil.Vzdalenost) / raketa.DosahExploze;
-                    }
-                }
-                exploze.ForEach(x => x.Update(casOdMinule)); // Aktualizace explozí
-
-                // Vypouštění nepřátel (vlny)
-                if (Zdroje.Aktualni.Level.PlanPosilaniVln.Count > 0)
-                {
-                    if (Zdroje.Aktualni.Level.PlanPosilaniVln[0].Cas <= celkovyHerniCas)
-                    {
-                        nepratele.Add(new Nepritel(Zdroje.Aktualni.Level.PlanPosilaniVln[0].Jednotka));
-                        Zdroje.Aktualni.Level.PlanPosilaniVln.RemoveAt(0); // Už byl vyslán, smazat z plánu
-                    }
-                }
-
-                // Kontrola Vojáků, kteří došli do cíle
-                foreach (var nepritel in nepratele.Where(x => x.DosahlCile))
-                {
-                    zdravi = Math.Max(zdravi - nepritel.SilaUtoku * nepritel.ProcentoZdravi, 0); // Ubrat hráči zdraví
-                }
-                
-                // Aktualizace textů v nabídce
-                NastavTexty();                
-
-
-                // Odstraňování smazaných objektů ze seznamů
-                nepratele.RemoveAll(x => x.Smazat);
-                mizejiciObjekty.RemoveAll(x => x.Smazat);
-                rakety.RemoveAll(x => x.Smazat);
-                exploze.RemoveAll(x => x.Smazat);
-                nabidka.ForEach(x => x.Update(casOdMinule));
             }
+
+            // Aktualizace ostatních herních objektů
+            nepratele.ForEach(x => x.Update(casOdMinule));
+            mizejiciObjekty.ForEach(x => x.Update(casOdMinule));
+
+            // Otáčení (update) věží (řeší se zvlášť)
+            nepratele = nepratele.OrderByDescending(x => x.VzdalenostNaCeste).ToList(); // Seřazení seznamu nepřátel, aby ti nejvíce vepředu byli první
+            foreach (var vez in veze)
+            {
+                vez.Cil = nepratele.FirstOrDefault(x => Vector2.Distance(vez.Pozice, x.Pozice) < vez.DosahStrelby); // Vybrat cíl věži, na který dostane a je nejvíce vepředu
+                vez.Update(casOdMinule);
+                // Výstřel
+                if (vez.Strelba)
+                {
+                    if (vez is VezKulomet)
+                    {
+                        Zdroje.Obsah.ZvukKulomet.HrajZvuk(celkovyHerniCas);
+                        mizejiciObjekty.Add(new PlamenStrelby((VezKulomet)vez));
+                    }
+                    else if (vez is VezRaketa)
+                    {
+                        Zdroje.Obsah.ZvukRaketaStart.HrajZvuk(celkovyHerniCas);
+                        rakety.Add(new Raketa((VezRaketa)vez));
+                    }
+                }
+            }
+
+            // Rakety
+            foreach (var raketa in rakety)
+            {
+                raketa.Update(casOdMinule);
+                // Dopad (výbuch) rakety
+                if (raketa.Dopad)
+                {
+                    Zdroje.Obsah.ZvukRaketaDopad.HrajZvuk(celkovyHerniCas);
+                    mizejiciObjekty.Add(new Dira() { Pozice = raketa.Pozice }); // Vykreslit díru na cestě
+                    exploze.Add(new Exploze(raketa));
+                    // Ubrání života nepřátelům v okolí
+                    var cile = nepratele
+                        .Select(x => new { Vzdalenost = Vector2.Distance(raketa.Pozice, x.Pozice), Nepritel = x })
+                        .Where(x => x.Vzdalenost < raketa.DosahExploze);
+                    foreach (var cil in cile)
+                        cil.Nepritel.Zdravi -= raketa.SilaStrely * (raketa.DosahExploze - cil.Vzdalenost) / raketa.DosahExploze;
+                }
+            }
+            exploze.ForEach(x => x.Update(casOdMinule)); // Aktualizace explozí
+
+            // Vypouštění nepřátel (vlny)
+            if (Zdroje.Aktualni.Level.PlanPosilaniVln.Count > 0)
+            {
+                if (Zdroje.Aktualni.Level.PlanPosilaniVln[0].Cas <= celkovyHerniCas)
+                {
+                    nepratele.Add(new Nepritel(Zdroje.Aktualni.Level.PlanPosilaniVln[0].Jednotka));
+                    Zdroje.Aktualni.Level.PlanPosilaniVln.RemoveAt(0); // Už byl vyslán, smazat z plánu
+                }
+            }
+
+            // Kontrola Vojáků, kteří došli do cíle
+            foreach (var nepritel in nepratele.Where(x => x.DosahlCile))
+            {
+                zdravi = Math.Max(zdravi - nepritel.SilaUtoku * nepritel.ProcentoZdravi, 0); // Ubrat hráči zdraví
+            }
+                
+            // Aktualizace textů v nabídce
+            NastavTexty();                
+
+
+            // Odstraňování smazaných objektů ze seznamů
+            nepratele.RemoveAll(x => x.Smazat);
+            mizejiciObjekty.RemoveAll(x => x.Smazat);
+            rakety.RemoveAll(x => x.Smazat);
+            exploze.RemoveAll(x => x.Smazat);
+            nabidka.ForEach(x => x.Update(casOdMinule));
+            
             base.Update(gameTime);
         }
 
         float globalniMeritko = 1; // Uložení měřítka grafiky, pro přepočet pozice kliknutí
+        void VypocetMeritka()
+        {
+            // Matice pro měřítko (zoom) vykreslování, aby se vše vešlo do okna
+            var scaleX = (float)GraphicsDevice.Viewport.Width / (float)(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice);
+            var scaleY = (float)GraphicsDevice.Viewport.Height / (float)((aktualniMapa.Level.Mapa.Radku + 1) * Zdroje.VelikostDlazdice);
+            globalniMeritko = MathHelper.Min(scaleX, scaleY); // Použijeme měřítko, aby se vše vždy vešlo do obrazovky
+
+            // Zkusit totéž vypočítat, pro transponovanou mapu, nebude-li to náhodou lepší
+            scaleX = (float)GraphicsDevice.Viewport.Height / (float)((aktualniMapa.Level.Mapa.Sloupcu + 1) * Zdroje.VelikostDlazdice);
+            scaleY = (float)GraphicsDevice.Viewport.Width / (float)(aktualniMapa.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
+            float globalniMeritko2 = MathHelper.Min(scaleX, scaleY);
+
+            // Výběr lepší varianty
+            if (globalniMeritko2 > globalniMeritko)
+            {
+                globalniMeritko = globalniMeritko2;
+                aktualniMapa.Level.Mapa.TranspoziceMapy();
+                nepratele.ForEach(x => x.TranspozicePozice());
+                mizejiciObjekty.ForEach(x => x.TranspozicePozice());
+                veze.ForEach(x => x.TranspozicePozice());
+                rakety.ForEach(x => x.TranspozicePozice());
+                exploze.ForEach(x => x.TranspozicePozice());
+                nabidka.ForEach(x => x.TranspozicePozice());
+                PolozkaNabidky.Vyber.TranspozicePozice();
+            }
+        }
+
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black); // Barva podkladu na pozadí
 
             // Matice pro měřítko (zoom) vykreslování, aby se vše vešlo do okna
-            var scaleX = (float)GraphicsDevice.Viewport.Width / (float)(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice);
-            var scaleY = (float)GraphicsDevice.Viewport.Height / (float)((aktualniMapa.Level.Mapa.Radku + 1) * Zdroje.VelikostDlazdice);
-            globalniMeritko = MathHelper.Min(scaleX, scaleY); // Použijeme měřítko, aby se vše vždy vešlo do obrazovky
+            //var scaleX = (float)GraphicsDevice.Viewport.Width / (float)(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice);
+            //var scaleY = (float)GraphicsDevice.Viewport.Height / (float)((aktualniMapa.Level.Mapa.Radku + 1) * Zdroje.VelikostDlazdice);
+            //globalniMeritko = MathHelper.Min(scaleX, scaleY); // Použijeme měřítko, aby se vše vždy vešlo do obrazovky
             var screenScale = new Vector3(new Vector2(globalniMeritko), 1.0f);
             var scaleMatrix = Matrix.CreateScale(screenScale);
 

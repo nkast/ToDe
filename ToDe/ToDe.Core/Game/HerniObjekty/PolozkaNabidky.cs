@@ -119,10 +119,16 @@ namespace ToDe
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
                 sb.DrawString(Zdroje.Obsah.Pismo, Text, Pozice, Color.White,
-                    UhelOtoceni, Stred, Meritko, SpriteEffects.None, 0);
+                    0, Stred, Meritko, SpriteEffects.None, 0);
             }
             else
                 base.Draw(sb);
+        }
+
+        public override void TranspozicePozice()
+        {
+            base.TranspozicePozice();
+            //Vyber.Pozice = Pozice;
         }
     }
 

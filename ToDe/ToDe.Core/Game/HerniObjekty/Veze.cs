@@ -46,6 +46,12 @@ namespace ToDe
         }
 
         protected abstract void Vystrel();
+
+        public override void TranspozicePozice()
+        {
+            base.TranspozicePozice();
+            SouradniceNaMape = new Point(SouradniceNaMape.Y, SouradniceNaMape.X);
+        }
     }
 
     internal class VezKulomet : Vez
@@ -152,6 +158,12 @@ namespace ToDe
             }
 
             base.Update(sekundOdMinule);
+        }
+
+        public override void TranspozicePozice()
+        {
+            base.TranspozicePozice();
+            SouradniceCile = new Vector2(SouradniceCile.Y, SouradniceCile.X);
         }
 
     }

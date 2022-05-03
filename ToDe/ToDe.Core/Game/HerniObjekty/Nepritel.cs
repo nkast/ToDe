@@ -89,6 +89,12 @@ namespace ToDe
             Ukazatel.Draw(sb);
         }
 
+        public override void TranspozicePozice()
+        {
+            base.TranspozicePozice();
+            SouradniceCile = new Vector2(SouradniceCile.Y, SouradniceCile.X);
+        }
+
     }
 
 }

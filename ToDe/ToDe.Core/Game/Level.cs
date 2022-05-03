@@ -242,7 +242,19 @@ namespace ToDe
             => TypNaDlazici[Pozadi[i, j]];
 
         public Rectangle CilDlazdice(int i, int j)
-            => new Rectangle(j* VelikostDlazdice, i* VelikostDlazdice, VelikostDlazdice, VelikostDlazdice);           
+            => new Rectangle(j* VelikostDlazdice, i* VelikostDlazdice, VelikostDlazdice, VelikostDlazdice); 
+        
+        public void TranspoziceMapy()
+        {
+            var novaMapa = new TypDlazdice[Sloupcu, Radku];
+            for (int i = 0; i < Radku; i++)
+                for (int j = 0; j < Sloupcu; j++)
+                    novaMapa[j, i] = Pozadi[i, j];
+            Pozadi = novaMapa;
+
+            for (int i = 0; i < TrasaPochodu.Count; i++)
+                TrasaPochodu[i] = new Point(TrasaPochodu[i].Y, TrasaPochodu[i].X);
+        }
     }
 
     internal class PolozkaPlanuVln

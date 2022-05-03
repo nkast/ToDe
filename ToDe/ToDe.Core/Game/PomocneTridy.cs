@@ -158,7 +158,7 @@ namespace ToDe
             return ang;
         }
 
-        static float KorekceUhlu(float angle)
+        public static float KorekceUhlu(float angle)
         {
             if (angle > 360)
                 angle = angle % 360;
