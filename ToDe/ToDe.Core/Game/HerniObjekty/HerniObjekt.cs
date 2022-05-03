@@ -26,7 +26,7 @@ namespace ToDe
             Stred = new Vector2(Zdroje.VelikostDlazdice / 2f);
         }
 
-        public virtual void Update(float elapsedSeconds)
+        public virtual void Update(float sekundOdMinule)
         {
 
         }

@@ -25,16 +25,16 @@ namespace ToDe
             return this;
         }
 
-        public override void Update(float elapsedSeconds)
+        public override void Update(float sekundOdMinule)
         {
-            base.Update(elapsedSeconds);
+            base.Update(sekundOdMinule);
             Strelba = false;
             if (SekundDoDalsihoVystrelu > 0)
-                SekundDoDalsihoVystrelu -= elapsedSeconds;
+                SekundDoDalsihoVystrelu -= sekundOdMinule;
 
             if (Cil == null || Cil.Smazat) return;
 
-            UhelOtoceni = TDUtils.OtacejSeKCili(elapsedSeconds, Pozice, Cil.Pozice, UhelOtoceni,
+            UhelOtoceni = TDUtils.OtacejSeKCili(sekundOdMinule, Pozice, Cil.Pozice, UhelOtoceni,
                                                 RychlostRotace, out bool muzeStrilet);
             if (muzeStrilet && SekundDoDalsihoVystrelu <= 0)
             {
@@ -92,9 +92,9 @@ namespace ToDe
             RychlostRakety = cfg.RychlostRakety;
         }
 
-        public override void Update(float elapsedSeconds)
+        public override void Update(float sekundOdMinule)
         {
-            base.Update(elapsedSeconds);
+            base.Update(sekundOdMinule);
             if (!Strelba && SekundDoDalsihoVystrelu <= 0)
                 Dlazdice[1].Vykreslovat = true;
         }
@@ -128,12 +128,12 @@ namespace ToDe
             Pozice = vez.Pozice;
         }
 
-        public override void Update(float elapsedSeconds)
+        public override void Update(float sekundOdMinule)
         {
             Dopad = false;
             if (Smazat) return;
 
-            var novaPozice = Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * elapsedSeconds);
+            var novaPozice = Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * sekundOdMinule);
 
             // Dosažení cíle (další dlaždice)?
             var vzdalenostDoCile = Vector2.Distance(novaPozice, SouradniceCile);
@@ -151,7 +151,7 @@ namespace ToDe
                     Dlazdice[0].Z = 0.7f;
             }
 
-            base.Update(elapsedSeconds);
+            base.Update(sekundOdMinule);
         }
 
     }

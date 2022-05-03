@@ -16,6 +16,7 @@ namespace ToDe
         public float Sila { get; set; } // Kolik ubere zdravi hráči, když dojde na konec
         public float Rychlost { get; set; } // Dlaždice za sekundu
         public float Odstup { get; set; } // Počet sekund, než se začne vypouštět tato jednotka
+        public float Uzdravovani { get; set; } = 0; // Přírůstek zdraví za 1 sekundu
 
         public DlazdiceUrceni[] Dlazdice() => DlazdiceZTypu(Typ);
 
@@ -315,6 +316,7 @@ namespace ToDe
                     jednotka.Sila = (float)eJednotka.Attribute("sila");
                     jednotka.Rychlost = (float)eJednotka.Attribute("rychlost");
                     jednotka.Odstup = eJednotka.Attribute("odstup") == null ? 0f : (float)eJednotka.Attribute("odstup");
+                    jednotka.Uzdravovani = eJednotka.Attribute("uzdravovani") == null ? 0f : (float)eJednotka.Attribute("uzdravovani");
                     jednotky.Add(jednotka);
                 }
                 vlna.Jednotky = jednotky.ToArray();

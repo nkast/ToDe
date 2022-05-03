@@ -8,16 +8,16 @@ namespace ToDe
     {
         public float RychlostMizeni { get; set; } // -% za s
 
-        public override void Update(float elapsedSeconds)
+        public override void Update(float sekundOdMinule)
         {
-            Nepruhlednost -= RychlostMizeni * elapsedSeconds;
+            Nepruhlednost -= RychlostMizeni * sekundOdMinule;
             if (Nepruhlednost <= 0)
             {
                 Nepruhlednost = 0;
                 Smazat = true;
             }
 
-            base.Update(elapsedSeconds);
+            base.Update(sekundOdMinule);
         }
     }
 
@@ -46,11 +46,11 @@ namespace ToDe
             Pozice = vez.Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, Zdroje.VelikostDlazdice * 0.55f);
         }
 
-        public override void Update(float elapsedSeconds)
+        public override void Update(float sekundOdMinule)
         {
             UhelOtoceni = vez.UhelOtoceni;
             Pozice = vez.Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, Zdroje.VelikostDlazdice * 0.55f);
-            base.Update(elapsedSeconds);
+            base.Update(sekundOdMinule);
         }
     }
 }

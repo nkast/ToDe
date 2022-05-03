@@ -46,9 +46,9 @@ namespace ToDe
             Pozice = nepritel.Pozice + new Vector2(-sirkaUkazatele * 0.5f, -vzdalenostUkazatele);
         }
 
-        public override void Update(float elapsedSeconds)
+        public override void Update(float sekundOdMinule)
         {
-            base.Update(elapsedSeconds);
+            base.Update(sekundOdMinule);
             Pozice = nepritel.Pozice + new Vector2(-sirkaUkazatele * 0.5f, -vzdalenostUkazatele);
         }
 

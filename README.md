@@ -24,6 +24,7 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * ~~Ukazatel zdraví nepřátel~~
 * Zdraví nepřátel se pomalu obnovuje
 * Při prohře opakovat kolo, ne celou hru
+* Transpozice mapy při překlopení displeje
 * Překážky na ploše (+ možnost je za $ odstranit)
 * Možnost zbořit věž
 * Možnost upgrade věží, možnost definovat i parametry raket
@@ -31,7 +32,6 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * Další typy věží
 * Pozadí u panelu s nabídkou
 * Lepší ovládací prvek pro panel nabídky
-* Transpozice mapy při překlopení displeje
 * Letadlo pouští parašutisty v půlce cesty
 * Protiútok jednotek (tanky střílí na věže, nálety...)
 * Mapa levelů

@@ -34,9 +34,9 @@ namespace ToDe
             Stred = new Vector2(SirkaObrzaku / 2.0f, VyskaObrzaku * 0.5f);
         }
 
-        public override void Update(float elapsedSeconds)
+        public override void Update(float sekundOdMinule)
         {
-            base.Update(elapsedSeconds);
+            base.Update(sekundOdMinule);
 
             // Animace
             if (RychlostAnimace > 0)
@@ -56,7 +56,7 @@ namespace ToDe
                 }
                 else
                     IndexObrazku = (int)postupAnimace;
-                postupAnimace += RychlostAnimace * elapsedSeconds;
+                postupAnimace += RychlostAnimace * sekundOdMinule;
             }
 
             // Výřez z obrázku

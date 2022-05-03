@@ -64,9 +64,9 @@ namespace ToDe
             }
         }
 
-        public void Update(float elapsedSeconds, Vector2 klik)
+        public void Update(float sekundOdMinule, Vector2 klik)
         {
-            Update(elapsedSeconds);
+            Update(sekundOdMinule);
 
             if (TypPolozky == TypPolozkyNabidky.Text) return; // Text se řeší v předchozím příkazu
 
@@ -95,9 +95,9 @@ namespace ToDe
 
         }
 
-        public override void Update(float elapsedSeconds)
+        public override void Update(float sekundOdMinule)
         {
-            base.Update(elapsedSeconds);
+            base.Update(sekundOdMinule);
 
             if (TypPolozky != TypPolozkyNabidky.Text) return;
 

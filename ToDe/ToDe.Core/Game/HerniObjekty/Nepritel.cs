@@ -18,6 +18,7 @@ namespace ToDe
         public TypNepritele Typ { get; set; }
         public UkazatelZdravi Ukazatel { get; set; }
         public float ProcentoZdravi { get; private set; }
+        public float Uzdravovani { get; private set; }
 
         public Nepritel(LevelVlnaJednotka jednotka)
         {
@@ -27,6 +28,7 @@ namespace ToDe
             Typ = jednotka.Typ;
             Zdravi = jednotka.Zdravi;
             MaxZdravi = jednotka.Zdravi;
+            Uzdravovani = jednotka.Uzdravovani;
             ProcentoZdravi = 1;
             SilaUtoku = jednotka.Sila;
             RychlostPohybu = Zdroje.VelikostDlazdice * jednotka.Rychlost;
@@ -40,17 +42,20 @@ namespace ToDe
             Ukazatel = new UkazatelZdravi(this);
         }
 
-        public override void Update(float elapsedSeconds)
+        public override void Update(float sekundOdMinule)
         {
             DosahlCile = false;
 
             if (Smazat) return;
 
-            UhelOtoceni = TDUtils.OtacejSeKCili(elapsedSeconds, Pozice, SouradniceCile, UhelOtoceni, RychlostRotace, out _);
-            Pozice += TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * elapsedSeconds);
+            if (Uzdravovani != 0)
+                Zdravi = MathHelper.Clamp(Zdravi + Uzdravovani * sekundOdMinule, 0, MaxZdravi);
+
+            UhelOtoceni = TDUtils.OtacejSeKCili(sekundOdMinule, Pozice, SouradniceCile, UhelOtoceni, RychlostRotace, out _);
+            Pozice += TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * sekundOdMinule);
 
             // Dosažení cíle (další dlaždice)?
-            var novaPozice = Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * elapsedSeconds);
+            var novaPozice = Pozice + TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * sekundOdMinule);
             var vzdalenostDoCile = Vector2.Distance(novaPozice, SouradniceCile);
             //var vzdalenostDoCile = Vector2.Distance(Pozice, SouradniceCile);
             VzdalenostNaCeste = IndexPoziceNaTrase + vzdalenostDoCile / Zdroje.VelikostDlazdice; // Pozice pro účely řazení
@@ -74,8 +79,8 @@ namespace ToDe
 
             ProcentoZdravi = MathHelper.Clamp(Zdravi / MaxZdravi, 0, 1);
 
-            base.Update(elapsedSeconds);
-            Ukazatel.Update(elapsedSeconds);
+            base.Update(sekundOdMinule);
+            Ukazatel.Update(sekundOdMinule);
         }
 
         public override void Draw(SpriteBatch sb)

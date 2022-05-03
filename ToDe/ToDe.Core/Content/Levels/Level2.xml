@@ -16,14 +16,14 @@
 	<vlny>
 		<vlna odstup="2">
       <jednotka typ="Robot" pocet="5" rozestup="4" zdravi="1.1" rychlost="0.5" sila="0.07" odstup="0" />
-      <jednotka typ="Ufon" pocet="5" rozestup="4" zdravi="1.1" rychlost="0.5" sila="0.07" odstup="2" />
+      <jednotka typ="Ufon" pocet="5" rozestup="4" zdravi="1.1" rychlost="0.5" sila="0.07" odstup="2" uzdravovani="0.01" />
     </vlna>
     <vlna odstup="10">
       <jednotka typ="TankPoustni" pocet="5" rozestup="3" zdravi="2.0" rychlost="0.7" sila="0.2" />
     </vlna>
 		<vlna odstup="5">
       <jednotka typ="Vojak" pocet="10" rozestup="3" zdravi="1.5" rychlost="0.6" sila="0.1" odstup="0" />
-      <jednotka typ="Parasutista" pocet="10" rozestup="3" zdravi="1.0" rychlost="0.6" sila="0.075" odstup="1.5" />
+      <jednotka typ="Parasutista" pocet="10" rozestup="3" zdravi="1.0" rychlost="0.6" sila="0.075" odstup="1.5" uzdravovani="0.01" />
 		</vlna>
 	</vlny>
 	<veze>
