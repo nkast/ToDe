@@ -22,8 +22,8 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * ~~Upravit texturu, aby každá dlaždice měla okolo sebe z každé strany 1px navíc~~
 * ~~Postupně zpřístupňované věže (počty) / ekonomika~~
 * ~~Ukazatel zdraví nepřátel~~
-* Zdraví nepřátel se pomalu obnovuje
-* Při prohře opakovat kolo, ne celou hru
+* ~~Zdraví nepřátel se pomalu obnovuje~~
+* ~~Při prohře opakovat kolo, ne celou hru~~
 * Transpozice mapy při překlopení displeje
 * Překážky na ploše (+ možnost je za $ odstranit)
 * Možnost zbořit věž

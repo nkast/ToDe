@@ -48,9 +48,6 @@ namespace ToDe
 
             if (Smazat) return;
 
-            if (Uzdravovani != 0)
-                Zdravi = MathHelper.Clamp(Zdravi + Uzdravovani * sekundOdMinule, 0, MaxZdravi);
-
             UhelOtoceni = TDUtils.OtacejSeKCili(sekundOdMinule, Pozice, SouradniceCile, UhelOtoceni, RychlostRotace, out _);
             Pozice += TDUtils.PosunPoUhlu(UhelOtoceni, RychlostPohybu * sekundOdMinule);
 
@@ -74,8 +71,11 @@ namespace ToDe
             }
             Pozice = novaPozice;
 
-            if (Zdravi < 0)
+            if (Zdravi <= 0)
                 Smazat = true;
+            else if (Uzdravovani != 0)
+                Zdravi = MathHelper.Clamp(Zdravi + Uzdravovani * sekundOdMinule, 0, MaxZdravi);
+
 
             ProcentoZdravi = MathHelper.Clamp(Zdravi / MaxZdravi, 0, 1);
 

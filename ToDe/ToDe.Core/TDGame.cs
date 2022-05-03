@@ -158,7 +158,7 @@ namespace ToDe
                 if (!jeKonecHry)
                 {
                     jeKonecHry = true;
-                    Zdroje.CisloLevelu = 1; // Až kliknem a zahájíme novou hru, tak začne od prvního kola
+                    //Zdroje.CisloLevelu = 1; // Až kliknem a zahájíme novou hru, tak začne od prvního kola
                     Zdroje.Obsah.ZvukKonecProhra.HrajZvuk(celkovyHerniCas);
                 }
 
