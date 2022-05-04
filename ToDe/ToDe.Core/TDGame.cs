@@ -40,8 +40,9 @@ namespace ToDe
         }
 
         float zdravi;
-        PolozkaNabidky textPocetVeziKluomet, textPocetVeziRaketa, textZivotu, textFinance;
+        PolozkaNabidky textCenaVezeKluomet, textCenaVezeRaketa, textZivotu, textFinance;
         Zdroje aktualniMapa;
+        Ramecek ramecek;
         protected override void LoadContent()
         {
             Content.RootDirectory = "Content";
@@ -59,16 +60,17 @@ namespace ToDe
             Zdroje.Obsah.Zakladni.Grafika = Content.Load<Texture2D>(@"Sprites/textura-vyber");
             Zdroje.Obsah.Exploze.Grafika = Content.Load<Texture2D>(@"Sprites/exploze");
             Zdroje.Obsah.Ukazatel.Grafika = Content.Load<Texture2D>(@"Sprites/ukazatel");
+            ramecek = new Ramecek();
 
             SpustitHru();
            
             // Sestavení panelu nabídky
             nabidka.Add(new PolozkaNabidky(0, TypPolozkyNabidky.VezKulomet));
-            nabidka.Add(textPocetVeziKluomet = new PolozkaNabidky(1, TypPolozkyNabidky.Text));
-            nabidka.Add(new PolozkaNabidky(3, TypPolozkyNabidky.VezRaketa));
-            nabidka.Add(textPocetVeziRaketa = new PolozkaNabidky(4, TypPolozkyNabidky.Text));
-            nabidka.Add(new PolozkaNabidky(-3, TypPolozkyNabidky.Pauza));
-            nabidka.Add(textFinance = new PolozkaNabidky(-4, TypPolozkyNabidky.Text));
+            nabidka.Add(textCenaVezeKluomet = new PolozkaNabidky(1, TypPolozkyNabidky.Text));
+            nabidka.Add(new PolozkaNabidky(2, TypPolozkyNabidky.VezRaketa));
+            nabidka.Add(textCenaVezeRaketa = new PolozkaNabidky(3, TypPolozkyNabidky.Text));
+            nabidka.Add(textFinance = new PolozkaNabidky(-3, TypPolozkyNabidky.Text));
+            nabidka.Add(new PolozkaNabidky(-2, TypPolozkyNabidky.Pauza));
             nabidka.Add(textZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text));
 
             NastavTexty(true);
@@ -84,6 +86,7 @@ namespace ToDe
             veze.Clear();
             rakety.Clear();
             exploze.Clear();
+            ramecek.Viditelny = false;
 
             // Načtení levelu
             aktualniMapa = Zdroje.NactiLevel(ref Zdroje.CisloLevelu);
@@ -113,9 +116,14 @@ namespace ToDe
             if (novyLevel)
             {
                 PolozkaNabidky.Vyber.Viditelny = false;
-                textPocetVeziKluomet.Text = "$" + KonfiguraceVezKulomet.VychoziParametry.Cena.ToString();
-                textPocetVeziRaketa.Text = "$" + KonfiguraceVezRaketa.VychoziParametry.Cena.ToString();
+                textCenaVezeKluomet.Text = "$" + KonfiguraceVezKulomet.VychoziParametry.Cena.ToString();
+                textCenaVezeRaketa.Text = "$" + KonfiguraceVezRaketa.VychoziParametry.Cena.ToString();
             }
+
+            textCenaVezeKluomet.Barva = Zdroje.Aktualni.Level.Konto >= KonfiguraceVezKulomet.VychoziParametry.Cena 
+                ? Color.Lime : Color.Red;
+            textCenaVezeRaketa.Barva = Zdroje.Aktualni.Level.Konto >= KonfiguraceVezRaketa.VychoziParametry.Cena
+                ? Color.Lime : Color.Red;
         }
 
         void AkutalizovatPlanUtoku(double oKolik)
@@ -123,6 +131,8 @@ namespace ToDe
             Zdroje.Aktualni.Level.PlanPosilaniVln.ForEach(x => x.Cas = x.Cas + (float)oKolik);
         }
 
+
+        // -------------------------------------------- UPDATE ---------------------------------------------
         bool byloKliknutoMinule = false;
         bool pauza = false, jeKonecHry = false;
         double casPriPauznuti;
@@ -216,7 +226,7 @@ namespace ToDe
             // Navýšení konta o finance, které nám přibývají za sekundu
             Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.RychlostBohatnuti * casOdMinule;
 
-            // Umístění věže na mapě
+            // Umístění věže na mapě nebo její výběr
             if (poziceKliknuti != Vector2.Zero &&
                 poziceKliknuti.X < Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice &&
                 poziceKliknuti.Y < Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice) // Kliknuto do prostoru mapy
@@ -225,27 +235,44 @@ namespace ToDe
                         (int)poziceKliknuti.X / Zdroje.VelikostDlazdice,
                         (int)poziceKliknuti.Y / Zdroje.VelikostDlazdice
                     );
-                if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Plocha &&
-                    !veze.Any(x => x.SouradniceNaMape == souradniceNaMape)) // Kliklo se mimo silnici a není tam už věž
+                if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Plocha) // Kliklo se mimo silnici 
                 {
-                    var typ = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky; // Vybraný typ věže ve spodní nabídce
+                    var oznacenyObjekt = veze.FirstOrDefault(x => x.SouradniceNaMape == souradniceNaMape);
+                    if (oznacenyObjekt == null) // a není tam už věž ani překážka
+                    {
+                        var typ = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky; // Vybraný typ věže ve spodní nabídce
 
-                    // Umístnění kulometné věže
-                    if (typ == TypPolozkyNabidky.VezKulomet &&  
-                        KonfiguraceVezKulomet.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
+                        // Umístnění kulometné věže
+                        if (typ == TypPolozkyNabidky.VezKulomet &&
+                            KonfiguraceVezKulomet.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
+                        {
+                            veze.Add((new VezKulomet()).UmistiVez(souradniceNaMape));
+                            Zdroje.Aktualni.Level.Konto -= KonfiguraceVezKulomet.VychoziParametry.Cena;
+                        }
+                        // Umístění raketové věže
+                        else if (typ == TypPolozkyNabidky.VezRaketa &&
+                                    KonfiguraceVezRaketa.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
+                        {
+                            veze.Add((new VezRaketa()).UmistiVez(souradniceNaMape));
+                            Zdroje.Aktualni.Level.Konto -= KonfiguraceVezRaketa.VychoziParametry.Cena;
+                        }
+                    } else
                     {
-                        veze.Add((new VezKulomet()).UmistiVez(souradniceNaMape));
-                        Zdroje.Aktualni.Level.Konto -= KonfiguraceVezKulomet.VychoziParametry.Cena;
-                    }
-                    // Umístění raketové věže
-                    else if (typ == TypPolozkyNabidky.VezRaketa && 
-                                KonfiguraceVezRaketa.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
-                    {
-                        veze.Add((new VezRaketa()).UmistiVez(souradniceNaMape));
-                        Zdroje.Aktualni.Level.Konto -= KonfiguraceVezRaketa.VychoziParametry.Cena;
+                        if (ramecek.PoziceNaMape == souradniceNaMape)
+                        {
+                            ramecek.Viditelny = !ramecek.Viditelny;
+                        }
+                        else
+                        {
+                            ramecek.PoziceNaMape = souradniceNaMape;
+                            ramecek.Viditelny = true;
+                        }
                     }
                 }
             }
+
+            // Aktualizace rámečku
+            ramecek.Update(casOdMinule, poziceKliknuti);
 
             // Aktualizace ostatních herních objektů
             nepratele.ForEach(x => x.Update(casOdMinule));
@@ -296,7 +323,7 @@ namespace ToDe
             // Vypouštění nepřátel (vlny)
             if (Zdroje.Aktualni.Level.PlanPosilaniVln.Count > 0)
             {
-                if (Zdroje.Aktualni.Level.PlanPosilaniVln[0].Cas <= celkovyHerniCas)
+                if (Zdroje.Aktualni.Level.PlanPosilaniVln[0].Cas <= celkovyHerniCas && !pauza)
                 {
                     nepratele.Add(new Nepritel(Zdroje.Aktualni.Level.PlanPosilaniVln[0].Jednotka));
                     Zdroje.Aktualni.Level.PlanPosilaniVln.RemoveAt(0); // Už byl vyslán, smazat z plánu
@@ -326,14 +353,27 @@ namespace ToDe
         float globalniMeritko = 1; // Uložení měřítka grafiky, pro přepočet pozice kliknutí
         void VypocetMeritka()
         {
+            Point rozmery;
+            if (Window?.ClientBounds != null)
+            {
+                rozmery = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height); // TODO: otestovat jestli to vrací správné rozměry i na ANdoridu
+                if (GraphicsDevice.Viewport.Width != rozmery.X || GraphicsDevice.Viewport.Height != rozmery.Y)
+                {
+                    GraphicsDevice.Viewport = new Viewport(0, 0, rozmery.X, rozmery.Y);
+                    //GraphicsDevice.PresentationParameters.Bounds = Window.ClientBounds; TODO: dořešit spuštění v režimu na výšku
+                }
+            }
+            else
+                rozmery = new Point(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+
             // Matice pro měřítko (zoom) vykreslování, aby se vše vešlo do okna
-            var scaleX = (float)GraphicsDevice.Viewport.Width / (float)(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice);
-            var scaleY = (float)GraphicsDevice.Viewport.Height / (float)((aktualniMapa.Level.Mapa.Radku + 1) * Zdroje.VelikostDlazdice);
+            var scaleX = rozmery.X / (float)(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice);
+            var scaleY = rozmery.Y / (float)((aktualniMapa.Level.Mapa.Radku + 1) * Zdroje.VelikostDlazdice);
             globalniMeritko = MathHelper.Min(scaleX, scaleY); // Použijeme měřítko, aby se vše vždy vešlo do obrazovky
 
             // Zkusit totéž vypočítat, pro transponovanou mapu, nebude-li to náhodou lepší
-            scaleX = (float)GraphicsDevice.Viewport.Height / (float)((aktualniMapa.Level.Mapa.Sloupcu + 1) * Zdroje.VelikostDlazdice);
-            scaleY = (float)GraphicsDevice.Viewport.Width / (float)(aktualniMapa.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
+            scaleX = rozmery.Y / (float)((aktualniMapa.Level.Mapa.Sloupcu + 1) * Zdroje.VelikostDlazdice);
+            scaleY = rozmery.X / (float)(aktualniMapa.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
             float globalniMeritko2 = MathHelper.Min(scaleX, scaleY);
 
             // Výběr lepší varianty
@@ -356,9 +396,6 @@ namespace ToDe
             GraphicsDevice.Clear(Color.Black); // Barva podkladu na pozadí
 
             // Matice pro měřítko (zoom) vykreslování, aby se vše vešlo do okna
-            //var scaleX = (float)GraphicsDevice.Viewport.Width / (float)(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice);
-            //var scaleY = (float)GraphicsDevice.Viewport.Height / (float)((aktualniMapa.Level.Mapa.Radku + 1) * Zdroje.VelikostDlazdice);
-            //globalniMeritko = MathHelper.Min(scaleX, scaleY); // Použijeme měřítko, aby se vše vždy vešlo do obrazovky
             var screenScale = new Vector3(new Vector2(globalniMeritko), 1.0f);
             var scaleMatrix = Matrix.CreateScale(screenScale);
 
@@ -378,6 +415,7 @@ namespace ToDe
             exploze.ForEach(x => x.Draw(spriteBatch));
             nabidka.ForEach(x => x.Draw(spriteBatch));
             PolozkaNabidky.Vyber.Draw(spriteBatch); // Vykreslení označovacího rámečku v nabídce
+            ramecek?.Draw(spriteBatch);
 
             // Game Over
             if (zdravi <= 0) // Prohra

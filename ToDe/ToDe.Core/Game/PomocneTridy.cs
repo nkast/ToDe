@@ -83,8 +83,8 @@ namespace ToDe
                   layerDepth: dlazdice.Z);
         }
 
-        public static Color Pruhlednost(float nepruhlednost)
-            => new Color(255, 255, 255, (int)(255 * nepruhlednost));
+        public static Color Pruhlednost(float nepruhlednost, Color barva)
+            => new Color(barva.R, barva.G, barva.B, (int)(255 * nepruhlednost));
 
         public static void KresliTextDoprostred(this SpriteBatch sb, string text)
         {

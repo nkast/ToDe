@@ -18,6 +18,7 @@ namespace ToDe
         public Vector2 Stred { get; set; }
         public bool Smazat { get; set; } = false;
         public float Nepruhlednost { get; set; } = 1;
+        public Color Barva { get; set; } = Color.White;
 
         public DlazdiceUrceni[] Dlazdice { get; set; }
 
@@ -37,7 +38,7 @@ namespace ToDe
             foreach (var obr in Dlazdice)
             {
                 sb.Kresli(Pozice, obr, Stred, (UhelOtoceni * (obr.Otacet ? 1 : 0)) + UhelKorkceObrazku, Meritko,
-                    barva: Nepruhlednost < 1 ? Kresleni.Pruhlednost(Nepruhlednost) : (Color?)null);
+                    barva: Nepruhlednost < 1 ? Kresleni.Pruhlednost(Nepruhlednost, Barva) : (Color?)null);
             }
         }
 

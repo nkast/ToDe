@@ -17,8 +17,12 @@ namespace ToDe
 
     internal class PolozkaNabidky : HerniObjekt
     {
+        const float MaxMeritkoTextu = 0.5f;
+
         public TypPolozkyNabidky TypPolozky { get; private set; }
         public string Text { get; set; } // Pouze pro typ text
+        public ushort SirkaTextu { get; set; } = 0; // Kolik dlaždic může text zabírat maximálně (0 = neomezovat)
+        public float SirkaOkraje { get; set; } = 0; // Mezera obsahu dlaždice od jejího okraje (padding)
         public short PoziceVNabidce { get; private set; } // Záporná pozice = počítáno od konce
 
         public static PolozkaNabidky Vyber { get; private set; }
@@ -53,9 +57,9 @@ namespace ToDe
 
             // Nastavení měřítka textu a výběrovému políčku
             if (TypPolozky == TypPolozkyNabidky.Text)
-                Meritko = 0.5f;
+                Meritko = MaxMeritkoTextu;
             else if (TypPolozky != TypPolozkyNabidky.Vyber)
-                Meritko = 0.75f;
+                SirkaOkraje = 32;// Meritko = 0.75f;
 
             // Výběrové označovátko
             if (Vyber == null && TypPolozky != TypPolozkyNabidky.Vyber)
@@ -93,6 +97,8 @@ namespace ToDe
                 }
             }
 
+            // Výpočet měřítka vzhledem k okrajům
+            Meritko = (Zdroje.VelikostDlazdice - SirkaOkraje) / (float)Zdroje.VelikostDlazdice;
         }
 
         public override void Update(float sekundOdMinule)
@@ -104,10 +110,16 @@ namespace ToDe
             var rozmery = Zdroje.Obsah.Pismo.MeasureString(Text);
             Stred = new Vector2(PoziceVNabidce < 0 ? rozmery.X : 0, rozmery.Y * 0.5f);
             Pozice = new Vector2((PoziceVNabidce < 0
-                                    ? Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce + 1 - 0.1f
-                                    : PoziceVNabidce + 0.1f)
-                                    * Zdroje.VelikostDlazdice,
+                                    ? Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce + 1 //- 0.1f
+                                    : PoziceVNabidce) //+ 0.1f)
+                                    * Zdroje.VelikostDlazdice + SirkaOkraje * Math.Sign(PoziceVNabidce),
                                 (Zdroje.Aktualni.Level.Mapa.Radku + 0.5f) * Zdroje.VelikostDlazdice);
+
+            // Zmenšení měřítka (je-li to za potřebí), aby se text vešel do zadaného počtu dlaždic na šířku
+            if (rozmery.X * MaxMeritkoTextu > Zdroje.VelikostDlazdice - SirkaOkraje)
+                Meritko = (Zdroje.VelikostDlazdice - SirkaOkraje) / rozmery.X;
+            else
+                Meritko = MaxMeritkoTextu;
         }
 
 
@@ -118,7 +130,7 @@ namespace ToDe
 
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
-                sb.DrawString(Zdroje.Obsah.Pismo, Text, Pozice, Color.White,
+                sb.DrawString(Zdroje.Obsah.Pismo, Text, Pozice, Barva,
                     0, Stred, Meritko, SpriteEffects.None, 0);
             }
             else

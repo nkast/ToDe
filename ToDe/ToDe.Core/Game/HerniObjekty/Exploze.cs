@@ -71,7 +71,7 @@ namespace ToDe
             //base.Draw(sb);        
 
             sb.Kresli(Pozice, VyrezZTextury, Stred, UhelOtoceni + UhelKorkceObrazku, Meritko, Z, SpriteEffects.None,
-                   Nepruhlednost < 1 ? Kresleni.Pruhlednost(Nepruhlednost) : (Color?)null, textura);
+                   Nepruhlednost < 1 ? Kresleni.Pruhlednost(Nepruhlednost, Barva) : (Color?)null, textura);
         }
     }
 
