@@ -6,13 +6,123 @@ using System.Text;
 
 namespace ToDe
 {
+    internal enum TypNabidky
+    {
+        Zakladni, // Nic neni oznaceno
+        ProDlazdici, // Je označena prázdná dlaždice na ploše
+        ProVez, // Je označena njěaká věž
+        ProPrekazku, // Je označena překážka na mapě
+    }
+
+    internal class OvladaciPanel
+    {
+        List<PolozkaNabidky> nabidka;
+        Dictionary<TypNabidky, List<PolozkaNabidky>> nabidky;
+
+        public TypNabidky AktualniNabidka { get; set; }
+
+        public PolozkaNabidky KliknutoNa { get; private set; }
+
+        public PolozkaNabidky TextZivotu { get; private set; }
+        public PolozkaNabidky TextFinance { get; private set; }
+
+        public PolozkaNabidky TextCenaVezeKluomet { get; private set; }
+        public PolozkaNabidky TextCenaVezeRaketa { get; private set; }
+        
+        public PolozkaNabidky TextCenaDemolice { get; private set; }
+        
+        public PolozkaNabidky Pauza { get; private set; }
+
+        public OvladaciPanel()
+        {          
+            TextFinance = new PolozkaNabidky(-3, TypPolozkyNabidky.Text);
+            Pauza = new PolozkaNabidky(-2, TypPolozkyNabidky.Pauza);
+            TextZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text);
+
+            TextCenaVezeKluomet = new PolozkaNabidky(1, TypPolozkyNabidky.Text);
+            TextCenaVezeRaketa = new PolozkaNabidky(3, TypPolozkyNabidky.Text);
+            TextCenaDemolice = new PolozkaNabidky(1, TypPolozkyNabidky.Text);
+
+            nabidky = new Dictionary<TypNabidky, List<PolozkaNabidky>>() 
+            {
+                 { TypNabidky.Zakladni,
+                    new List<PolozkaNabidky>()
+                    {
+                        TextFinance,
+                        Pauza,
+                        TextZivotu,
+                    }
+                },
+                { TypNabidky.ProDlazdici, 
+                    new List<PolozkaNabidky>()
+                    {
+                        new PolozkaNabidky(0, TypPolozkyNabidky.VezKulomet),
+                        TextCenaVezeKluomet,
+                        new PolozkaNabidky(2, TypPolozkyNabidky.VezRaketa),
+                        TextCenaVezeRaketa,
+                        TextFinance,
+                        Pauza,
+                        TextZivotu,
+                    } 
+                },
+                { TypNabidky.ProVez,
+                    new List<PolozkaNabidky>()
+                    {
+                        new PolozkaNabidky(0, TypPolozkyNabidky.Vymazat),
+                        TextCenaDemolice, // Cena +- za delete
+                        //new PolozkaNabidky(2, TypPolozkyNabidky.VezRaketa), // Upgrade
+                        //new PolozkaNabidky(3, TypPolozkyNabidky.Text), // Parametry update (včetně ceny)
+                        // Víc textů...
+                        TextFinance,
+                        Pauza,
+                        TextZivotu,
+                    }
+                },
+            };
+
+            PrepniNabidku(TypNabidky.Zakladni);
+        }
+
+        public void PrepniNabidku(TypNabidky typ)
+        {
+            if (typ != AktualniNabidka || nabidka == null)
+            {
+                nabidka = nabidky[typ];
+                AktualniNabidka = typ;
+            }
+        }
+
+
+        public void Update(float sekundOdMinule, Vector2 klik)
+        {
+            KliknutoNa = null;
+            foreach (var polozka in nabidka)
+            {
+                polozka.Update(sekundOdMinule, klik);
+                if (polozka.Kliknuto)
+                    KliknutoNa = polozka;
+            }
+        }
+
+        public void Draw(SpriteBatch sb)
+        {
+            nabidka.ForEach(x => x.Draw(sb));
+        }
+
+        public void TranspozicePozice()
+        {
+            nabidka.ForEach(x => x.TranspozicePozice());
+        }
+    }
+
+
     public enum TypPolozkyNabidky
     {
         VezKulomet,
         VezRaketa,
         Pauza,
         Text,
-        Vyber, // Obdélníček značící výběr položky
+        Vymazat,
     }
 
     internal class PolozkaNabidky : HerniObjekt
@@ -24,10 +134,7 @@ namespace ToDe
         public ushort SirkaTextu { get; set; } = 0; // Kolik dlaždic může text zabírat maximálně (0 = neomezovat)
         public float SirkaOkraje { get; set; } = 0; // Mezera obsahu dlaždice od jejího okraje (padding)
         public short PoziceVNabidce { get; private set; } // Záporná pozice = počítáno od konce
-
-        public static PolozkaNabidky Vyber { get; private set; }
-        public bool Oznacen { get => Vyber?.Viditelny == true && Vyber?.PoziceVNabidce == PoziceVNabidce; }
-        public bool Viditelny { get; set; } = false; // Platí jen pro Vyber
+        public bool Kliknuto { get; set; }
 
         public PolozkaNabidky(short poziceVNabidce, TypPolozkyNabidky typPolozky)
         {
@@ -35,6 +142,7 @@ namespace ToDe
             TypPolozky = typPolozky;
 
             UhelKorkceObrazku = 0;
+            SirkaOkraje = 16;
 
             // Grafika netextových typů
             if (TypPolozky == TypPolozkyNabidky.VezKulomet)
@@ -48,28 +156,29 @@ namespace ToDe
                     new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Stred, 0.2f, false),
                     new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Vrsek, 0.5f, false),
                 };
-            else if (TypPolozky == TypPolozkyNabidky.Pauza)
-                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Pauza, 0.0f, false), };
-            else if (TypPolozky == TypPolozkyNabidky.Vyber)
+            else if (TypPolozky == TypPolozkyNabidky.Vymazat)
             {
-                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Vyber, 0.9f, false) };
+                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Kos, 0.0f, false), };
+                Barva = Color.Silver;
+                SirkaOkraje = 48;
             }
-
-            // Nastavení měřítka textu a výběrovému políčku
-            if (TypPolozky == TypPolozkyNabidky.Text)
-                Meritko = MaxMeritkoTextu;
-            else if (TypPolozky != TypPolozkyNabidky.Vyber)
-                SirkaOkraje = 32;// Meritko = 0.75f;
-
-            // Výběrové označovátko
-            if (Vyber == null && TypPolozky != TypPolozkyNabidky.Vyber)
+            else if (TypPolozky == TypPolozkyNabidky.Pauza)
             {
-                Vyber = new PolozkaNabidky(-1, TypPolozkyNabidky.Vyber);
+                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Pauza, 0.0f, false), };
+                SirkaOkraje = 48;
+
+            }
+            else if (TypPolozky == TypPolozkyNabidky.Text)
+            {
+                Meritko = MaxMeritkoTextu; // Nastavení měřítka textu a výběrovému políčku
+                Text = " ";
             }
         }
 
         public void Update(float sekundOdMinule, Vector2 klik)
         {
+            Kliknuto = false;
+
             Update(sekundOdMinule);
 
             if (TypPolozky == TypPolozkyNabidky.Text) return; // Text se řeší v předchozím příkazu
@@ -83,19 +192,8 @@ namespace ToDe
             Pozice = new Vector2(pozice.X + 0.5f * Zdroje.VelikostDlazdice, pozice.Y + 0.5f * Zdroje.VelikostDlazdice);
 
             if (klik != Vector2.Zero)
-            {
                 if (new Rectangle(pozice.X, pozice.Y, Zdroje.VelikostDlazdice, Zdroje.VelikostDlazdice).Contains(klik))
-                {
-                    if (Vyber.PoziceVNabidce == PoziceVNabidce)
-                        Vyber.Viditelny = !Vyber.Viditelny;
-                    else
-                    {
-                        Vyber.Viditelny = true;
-                        Vyber.PoziceVNabidce = PoziceVNabidce;
-                        Vyber.Pozice = Pozice;
-                    }
-                }
-            }
+                    Kliknuto = true;
 
             // Výpočet měřítka vzhledem k okrajům
             Meritko = (Zdroje.VelikostDlazdice - SirkaOkraje) / (float)Zdroje.VelikostDlazdice;
@@ -125,12 +223,9 @@ namespace ToDe
 
         public override void Draw(SpriteBatch sb)
         {
-            if (TypPolozky == TypPolozkyNabidky.Vyber && !Viditelny)
-                return;
-
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
-                sb.DrawString(Zdroje.Obsah.Pismo, Text, Pozice, Barva,
+                sb.DrawString(Zdroje.Obsah.Pismo, Text??"", Pozice, Barva,
                     0, Stred, Meritko, SpriteEffects.None, 0);
             }
             else
@@ -140,7 +235,6 @@ namespace ToDe
         public override void TranspozicePozice()
         {
             base.TranspozicePozice();
-            //Vyber.Pozice = Pozice;
         }
     }
 

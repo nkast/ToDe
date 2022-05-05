@@ -1,11 +1,11 @@
-Označování položek na mapě, jak prázdné dlaždice mapy, tak překážek, nebo věží, by bylo realizováno lehkou změnou barvy pro vykreslení dané položky třeba do červena.
+- Označování položek na mapě, jak prázdné dlaždice mapy, tak překážek, nebo věží, by bylo realizováno lehkou změnou barvy pro vykreslení dané položky třeba do červena.
 
-Levá část panelu bude proměnnlivá dle označeného objektu na mapě.
+- Levá část panelu bude proměnnlivá dle označeného objektu na mapě.
 
-Věže v panleu nabídky nepůjde vybírat. Vybere se prázdná dlaždice na mapě, čímž se zobarzí nabídka dostupných věží a kliknutím na některou z nich se tam umístí.
+- Věže v panleu nabídky nepůjde vybírat. Vybere se prázdná dlaždice na mapě, čímž se zobarzí nabídka dostupných věží a kliknutím na některou z nich se tam umístí.
 
-Po označení překážky na mapě bude v levé části panelu ikona pro vyčištění plochy dlaždice a cena za toto vyčištění.
+- Po označení překážky na mapě bude v levé části panelu ikona pro vyčištění plochy dlaždice a cena za toto vyčištění.
 
 Po označení věže se zobrazí její aktuální statistiky, ikona pro smazání věže (s cenou, která může být jak + tak -, bude určeno v level.xml), ikona pro upgrade, a statistiky věže po něm (+ cena). Součástí toho by mohlo být zobrazení rádiusu dostřelu věže na mapě + i kruhu nového rádiusu po upgradu věže.
 
-V panelu tlačítko pauza bude střídat ikonu pauzy a play. Označovací rámeček tak může úplně zmizet z panelu nabídky.
+- V panelu tlačítko pauza bude střídat ikonu pauzy a play. Označovací rámeček tak může úplně zmizet z panelu nabídky.

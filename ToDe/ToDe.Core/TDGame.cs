@@ -23,15 +23,14 @@ namespace ToDe
 
         List<Nepritel> nepratele;
         List<MizejiciObjekt> mizejiciObjekty;
-        List<PolozkaNabidky> nabidka;
         List<Vez> veze;
         List<Raketa> rakety;
         List<Exploze> exploze;
+        OvladaciPanel ovladaciPanel;
         protected override void Initialize()
         {
             nepratele = new List<Nepritel>();
             mizejiciObjekty = new List<MizejiciObjekt>();
-            nabidka = new List<PolozkaNabidky>();
             veze = new List<Vez>();
             rakety = new List<Raketa>();
             exploze = new List<Exploze>();
@@ -40,9 +39,8 @@ namespace ToDe
         }
 
         float zdravi;
-        PolozkaNabidky textCenaVezeKluomet, textCenaVezeRaketa, textZivotu, textFinance;
         Zdroje aktualniMapa;
-        Ramecek ramecek;
+        HerniObjekt vybranyObjekt;
         protected override void LoadContent()
         {
             Content.RootDirectory = "Content";
@@ -60,18 +58,10 @@ namespace ToDe
             Zdroje.Obsah.Zakladni.Grafika = Content.Load<Texture2D>(@"Sprites/textura-vyber");
             Zdroje.Obsah.Exploze.Grafika = Content.Load<Texture2D>(@"Sprites/exploze");
             Zdroje.Obsah.Ukazatel.Grafika = Content.Load<Texture2D>(@"Sprites/ukazatel");
-            ramecek = new Ramecek();
 
             SpustitHru();
-           
-            // Sestavení panelu nabídky
-            nabidka.Add(new PolozkaNabidky(0, TypPolozkyNabidky.VezKulomet));
-            nabidka.Add(textCenaVezeKluomet = new PolozkaNabidky(1, TypPolozkyNabidky.Text));
-            nabidka.Add(new PolozkaNabidky(2, TypPolozkyNabidky.VezRaketa));
-            nabidka.Add(textCenaVezeRaketa = new PolozkaNabidky(3, TypPolozkyNabidky.Text));
-            nabidka.Add(textFinance = new PolozkaNabidky(-3, TypPolozkyNabidky.Text));
-            nabidka.Add(new PolozkaNabidky(-2, TypPolozkyNabidky.Pauza));
-            nabidka.Add(textZivotu = new PolozkaNabidky(-1, TypPolozkyNabidky.Text));
+
+            ovladaciPanel = new OvladaciPanel();
 
             NastavTexty(true);
 
@@ -82,11 +72,10 @@ namespace ToDe
         {
             nepratele.Clear();
             mizejiciObjekty.Clear();
-            //nabidka.Clear();
             veze.Clear();
             rakety.Clear();
             exploze.Clear();
-            ramecek.Viditelny = false;
+            vybranyObjekt = null;
 
             // Načtení levelu
             aktualniMapa = Zdroje.NactiLevel(ref Zdroje.CisloLevelu);
@@ -101,7 +90,7 @@ namespace ToDe
         void NastavTexty(bool novyLevel = false)
         {
             // Texty do nabídky
-            textFinance.Text = "$" + (Math.Floor(Zdroje.Aktualni.Level.Konto / 10.0)*10).ToString();
+            ovladaciPanel.TextFinance.Text = "$" + (Math.Floor(Zdroje.Aktualni.Level.Konto / 10.0)*10).ToString();
 
             int zbytekZivota = (int)Math.Round(zdravi * 100);
             if (zdravi < 0)
@@ -111,19 +100,27 @@ namespace ToDe
             else if (zbytekZivota == 0 && zdravi > 0)
                 zbytekZivota = 1;
 
-            textZivotu.Text = zbytekZivota + "%";
+            ovladaciPanel.TextZivotu.Text = zbytekZivota + "%";
 
             if (novyLevel)
             {
-                PolozkaNabidky.Vyber.Viditelny = false;
-                textCenaVezeKluomet.Text = "$" + KonfiguraceVezKulomet.VychoziParametry.Cena.ToString();
-                textCenaVezeRaketa.Text = "$" + KonfiguraceVezRaketa.VychoziParametry.Cena.ToString();
+                //PolozkaNabidky.Vyber.Viditelny = false;
+                ovladaciPanel.TextCenaVezeKluomet.Text = "$" + KonfiguraceVezKulomet.VychoziParametry.Cena.ToString();
+                ovladaciPanel.TextCenaVezeRaketa.Text = "$" + KonfiguraceVezRaketa.VychoziParametry.Cena.ToString();
             }
 
-            textCenaVezeKluomet.Barva = Zdroje.Aktualni.Level.Konto >= KonfiguraceVezKulomet.VychoziParametry.Cena 
+            ovladaciPanel.TextCenaVezeKluomet.Barva = Zdroje.Aktualni.Level.Konto >= KonfiguraceVezKulomet.VychoziParametry.Cena 
                 ? Color.Lime : Color.Red;
-            textCenaVezeRaketa.Barva = Zdroje.Aktualni.Level.Konto >= KonfiguraceVezRaketa.VychoziParametry.Cena
+            ovladaciPanel.TextCenaVezeRaketa.Barva = Zdroje.Aktualni.Level.Konto >= KonfiguraceVezRaketa.VychoziParametry.Cena
                 ? Color.Lime : Color.Red;
+
+            if (vybranyObjekt?.GetType().IsSubclassOf(typeof(Vez)) == true)
+            {
+                float cena = Zdroje.Aktualni.Level.VezDleTypu(((Vez)vybranyObjekt).TypVeze).CenaDemolice;
+                ovladaciPanel.TextCenaDemolice.Text = (cena < 0 ? "-" : "+") + "$" + Math.Abs(cena).ToString();
+                ovladaciPanel.TextCenaDemolice.Barva = (cena < 0 && Zdroje.Aktualni.Level.Konto + cena < 0)
+                    ? Color.Red : Color.Lime;
+            }
         }
 
         void AkutalizovatPlanUtoku(double oKolik)
@@ -204,20 +201,25 @@ namespace ToDe
             }
 
             // Aktualizace nabídky (ještě před pauzou, aby se dala odpauzovat)
-            nabidka.ForEach(x => x.Update(casOdMinule, poziceKliknuti));
-            PolozkaNabidky.Vyber.Update(casOdMinule, Vector2.Zero);
+            ovladaciPanel.Update(casOdMinule, poziceKliknuti);
 
             // Pauzování (zapnout/vyponout pauzu)
-            var oznacenaPolozkaNabidky = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky;
-            if (oznacenaPolozkaNabidky == TypPolozkyNabidky.Pauza && !pauza)
+            var oznacenaPolozkaNabidky = ovladaciPanel.KliknutoNa?.TypPolozky;
+            if (oznacenaPolozkaNabidky == TypPolozkyNabidky.Pauza)
             {
-                pauza = true;
-                casPriPauznuti = gameTime.TotalGameTime.TotalSeconds;
-            } else if (oznacenaPolozkaNabidky != TypPolozkyNabidky.Pauza && pauza)
-            { 
-                pauza = false;
-                // Přepočítat plán útoku
-                AkutalizovatPlanUtoku(gameTime.TotalGameTime.TotalSeconds - casPriPauznuti);
+                if (!pauza)
+                {
+                    pauza = true;
+                    casPriPauznuti = gameTime.TotalGameTime.TotalSeconds;
+                    ovladaciPanel.Pauza.Dlazdice[0] = new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Pauza_Konec, ovladaciPanel.Pauza.Dlazdice[0].Z, false);
+                }
+                else 
+                {
+                    pauza = false;
+                    // Přepočítat plán útoku
+                    AkutalizovatPlanUtoku(gameTime.TotalGameTime.TotalSeconds - casPriPauznuti);
+                    ovladaciPanel.Pauza.Dlazdice[0] = new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Pauza, ovladaciPanel.Pauza.Dlazdice[0].Z, false);
+                }
             }
 
             if (pauza) // Pokud je pauza, čas od minule dáme na 0, tzn. nic se nebude hýbat
@@ -237,42 +239,75 @@ namespace ToDe
                     );
                 if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Plocha) // Kliklo se mimo silnici 
                 {
-                    var oznacenyObjekt = veze.FirstOrDefault(x => x.SouradniceNaMape == souradniceNaMape);
-                    if (oznacenyObjekt == null) // a není tam už věž ani překážka
+                    HerniObjekt kliknutyObjekt = veze.FirstOrDefault(x => x.SouradniceNaMape == souradniceNaMape);
+                    if (kliknutyObjekt == null) // Kliknuto na dlaždici na mapě, na které nic dalšího není
+                        kliknutyObjekt = new VybranaDlazdice(souradniceNaMape);
+                    if (vybranyObjekt != null && (vybranyObjekt == kliknutyObjekt ||
+                        (vybranyObjekt is VybranaDlazdice && kliknutyObjekt is VybranaDlazdice &&
+                            ((VybranaDlazdice)vybranyObjekt).PoziceNaMape == ((VybranaDlazdice)kliknutyObjekt).PoziceNaMape)))
                     {
-                        var typ = nabidka.FirstOrDefault(x => x.Oznacen)?.TypPolozky; // Vybraný typ věže ve spodní nabídce
-
-                        // Umístnění kulometné věže
-                        if (typ == TypPolozkyNabidky.VezKulomet &&
-                            KonfiguraceVezKulomet.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
-                        {
-                            veze.Add((new VezKulomet()).UmistiVez(souradniceNaMape));
-                            Zdroje.Aktualni.Level.Konto -= KonfiguraceVezKulomet.VychoziParametry.Cena;
-                        }
-                        // Umístění raketové věže
-                        else if (typ == TypPolozkyNabidky.VezRaketa &&
-                                    KonfiguraceVezRaketa.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
-                        {
-                            veze.Add((new VezRaketa()).UmistiVez(souradniceNaMape));
-                            Zdroje.Aktualni.Level.Konto -= KonfiguraceVezRaketa.VychoziParametry.Cena;
-                        }
-                    } else
+                        // Kliknutí na objekt, který již byl vybrán před tím
+                        if (!(vybranyObjekt is VybranaDlazdice))
+                            vybranyObjekt.ObjektJeVybran = false;
+                        vybranyObjekt = null;
+                    }
+                    else
                     {
-                        if (ramecek.PoziceNaMape == souradniceNaMape)
-                        {
-                            ramecek.Viditelny = !ramecek.Viditelny;
-                        }
-                        else
-                        {
-                            ramecek.PoziceNaMape = souradniceNaMape;
-                            ramecek.Viditelny = true;
-                        }
+                        // Kliknutí na nový objekt
+                        if (vybranyObjekt != null)
+                            vybranyObjekt.ObjektJeVybran = false;
+                        vybranyObjekt = kliknutyObjekt;
+                        vybranyObjekt.ObjektJeVybran = true;
                     }
                 }
             }
 
-            // Aktualizace rámečku
-            ramecek.Update(casOdMinule, poziceKliknuti);
+            // Kliknutí na něco v ovládacím panelu
+            if (ovladaciPanel.KliknutoNa != null)
+            {
+                // Postavení věže
+                if (vybranyObjekt is VybranaDlazdice)
+                {
+                    var typ = ovladaciPanel.KliknutoNa.TypPolozky; // Vybraný typ věže ve spodní nabídce
+
+                    // Umístnění kulometné věže
+                    if (typ == TypPolozkyNabidky.VezKulomet &&
+                        KonfiguraceVezKulomet.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
+                    {
+                        veze.Add((new VezKulomet()).UmistiVez(((VybranaDlazdice)vybranyObjekt).PoziceNaMape));
+                        Zdroje.Aktualni.Level.Konto -= KonfiguraceVezKulomet.VychoziParametry.Cena;
+                        vybranyObjekt = null;
+                    }
+                    // Umístění raketové věže
+                    else if (typ == TypPolozkyNabidky.VezRaketa &&
+                                KonfiguraceVezRaketa.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
+                    {
+                        veze.Add((new VezRaketa()).UmistiVez(((VybranaDlazdice)vybranyObjekt).PoziceNaMape));
+                        Zdroje.Aktualni.Level.Konto -= KonfiguraceVezRaketa.VychoziParametry.Cena;
+                        vybranyObjekt = null;
+                    }
+                }
+
+                // Zboření věže
+                if (vybranyObjekt != null &&
+                    vybranyObjekt.GetType().IsSubclassOf(typeof(Vez)) && 
+                    ovladaciPanel.KliknutoNa?.TypPolozky == TypPolozkyNabidky.Vymazat)
+                {
+                    veze.Remove(vybranyObjekt as Vez);
+                    var typVeze = ((Vez)vybranyObjekt).TypVeze;
+                    Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.VezDleTypu(typVeze)?.CenaDemolice ?? 0;
+                    vybranyObjekt = null;
+                }
+            }
+
+            // Přepnutí nabídky dle typu vybraného objektu na mapě
+            if (vybranyObjekt == null)
+                ovladaciPanel.PrepniNabidku(TypNabidky.Zakladni);
+            else if (vybranyObjekt is VybranaDlazdice)
+                ovladaciPanel.PrepniNabidku(TypNabidky.ProDlazdici);
+            else if (vybranyObjekt.GetType().IsSubclassOf(typeof(Vez)))
+                ovladaciPanel.PrepniNabidku(TypNabidky.ProVez);
+
 
             // Aktualizace ostatních herních objektů
             nepratele.ForEach(x => x.Update(casOdMinule));
@@ -345,7 +380,6 @@ namespace ToDe
             mizejiciObjekty.RemoveAll(x => x.Smazat);
             rakety.RemoveAll(x => x.Smazat);
             exploze.RemoveAll(x => x.Smazat);
-            nabidka.ForEach(x => x.Update(casOdMinule));
             
             base.Update(gameTime);
         }
@@ -386,8 +420,8 @@ namespace ToDe
                 veze.ForEach(x => x.TranspozicePozice());
                 rakety.ForEach(x => x.TranspozicePozice());
                 exploze.ForEach(x => x.TranspozicePozice());
-                nabidka.ForEach(x => x.TranspozicePozice());
-                PolozkaNabidky.Vyber.TranspozicePozice();
+                ovladaciPanel.TranspozicePozice();
+                vybranyObjekt?.TranspozicePozice();
             }
         }
 
@@ -405,7 +439,11 @@ namespace ToDe
             for (int i = 0; i < aktualniMapa.Level.Mapa.Radku; i++)
                 for (int j = 0; j < aktualniMapa.Level.Mapa.Sloupcu; j++)
                     spriteBatch.Kresli(aktualniMapa.Level.Mapa.CilDlazdice(i, j), 
-                                       aktualniMapa.Level.Mapa.MezeDlazdice(i, j), Vector2.Zero);
+                                       aktualniMapa.Level.Mapa.MezeDlazdice(i, j), Vector2.Zero, 
+                                       barva: (vybranyObjekt is VybranaDlazdice && 
+                                               ((VybranaDlazdice)vybranyObjekt).PoziceNaMape.Y == i &&
+                                               ((VybranaDlazdice)vybranyObjekt).PoziceNaMape.X == j)
+                                               ? Color.LightSalmon : (Color?)null);
 
             // Vykreslování seznamů herních objektů
             nepratele.ForEach(x => x.Draw(spriteBatch));
@@ -413,9 +451,7 @@ namespace ToDe
             veze.ForEach(x => x.Draw(spriteBatch));
             rakety.ForEach(x => x.Draw(spriteBatch));
             exploze.ForEach(x => x.Draw(spriteBatch));
-            nabidka.ForEach(x => x.Draw(spriteBatch));
-            PolozkaNabidky.Vyber.Draw(spriteBatch); // Vykreslení označovacího rámečku v nabídce
-            ramecek?.Draw(spriteBatch);
+            ovladaciPanel.Draw(spriteBatch);
 
             // Game Over
             if (zdravi <= 0) // Prohra

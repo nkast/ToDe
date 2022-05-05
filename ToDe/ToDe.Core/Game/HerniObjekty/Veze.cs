@@ -15,6 +15,8 @@ namespace ToDe
         public Nepritel Cil { get; set; }
         public bool Strelba { get; private set; }
         public ushort Uroven { get; private set; } = 1;
+        public abstract TypVeze TypVeze { get; }
+
 
         public Vez UmistiVez(Point souradniceNaMape)
         {
@@ -56,6 +58,8 @@ namespace ToDe
 
     internal class VezKulomet : Vez
     {
+        public override TypVeze TypVeze => TypVeze.Kulomet;
+
         public VezKulomet()
         {
             UhelKorkceObrazku = 90;
@@ -78,6 +82,7 @@ namespace ToDe
 
     internal class VezRaketa : Vez
     {
+        public override TypVeze TypVeze => TypVeze.Raketa;
         public float DosahExploze { get; set; }
         public float RychlostRakety { get; set; }
 

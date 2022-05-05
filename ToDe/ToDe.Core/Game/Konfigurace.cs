@@ -18,6 +18,7 @@ namespace ToDe
         public float SilaStrely { get; set; }
         public float DosahStrelby { get; set; } // Poloměr rádiusu kruhu dostřelu
         public float Cena { get; set; }
+        public float VychoziCenaDemolice { get; set; }
     }
 
     internal class KonfiguraceVezKulomet : Konfigurace
@@ -30,6 +31,7 @@ namespace ToDe
                 SekundMeziVystrely = 0.5f,
                 SilaStrely = 0.05f,
                 Cena = 100,
+                VychoziCenaDemolice = 50,
             };
 
         static Dictionary<ushort, KonfiguraceVezKulomet> Vlasntosti = new Dictionary<ushort, KonfiguraceVezKulomet>()
@@ -60,6 +62,7 @@ namespace ToDe
                 Cena = 150,
                 DosahExploze = Zdroje.VelikostDlazdice * 1.5f,
                 RychlostRakety = Zdroje.VelikostDlazdice * 2.0f,
+                VychoziCenaDemolice = 75,
             };
 
         static Dictionary<ushort, KonfiguraceVezRaketa> Vlasntosti = new Dictionary<ushort, KonfiguraceVezRaketa>()

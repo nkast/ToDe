@@ -54,6 +54,7 @@ namespace ToDe
     {
         public TypVeze Typ { get; set; }
         public short MaxUroven { get; set; }
+        public float CenaDemolice { get; set; }
     }
 
     public enum TypNepritele
@@ -344,6 +345,10 @@ namespace ToDe
                 var vez = new LevelVez();
                 vez.Typ = (TypVeze)Enum.Parse(typeof(TypVeze), eVez.Attribute("typ").Value);
                 vez.MaxUroven = (short)eVez.Attribute("maxUroven");
+                vez.CenaDemolice = eVez.Attribute("cenaDemolice") != null 
+                    ? (float)eVez.Attribute("cenaDemolice") 
+                    : vez.Typ == TypVeze.Kulomet ? KonfiguraceVezKulomet.VychoziParametry.VychoziCenaDemolice
+                                                 : KonfiguraceVezRaketa.VychoziParametry.VychoziCenaDemolice;
                 veze.Add(vez);
             }
             level.Veze = veze.ToArray();
@@ -353,5 +358,8 @@ namespace ToDe
 
             return level;
         }
+
+        public LevelVez VezDleTypu(TypVeze typ)
+            => Veze.FirstOrDefault(x => x.Typ == typ);
     }
 }

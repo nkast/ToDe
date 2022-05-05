@@ -18,7 +18,15 @@ namespace ToDe
         public Vector2 Stred { get; set; }
         public bool Smazat { get; set; } = false;
         public float Nepruhlednost { get; set; } = 1;
-        public Color Barva { get; set; } = Color.White;
+
+        public Color barva = Color.White;
+        public Color Barva { 
+            get => ObjektJeVybran ? BarvaPriVyberu : barva; 
+            set => barva = value; 
+        }
+        
+        public Color BarvaPriVyberu { get; set; } = Color.LightSalmon;
+        public bool ObjektJeVybran { get; set; } = false;
 
         public DlazdiceUrceni[] Dlazdice { get; set; }
 
@@ -38,7 +46,7 @@ namespace ToDe
             foreach (var obr in Dlazdice)
             {
                 sb.Kresli(Pozice, obr, Stred, (UhelOtoceni * (obr.Otacet ? 1 : 0)) + UhelKorkceObrazku, Meritko,
-                    barva: Nepruhlednost < 1 ? Kresleni.Pruhlednost(Nepruhlednost, Barva) : (Color?)null);
+                    barva: Nepruhlednost < 1 ? Kresleni.Pruhlednost(Nepruhlednost, Barva) : Barva);
             }
         }
 
@@ -46,6 +54,22 @@ namespace ToDe
         {
             Pozice = new Vector2(Pozice.Y, Pozice.X);
             UhelOtoceni = TDUtils.KorekceUhlu(90 - UhelOtoceni);
+        }
+    }
+
+    internal class VybranaDlazdice : HerniObjekt
+    {
+        public Point PoziceNaMape { get; set; }
+
+        public VybranaDlazdice(Point poziceNaMape)
+        {
+            PoziceNaMape = poziceNaMape;
+        }
+
+        public override void TranspozicePozice()
+        {
+            base.TranspozicePozice();
+            PoziceNaMape = new Point(PoziceNaMape.Y, PoziceNaMape.X);
         }
     }
 }

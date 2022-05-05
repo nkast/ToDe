@@ -104,9 +104,9 @@ namespace ToDe
         public bool Otacet;
         public bool Vykreslovat;
 
-        public DlazdiceUrceni(int x, int y, float z = 0, bool otacet = true) 
+        private DlazdiceUrceni(int x, int y, float z = 0, bool otacet = true) 
             => (X, Y, Z, Otacet, Vykreslovat) = (x, y, z, otacet, true);
-        public DlazdiceUrceni(Point souradnice, float z = 0, bool otacet = true)
+        private DlazdiceUrceni(Point souradnice, float z = 0, bool otacet = true)
             => (X, Y, Z, Otacet, Vykreslovat) = (souradnice.X, souradnice.Y, z, otacet, true);
         public DlazdiceUrceni(ZakladniDlazdice zd, float z = 0, bool otacet = true)
         {

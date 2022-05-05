@@ -26,7 +26,7 @@ S*.....*******E
 		</vlna>
 	</vlny>
 	<veze>
-		<vez typ="Kulomet" maxUroven="3" />
-		<vez typ="Raketa" maxUroven="3" />
+		<vez typ="Kulomet" maxUroven="3" cenaDemolice="100" />
+		<vez typ="Raketa" maxUroven="3" cenaDemolice="-50" />
 	</veze>
 </level>
