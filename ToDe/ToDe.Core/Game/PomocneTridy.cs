@@ -189,6 +189,8 @@ namespace ToDe
                 return rozdil + 360;
             return rozdil;
         }
+
+
     }
 
 }

@@ -77,6 +77,7 @@ namespace ToDe
             veze.Clear();
             rakety.Clear();
             exploze.Clear();
+            prekazky.Clear();
             vybranyObjekt = null;
 
             // Načtení levelu
@@ -123,9 +124,15 @@ namespace ToDe
             if (vybranyObjekt?.GetType().IsSubclassOf(typeof(Vez)) == true)
             {
                 float cena = Zdroje.Aktualni.Level.VezDleTypu(((Vez)vybranyObjekt).TypVeze).PrijemZaDemolici;
-                ovladaciPanel.TextCenaDemolice.Text = (cena < 0 ? "-" : "+") + "$" + Math.Abs(cena).ToString();
-                ovladaciPanel.TextCenaDemolice.Barva = (cena < 0 && Zdroje.Aktualni.Level.Konto + cena < 0)
-                    ? Color.Red : Color.Lime;
+                ovladaciPanel.TextCenaDemolice.NastavTextCeny(cena);
+                //ovladaciPanel.TextCenaDemolice.Text = (cena < 0 ? "-" : "+") + "$" + Math.Abs(cena).ToString();
+                //ovladaciPanel.TextCenaDemolice.Barva = (cena < 0 && Zdroje.Aktualni.Level.Konto + cena < 0)
+                //    ? Color.Red : Color.Lime;
+            }
+            else if (vybranyObjekt is Prekazka)
+            {
+                float cena = Zdroje.Aktualni.Level.CenikPrekazek[((Prekazka)vybranyObjekt).ZnakPrekazky];
+                ovladaciPanel.TextCenaDemolice.NastavTextCeny(cena);
             }
         }
 
@@ -234,7 +241,7 @@ namespace ToDe
             // Navýšení konta o finance, které nám přibývají za sekundu
             Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.RychlostBohatnuti * casOdMinule;
 
-            // Umístění věže na mapě nebo její výběr
+            // Výběr objektu na mapě 
             if (poziceKliknuti != Vector2.Zero &&
                 poziceKliknuti.X < Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice &&
                 poziceKliknuti.Y < Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice) // Kliknuto do prostoru mapy
@@ -245,9 +252,15 @@ namespace ToDe
                     );
                 if (Zdroje.Aktualni.Level.Mapa.Pozadi[souradniceNaMape.Y, souradniceNaMape.X] == TypDlazdice.Plocha) // Kliklo se mimo silnici 
                 {
+                    // Kliklo se na věž?
                     HerniObjekt kliknutyObjekt = veze.FirstOrDefault(x => x.SouradniceNaMape == souradniceNaMape);
-                    if (kliknutyObjekt == null) // Kliknuto na dlaždici na mapě, na které nic dalšího není
+                    // Nebo se kliklo na překážku?
+                    if (kliknutyObjekt == null)
+                        kliknutyObjekt = prekazky.FirstOrDefault(x => x.SouradniceNaMape == souradniceNaMape);
+                    // Kliknuto na dlaždici na mapě, na které nic dalšího není
+                    if (kliknutyObjekt == null) 
                         kliknutyObjekt = new VybranaDlazdice(souradniceNaMape);
+
                     if (vybranyObjekt != null && (vybranyObjekt == kliknutyObjekt ||
                         (vybranyObjekt is VybranaDlazdice && kliknutyObjekt is VybranaDlazdice &&
                             ((VybranaDlazdice)vybranyObjekt).PoziceNaMape == ((VybranaDlazdice)kliknutyObjekt).PoziceNaMape)))
@@ -294,15 +307,25 @@ namespace ToDe
                     }
                 }
 
-                // Zboření věže
-                if (vybranyObjekt != null &&
-                    vybranyObjekt.GetType().IsSubclassOf(typeof(Vez)) && 
-                    ovladaciPanel.KliknutoNa?.TypPolozky == TypPolozkyNabidky.Vymazat)
+                // Zboření
+                if (ovladaciPanel.KliknutoNa?.TypPolozky == TypPolozkyNabidky.Vymazat && vybranyObjekt != null)
                 {
-                    veze.Remove(vybranyObjekt as Vez);
-                    var typVeze = ((Vez)vybranyObjekt).TypVeze;
-                    Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.VezDleTypu(typVeze)?.PrijemZaDemolici ?? 0;
-                    vybranyObjekt = null;
+                    // Zboření věže
+                    if (vybranyObjekt?.GetType().IsSubclassOf(typeof(Vez)) == true)
+                    {
+                        veze.Remove(vybranyObjekt as Vez);
+                        var typVeze = ((Vez)vybranyObjekt).TypVeze;
+                        Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.VezDleTypu(typVeze)?.PrijemZaDemolici ?? 0;
+                        vybranyObjekt = null;
+                    }
+                    // Zboření překážky
+                    else if (vybranyObjekt is Prekazka)
+                    {
+                        prekazky.Remove(vybranyObjekt as Prekazka);
+                        Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.CenikPrekazek[((Prekazka)vybranyObjekt).ZnakPrekazky];
+                        vybranyObjekt = null;
+                    }
+
                 }
             }
 
@@ -313,6 +336,8 @@ namespace ToDe
                 ovladaciPanel.PrepniNabidku(TypNabidky.ProDlazdici);
             else if (vybranyObjekt.GetType().IsSubclassOf(typeof(Vez)))
                 ovladaciPanel.PrepniNabidku(TypNabidky.ProVez);
+            else if (vybranyObjekt is Prekazka)
+                ovladaciPanel.PrepniNabidku(TypNabidky.ProPrekazku);
 
 
             // Aktualizace ostatních herních objektů

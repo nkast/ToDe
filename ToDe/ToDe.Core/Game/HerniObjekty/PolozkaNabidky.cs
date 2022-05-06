@@ -78,6 +78,16 @@ namespace ToDe
                         TextZivotu,
                     }
                 },
+                { TypNabidky.ProPrekazku,
+                    new List<PolozkaNabidky>()
+                    {
+                        new PolozkaNabidky(0, TypPolozkyNabidky.Vymazat),
+                        TextCenaDemolice,
+                        TextFinance,
+                        Pauza,
+                        TextZivotu,
+                    }
+                },
             };
 
             PrepniNabidku(TypNabidky.Zakladni);
@@ -113,6 +123,7 @@ namespace ToDe
         {
             nabidka.ForEach(x => x.TranspozicePozice());
         }
+
     }
 
 
@@ -235,6 +246,15 @@ namespace ToDe
         public override void TranspozicePozice()
         {
             base.TranspozicePozice();
+        }
+
+
+        public void NastavTextCeny(float cena, bool pridatMenu = true, bool pridatZnamenko = true)
+        {
+            Text = (pridatZnamenko ? (cena < 0 ? "-" : "+") : "") +
+                   (pridatMenu ? "$" : "") + 
+                   Math.Abs(cena).ToString();
+            Barva = (cena < 0 && Zdroje.Aktualni.Level.Konto + cena < 0) ? Color.Red : Color.Lime;
         }
     }
 
