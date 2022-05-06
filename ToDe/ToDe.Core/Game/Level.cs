@@ -54,7 +54,7 @@ namespace ToDe
     {
         public TypVeze Typ { get; set; }
         public short MaxUroven { get; set; }
-        public float CenaDemolice { get; set; }
+        public float PrijemZaDemolici { get; set; }
     }
 
     public enum TypNepritele
@@ -86,6 +86,7 @@ namespace ToDe
 
         public Point Start { get; private set; }
         public Point Cil { get; private set; }
+        public List<PrekazkaNaMape> Prekzaky { get; private set; } = new List<PrekazkaNaMape>();
 
         public int VelikostDlazdice => Zdroje.VelikostDlazdice;
         public int OkrajDlazdice => Zdroje.Obsah.Zakladni.Okraj;
@@ -168,15 +169,21 @@ namespace ToDe
             return mapa;
         }
 
-        static TypDlazdice ZnakNaTyp(LevelMapa mapa, char tile, int i, int j)
+        static TypDlazdice ZnakNaTyp(LevelMapa mapa, char znak, int i, int j)
         {
-            switch (tile)
+            switch (znak)
             {
                 case '.': return TypDlazdice.Plocha;
                 case 'S': mapa.Start = new Point(j, i); return TypDlazdice.Cesta;
                 case 'E': mapa.Cil = new Point(j, i); return TypDlazdice.Cesta;
                 case '*': return TypDlazdice.Cesta;
-                default: return TypDlazdice.Plocha;
+                default:
+                    {
+                        if (KonfiguracePrekazek.ZnakJePrekazka(znak))
+                            mapa.Prekzaky.Add(new PrekazkaNaMape(new Point(j, i), znak));
+
+                        return TypDlazdice.Plocha;
+                    }
             }
         }
 
@@ -303,6 +310,7 @@ namespace ToDe
         public LevelMapa Mapa { get; set; }
         public float Konto { get; set; }
         public float RychlostBohatnuti { get; set; } // +$/s
+        public Dictionary<char, float> CenikPrekazek { get; private set; }
 
         public static Level Nacti(XElement eLevel)
         {
@@ -345,13 +353,19 @@ namespace ToDe
                 var vez = new LevelVez();
                 vez.Typ = (TypVeze)Enum.Parse(typeof(TypVeze), eVez.Attribute("typ").Value);
                 vez.MaxUroven = (short)eVez.Attribute("maxUroven");
-                vez.CenaDemolice = eVez.Attribute("cenaDemolice") != null 
-                    ? (float)eVez.Attribute("cenaDemolice") 
-                    : vez.Typ == TypVeze.Kulomet ? KonfiguraceVezKulomet.VychoziParametry.VychoziCenaDemolice
-                                                 : KonfiguraceVezRaketa.VychoziParametry.VychoziCenaDemolice;
+                vez.PrijemZaDemolici = eVez.Attribute("prijemDemolice") != null 
+                    ? (float)eVez.Attribute("prijemDemolice") 
+                    : vez.Typ == TypVeze.Kulomet ? KonfiguraceVezKulomet.VychoziParametry.VychoziPrijemZDemolice
+                                                 : KonfiguraceVezRaketa.VychoziParametry.VychoziPrijemZDemolice;
                 veze.Add(vez);
             }
             level.Veze = veze.ToArray();
+
+            // Načtení ceníku překážek
+            level.CenikPrekazek = new Dictionary<char, float>(KonfiguracePrekazek.Cenik);
+            if (eLevel.Element("prekazky") != null)
+                foreach (var ePrakazka in eLevel.Element("prekazky").Elements())
+                    level.CenikPrekazek[ePrakazka.Attribute("znak").Value[0]] = (float)ePrakazka.Attribute("prijemDemolice");
 
             // Načtení mapy
             level.Mapa = LevelMapa.NactiMapu(eLevel.Element("mapa"));

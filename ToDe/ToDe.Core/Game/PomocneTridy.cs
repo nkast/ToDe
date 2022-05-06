@@ -125,6 +125,15 @@ namespace ToDe
                              textura.VelikostDlazdice.X, textura.VelikostDlazdice.Y);
     }
 
+    internal struct PrekazkaNaMape
+    {
+        public Point Pozice;
+        public char Znak;
+
+        public PrekazkaNaMape(Point pozice, char znak)
+            => (Pozice, Znak) = (pozice, znak);
+    }
+
     //internal static class Rozsireni {
     //    public static Rectangle Plus(this Rectangle rec, int plusX, int plusY, int plusSirka, int plusVyska)
     //        => new Rectangle(rec.Left + plusX, rec.Top + plusY, rec.Width + plusSirka, rec.Height + plusVyska);

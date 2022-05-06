@@ -26,6 +26,7 @@ namespace ToDe
         List<Vez> veze;
         List<Raketa> rakety;
         List<Exploze> exploze;
+        List<Prekazka> prekazky;
         OvladaciPanel ovladaciPanel;
         protected override void Initialize()
         {
@@ -34,6 +35,7 @@ namespace ToDe
             veze = new List<Vez>();
             rakety = new List<Raketa>();
             exploze = new List<Exploze>();
+            prekazky = new List<Prekazka>();
 
             base.Initialize();
         }
@@ -80,6 +82,10 @@ namespace ToDe
             // Načtení levelu
             aktualniMapa = Zdroje.NactiLevel(ref Zdroje.CisloLevelu);
 
+            // Přidání překážek na mapě
+            foreach (var prekazka in aktualniMapa.Level.Mapa.Prekzaky)
+                prekazky.Add(new Prekazka(prekazka.Znak, prekazka.Pozice));
+
             // Nastavení hry
             zdravi = 1;
 
@@ -116,7 +122,7 @@ namespace ToDe
 
             if (vybranyObjekt?.GetType().IsSubclassOf(typeof(Vez)) == true)
             {
-                float cena = Zdroje.Aktualni.Level.VezDleTypu(((Vez)vybranyObjekt).TypVeze).CenaDemolice;
+                float cena = Zdroje.Aktualni.Level.VezDleTypu(((Vez)vybranyObjekt).TypVeze).PrijemZaDemolici;
                 ovladaciPanel.TextCenaDemolice.Text = (cena < 0 ? "-" : "+") + "$" + Math.Abs(cena).ToString();
                 ovladaciPanel.TextCenaDemolice.Barva = (cena < 0 && Zdroje.Aktualni.Level.Konto + cena < 0)
                     ? Color.Red : Color.Lime;
@@ -295,7 +301,7 @@ namespace ToDe
                 {
                     veze.Remove(vybranyObjekt as Vez);
                     var typVeze = ((Vez)vybranyObjekt).TypVeze;
-                    Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.VezDleTypu(typVeze)?.CenaDemolice ?? 0;
+                    Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.VezDleTypu(typVeze)?.PrijemZaDemolici ?? 0;
                     vybranyObjekt = null;
                 }
             }
@@ -312,6 +318,7 @@ namespace ToDe
             // Aktualizace ostatních herních objektů
             nepratele.ForEach(x => x.Update(casOdMinule));
             mizejiciObjekty.ForEach(x => x.Update(casOdMinule));
+            prekazky.ForEach(x => x.Update(casOdMinule));
 
             // Otáčení (update) věží (řeší se zvlášť)
             nepratele = nepratele.OrderByDescending(x => x.VzdalenostNaCeste).ToList(); // Seřazení seznamu nepřátel, aby ti nejvíce vepředu byli první
@@ -451,6 +458,7 @@ namespace ToDe
             veze.ForEach(x => x.Draw(spriteBatch));
             rakety.ForEach(x => x.Draw(spriteBatch));
             exploze.ForEach(x => x.Draw(spriteBatch));
+            prekazky.ForEach(x => x.Draw(spriteBatch));
             ovladaciPanel.Draw(spriteBatch);
 
             // Game Over

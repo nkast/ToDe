@@ -29,25 +29,25 @@ namespace ToDe
             // Načtení streamu
             string soubor = string.Format("Content/Levels/Level{0}.xml", cisloMapy);
 
-            var mapa = new Zdroje();
-            mapa.Level = new Level();
-            mapa.Level.Cislo = cisloMapy;
-            Aktualni = mapa;
+            var zdroje = new Zdroje();
+            zdroje.Level = new Level();
+            zdroje.Level.Cislo = cisloMapy;
+            Aktualni = zdroje;
 
             XDocument doc;
             try
             {
                 using (Stream fileStream = TitleContainer.OpenStream(soubor))
                     doc = XDocument.Load(fileStream);
-                mapa.Level = Level.Nacti(doc.Root);
+                zdroje.Level = Level.Nacti(doc.Root);
             }
             catch (Exception)
             {
                 cisloMapy = 1;
-                mapa = NactiLevel(ref cisloMapy);
+                zdroje = NactiLevel(ref cisloMapy);
             }
 
-            return mapa;
+            return zdroje;
         }
       
     }
