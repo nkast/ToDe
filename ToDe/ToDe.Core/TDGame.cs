@@ -97,8 +97,6 @@ namespace ToDe
         void NastavTexty(bool novyLevel = false)
         {
             // Texty do nabídky
-            ovladaciPanel.TextFinance.Text = "$" + (Math.Floor(Zdroje.Aktualni.Level.Konto / 10.0)*10).ToString();
-
             int zbytekZivota = (int)Math.Round(zdravi * 100);
             if (zdravi < 0)
                 zbytekZivota = 0;
@@ -107,7 +105,10 @@ namespace ToDe
             else if (zbytekZivota == 0 && zdravi > 0)
                 zbytekZivota = 1;
 
-            ovladaciPanel.TextZivotu.Text = zbytekZivota + "%";
+            //ovladaciPanel.TextFinance.Text = "$" + (Math.Floor(Zdroje.Aktualni.Level.Konto / 10.0) * 10).ToString();
+            //ovladaciPanel.TextZivotu.Text = zbytekZivota + "%";
+            ovladaciPanel.TextFinanceAZivotu.Text = String.Format("{0}%\n${1}", 
+                zbytekZivota, Math.Floor(Zdroje.Aktualni.Level.Konto / 10.0) * 10);
 
             if (novyLevel)
             {
@@ -452,8 +453,10 @@ namespace ToDe
                 veze.ForEach(x => x.TranspozicePozice());
                 rakety.ForEach(x => x.TranspozicePozice());
                 exploze.ForEach(x => x.TranspozicePozice());
+                prekazky.ForEach(x => x.TranspozicePozice());
                 ovladaciPanel.TranspozicePozice();
-                vybranyObjekt?.TranspozicePozice();
+                if (vybranyObjekt is VybranaDlazdice)
+                    vybranyObjekt.TranspozicePozice();
             }
         }
 

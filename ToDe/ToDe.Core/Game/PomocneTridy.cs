@@ -134,6 +134,39 @@ namespace ToDe
             => (Pozice, Znak) = (pozice, znak);
     }
 
+    internal struct MezeryOdOkraju 
+    {
+        public float Vlevo;
+        public float Nahore;
+        public float Vpravo;
+        public float Dole;
+
+        public float Horizontalne { 
+            get => Vlevo + Vpravo;
+            set => (Vlevo, Vpravo) = (value, value);
+        }
+
+        public float Vertikalne
+        {
+            get => Nahore + Dole;
+            set => (Nahore, Dole) = (value, value);
+        }
+
+        public MezeryOdOkraju(float vlevo, float nahore, float vpravo, float dole)
+            => (Vlevo, Nahore, Vpravo, Dole) = (vlevo, nahore, vpravo, dole);
+        public MezeryOdOkraju(float horizontalne, float vertikalne, float mezi = 0)
+            => (Vlevo, Nahore, Vpravo, Dole) = (horizontalne, vertikalne, horizontalne, vertikalne);
+        public MezeryOdOkraju(float vse, float mezi = 0)
+            => (Vlevo, Nahore, Vpravo, Dole) = (vse, vse, vse, vse);
+
+        public static implicit operator MezeryOdOkraju(float vse) => new MezeryOdOkraju(vse);
+        public MezeryOdOkraju(MezeryOdOkraju vzor, float? vlevo = null, float? nahore = null, float? vpravo = null, float? dole = null)
+            => (Vlevo, Nahore, Vpravo, Dole) = (vlevo ?? vzor.Vlevo, nahore ?? vzor.Nahore, vpravo ?? vzor.Vpravo, dole ?? vzor.Dole);
+
+        public override string ToString() => $"{Vlevo}, {Nahore}, {Vpravo}, {Dole}";
+    }
+
+
     //internal static class Rozsireni {
     //    public static Rectangle Plus(this Rectangle rec, int plusX, int plusY, int plusSirka, int plusVyska)
     //        => new Rectangle(rec.Left + plusX, rec.Top + plusY, rec.Width + plusSirka, rec.Height + plusVyska);
