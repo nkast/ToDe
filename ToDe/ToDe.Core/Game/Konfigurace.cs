@@ -19,6 +19,7 @@ namespace ToDe
         public float DosahStrelby { get; set; } // Poloměr rádiusu kruhu dostřelu
         public float Cena { get; set; }
         public float VychoziPrijemZDemolice { get; set; }
+        public ushort PocetStrilen { get; set; }
     }
 
     internal class KonfiguraceVezKulomet : KonfiguraceVeze
@@ -28,23 +29,45 @@ namespace ToDe
             {
                 DosahStrelby = Zdroje.VelikostDlazdice * 2.1f,
                 RychlostRotace = 90,
-                SekundMeziVystrely = 0.5f,
-                SilaStrely = 0.05f,
+                SekundMeziVystrely = 0.75f,
+                SilaStrely = 0.025f,
                 Cena = 100,
                 VychoziPrijemZDemolice = 50,
+                PocetStrilen = 1,
             };
 
         static Dictionary<ushort, KonfiguraceVezKulomet> Vlasntosti = new Dictionary<ushort, KonfiguraceVezKulomet>()
         {
-            { 1, VychoziParametry }
+            { 1, VychoziParametry },
+            { 2, new KonfiguraceVezKulomet() {
+                DosahStrelby = Zdroje.VelikostDlazdice * 2.5f,
+                RychlostRotace = 110,
+                SekundMeziVystrely = 0.65f,
+                SilaStrely = 0.035f,
+                Cena = 70,
+                VychoziPrijemZDemolice = 75, 
+                PocetStrilen = 1,
+            } },
+            { 3, new KonfiguraceVezKulomet() {
+                DosahStrelby = Zdroje.VelikostDlazdice * 3f,
+                RychlostRotace = 130,
+                SekundMeziVystrely = 0.55f,
+                SilaStrely = 0.045f,
+                Cena = 70,
+                VychoziPrijemZDemolice = 90,
+                PocetStrilen = 1,
+            } },
         };
 
         public static KonfiguraceVezKulomet ParametryVeze(ushort uroven)
         {
             if (Vlasntosti.ContainsKey(uroven))
                 return Vlasntosti[uroven];
-            return Vlasntosti.Values.Last();
+            return null;// Vlasntosti.Values.Last();
         }
+
+        //public ushort MaxUroven => MaxUroven;
+        public static ushort MaxUroven => Vlasntosti.Keys.Max();
     }
 
     internal class KonfiguraceVezRaketa : KonfiguraceVeze
@@ -55,7 +78,7 @@ namespace ToDe
         public static KonfiguraceVezRaketa VychoziParametry { get; private set; } =
             new KonfiguraceVezRaketa()
             {
-                DosahStrelby = Zdroje.VelikostDlazdice * 4.1f,
+                DosahStrelby = Zdroje.VelikostDlazdice * 4f,
                 RychlostRotace = 45,
                 SekundMeziVystrely = 2f,
                 SilaStrely = 0.34f,
@@ -63,19 +86,33 @@ namespace ToDe
                 DosahExploze = Zdroje.VelikostDlazdice * 1.5f,
                 RychlostRakety = Zdroje.VelikostDlazdice * 2.0f,
                 VychoziPrijemZDemolice = 75,
+                PocetStrilen = 1,
             };
 
         static Dictionary<ushort, KonfiguraceVezRaketa> Vlasntosti = new Dictionary<ushort, KonfiguraceVezRaketa>()
         {
-            { 1, VychoziParametry }
+            { 1, VychoziParametry },
+            { 2, new KonfiguraceVezRaketa()
+            {
+                DosahStrelby = VychoziParametry.DosahStrelby * 1.1f,
+                RychlostRotace = VychoziParametry.RychlostRotace * 1.1f,
+                SekundMeziVystrely = VychoziParametry.SekundMeziVystrely * 0.9f,
+                SilaStrely = VychoziParametry.SilaStrely * 1.1f,
+                Cena = 100,
+                DosahExploze = VychoziParametry.DosahExploze * 1.1f,
+                RychlostRakety = VychoziParametry.RychlostRakety * 1.1f,
+                VychoziPrijemZDemolice = 100,
+                PocetStrilen = 1,
+            } },
         };
 
         public static KonfiguraceVezRaketa ParametryVeze(ushort uroven)
         {
             if (Vlasntosti.ContainsKey(uroven))
                 return Vlasntosti[uroven];
-            return Vlasntosti.Values.Last();
+            return null; // Vlasntosti.Values.Last();
         }
+        public static ushort MaxUroven => Vlasntosti.Keys.Max();
     }
 
     internal static class KonfiguracePrekazek

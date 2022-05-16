@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,15 +9,19 @@ namespace ToDe
     internal abstract class Vez : HerniObjekt
     {
         public float SekundDoDalsihoVystrelu { get; set; } // Odpočet
+
         public float SekundMeziVystrely { get; set; }
         public float SilaStrely { get; set; }
         public float DosahStrelby { get; set; } // Poloměr rádiusu kruhu dostřelu
+
         public Point SouradniceNaMape { get; set; }
         public Nepritel Cil { get; set; }
         public bool Strelba { get; private set; }
         public ushort Uroven { get; private set; } = 1;
         public abstract TypVeze TypVeze { get; }
 
+
+        private Kruh kruh;
 
         public Vez UmistiVez(Point souradniceNaMape)
         {
@@ -27,12 +32,35 @@ namespace ToDe
             return this;
         }
 
+        public abstract KonfiguraceVeze KonfiguraceDalsiUrovne {get;}
+        public virtual bool ZvysUroven()
+        {
+            var cfg = KonfiguraceDalsiUrovne;
+            if (cfg == null) return false;
+            Uroven++;
+            SekundMeziVystrely = cfg.SekundMeziVystrely;
+            SilaStrely = cfg.SilaStrely;
+            DosahStrelby = cfg.DosahStrelby;
+            RychlostRotace = cfg.RychlostRotace;
+            return true;
+        }
+
         public override void Update(float sekundOdMinule)
         {
             base.Update(sekundOdMinule);
             Strelba = false;
             if (SekundDoDalsihoVystrelu > 0)
                 SekundDoDalsihoVystrelu -= sekundOdMinule;
+
+            // Zobrazení kruhu (dostřelu) pokud je věž vybrána
+            if (ObjektJeVybran)
+            {
+                if (kruh == null)
+                    kruh = new Kruh(this);
+                kruh.Update(sekundOdMinule);
+            }
+            else
+                kruh = null;
 
             if (Cil == null || Cil.Smazat) return;
 
@@ -45,6 +73,12 @@ namespace ToDe
                 Strelba = true;
                 SekundDoDalsihoVystrelu = SekundMeziVystrely;
             }
+        }
+
+        public override void Draw(SpriteBatch sb)
+        {
+            base.Draw(sb);
+            kruh?.Draw(sb);
         }
 
         protected abstract void Vystrel();
@@ -72,6 +106,12 @@ namespace ToDe
             RychlostRotace = cfg.RychlostRotace;
             SekundMeziVystrely = cfg.SekundMeziVystrely;
             SilaStrely = cfg.SilaStrely;
+        }
+
+        public override KonfiguraceVeze KonfiguraceDalsiUrovne => KonfiguraceVezKulomet.ParametryVeze((ushort)(Uroven + 1));
+        public override bool ZvysUroven()
+        {
+            return base.ZvysUroven();
         }
 
         protected override void Vystrel()
@@ -103,6 +143,17 @@ namespace ToDe
             RychlostRakety = cfg.RychlostRakety;
         }
 
+        public override KonfiguraceVeze KonfiguraceDalsiUrovne => KonfiguraceVezRaketa.ParametryVeze((ushort)(Uroven + 1));
+        public override bool ZvysUroven()
+        {
+            if (!base.ZvysUroven()) return false;
+            var cfg = KonfiguraceVezRaketa.ParametryVeze(Uroven);
+            if (cfg == null) return false;
+            DosahExploze = cfg.DosahExploze;
+            RychlostRakety = cfg.RychlostRakety;
+            return true;
+        }
+
         public override void Update(float sekundOdMinule)
         {
             base.Update(sekundOdMinule);
@@ -122,6 +173,7 @@ namespace ToDe
         VezRaketa vez;
         public Vector2 SouradniceCile { get; set; }
         public bool Dopad { get; private set; } = false;
+
         public float SilaStrely { get; set; } // Kolik ubere života v epicentru
         public float DosahExploze { get; set; } // Jak až daleko bude zraňovat nepřátele
 

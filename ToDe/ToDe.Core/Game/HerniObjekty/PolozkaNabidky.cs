@@ -37,8 +37,15 @@ namespace ToDe
 
         PolozkaNabidkyObrazekSTextem demolice;
         public PolozkaNabidky TextCenaDemolice { get; private set; }
-        
+
+        PolozkaNabidkyObrazekSTextem upgrade;
+        public PolozkaNabidky TextCenaUpgrade { get; private set; }
+
         public PolozkaNabidky Pauza { get; private set; }
+
+        public PolozkaNabidky UpgradeText1 { get; private set; }
+        public PolozkaNabidky UpgradeText2 { get; private set; }
+        public PolozkaNabidky UpgradeText3 { get; private set; }
 
         public OvladaciPanel()
         {          
@@ -53,6 +60,8 @@ namespace ToDe
             //TextCenaDemolice = new PolozkaNabidky(0, TypPolozkyNabidky.Vymazat) { VyskaTextuPodObrazkem = 0.33f };
             demolice = new PolozkaNabidkyObrazekSTextem(0, TypPolozkyNabidky.Vymazat);
             TextCenaDemolice = demolice.TextovaCast;
+            upgrade = new PolozkaNabidkyObrazekSTextem(1, TypPolozkyNabidky.Upgrade);
+            TextCenaUpgrade = upgrade.TextovaCast;
 
             nabidky = new Dictionary<TypNabidky, List<PolozkaNabidky>>() 
             {
@@ -83,23 +92,11 @@ namespace ToDe
                     {
                         //new PolozkaNabidky(0, TypPolozkyNabidky.Vymazat),
                         demolice, // Cena +- za delete
+                        upgrade,
                         //new PolozkaNabidky(2, TypPolozkyNabidky.VezRaketa), // Upgrade
-                        new PolozkaNabidky(2, TypPolozkyNabidky.Text) { SirkaTextu = 2,
-Text = 
-@"Uroven 3 ($500)
-Dostrel: +5%
-Otaceni: +5%",  },
-                        new PolozkaNabidky(4, TypPolozkyNabidky.Text) { SirkaTextu = 2,
-Text =
-@"Nabijeni: -5%
-Strilen: +1
-Sila: +20%",  },
-                        new PolozkaNabidky(6, TypPolozkyNabidky.Text) { SirkaTextu = 2,
-Text =
-@"Rakety:
-Rychlost: +10%
-Dosah: +10%",  },
-
+                        (UpgradeText1 = new PolozkaNabidky(2, TypPolozkyNabidky.Text) { SirkaTextu = 2 } ),
+                        (UpgradeText2 = new PolozkaNabidky(4, TypPolozkyNabidky.Text) { SirkaTextu = 2 } ),
+                        (UpgradeText3 = new PolozkaNabidky(6, TypPolozkyNabidky.Text) { SirkaTextu = 2 } ),
                         // Víc textů...
                         //TextFinance,
                         Pauza,
@@ -123,6 +120,7 @@ Dosah: +10%",  },
             PrepniNabidku(TypNabidky.Zakladni);
         }
 
+
         public void PrepniNabidku(TypNabidky typ)
         {
             if (typ != AktualniNabidka || nabidka == null)
@@ -130,6 +128,63 @@ Dosah: +10%",  },
                 nabidka = nabidky[typ];
                 AktualniNabidka = typ;
             }
+        }
+
+        public void PrepniNabidku(TypNabidky typ, Vez vez)
+        {
+            PrepniNabidku(typ);
+            ushort novaUroven = (ushort)(vez.Uroven + 1);
+            KonfiguraceVeze novaCfg = null, staraCfg = null;
+            switch (vez.TypVeze)
+            {
+                case TypVeze.Kulomet:
+                    staraCfg = KonfiguraceVezKulomet.ParametryVeze(vez.Uroven);
+                    novaCfg = KonfiguraceVezKulomet.ParametryVeze(novaUroven);
+                    UpgradeText3.Text = "";
+                    break;
+                case TypVeze.Raketa:
+                    staraCfg = KonfiguraceVezRaketa.ParametryVeze(vez.Uroven);
+                    novaCfg = KonfiguraceVezRaketa.ParametryVeze(novaUroven);
+                    if (novaCfg != null)
+                        UpgradeText3.Text = String.Format("Rakety\nRychlost: {0}\nDosah: {1}",
+                            UpgradeHodnota(((KonfiguraceVezRaketa)staraCfg).RychlostRakety, ((KonfiguraceVezRaketa)novaCfg).RychlostRakety),
+                            UpgradeHodnota(((KonfiguraceVezRaketa)staraCfg).DosahExploze, ((KonfiguraceVezRaketa)novaCfg).DosahExploze));
+                    break;
+                default: break;
+            }
+            if (novaCfg != null)
+            {
+                upgrade.Viditelne = true;
+                //upgrade.TextovaCast.Text = "$" + Math.Abs(novaCfg.Cena).ToString();
+                upgrade.TextovaCast.NastavTextCeny(-novaCfg.Cena);
+                UpgradeText1.Text = String.Format("Upgrade {0}->{1}\nDostrel: {2}\nOtaceni: {3}",
+                    vez.Uroven, novaUroven,
+                    UpgradeHodnota(staraCfg.DosahStrelby, novaCfg.DosahStrelby),
+                    UpgradeHodnota(staraCfg.RychlostRotace, novaCfg.RychlostRotace));
+                UpgradeText2.Text = String.Format("Nabijeni {0}\nStrilen: {1}\nSila: {2}",
+                    UpgradeHodnota(staraCfg.SekundMeziVystrely, novaCfg.SekundMeziVystrely),
+                    novaCfg.PocetStrilen,
+                    UpgradeHodnota(staraCfg.SilaStrely, novaCfg.SilaStrely));
+            }
+            else
+            {
+                VymazUpgradeTexty();
+                UpgradeText1.Text = $"Vez max urovne {vez.Uroven}";
+            }
+        }
+
+        static string UpgradeHodnota(float stara, float nova)
+        {
+            float posun = (float)Math.Round(((nova - stara) / stara)*100, 0);
+            return $"{(posun < 0 ? "-" : "+")}{Math.Abs(posun)}%";
+        }
+
+        void VymazUpgradeTexty()
+        {
+            UpgradeText1.Text = "";
+            UpgradeText2.Text = "";
+            UpgradeText3.Text = "";
+            upgrade.Viditelne = false;
         }
 
 
@@ -164,6 +219,7 @@ Dosah: +10%",  },
         Pauza,
         Text,
         Vymazat,
+        Upgrade,
     }
 
     internal class PolozkaNabidkyObrazekSTextem : PolozkaNabidky
@@ -172,6 +228,7 @@ Dosah: +10%",  },
         public PolozkaNabidky TextovaCast { get; set; }
         public float VyskaTextuPodObrazkem { get; set; } // % dlaždice
         public float MezeraMezi { get; set; }
+        public bool Viditelne { get; set; } = true;
 
         public override string Text { get => TextovaCast.Text; set => TextovaCast.Text = value; }
         public override ushort SirkaTextu { get => TextovaCast.SirkaTextu; set => TextovaCast.SirkaTextu = value; }
@@ -191,11 +248,13 @@ Dosah: +10%",  },
 
         public override void Update(float sekundOdMinule, Vector2 klik)
         {
-            base.Update(sekundOdMinule, klik);
+            if (Viditelne)
+                base.Update(sekundOdMinule, klik);
         }
 
         public override void Update(float sekundOdMinule)
         {
+            if (!Viditelne) return;
             Okraje = new MezeryOdOkraju(VychoziOkraje, 
                 dole: Zdroje.VelikostDlazdice * VyskaTextuPodObrazkem + MezeraMezi * 0.5f);
             base.Update(sekundOdMinule);
@@ -207,6 +266,7 @@ Dosah: +10%",  },
 
         public override void Draw(SpriteBatch sb)
         {
+            if (!Viditelne) return;
             base.Draw(sb);
             TextovaCast.Draw(sb);
         }
@@ -251,6 +311,11 @@ Dosah: +10%",  },
             {
                 Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Kos, 0.0f, false), };
                 Barva = Color.Silver;
+                Okraje = 24;
+            }
+            else if (TypPolozky == TypPolozkyNabidky.Upgrade)
+            {
+                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Upgrade, 0.0f, false), };
                 Okraje = 24;
             }
             else if (TypPolozky == TypPolozkyNabidky.Pauza)

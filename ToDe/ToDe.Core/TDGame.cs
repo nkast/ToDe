@@ -60,6 +60,7 @@ namespace ToDe
             Zdroje.Obsah.Zakladni.Grafika = Content.Load<Texture2D>(@"Sprites/textura-vyber");
             Zdroje.Obsah.Exploze.Grafika = Content.Load<Texture2D>(@"Sprites/exploze");
             Zdroje.Obsah.Ukazatel.Grafika = Content.Load<Texture2D>(@"Sprites/ukazatel");
+            Zdroje.Obsah.Kruh.Grafika = Content.Load<Texture2D>(@"Sprites/kruh");
 
             SpustitHru();
 
@@ -126,6 +127,8 @@ namespace ToDe
             {
                 float cena = Zdroje.Aktualni.Level.VezDleTypu(((Vez)vybranyObjekt).TypVeze).PrijemZaDemolici;
                 ovladaciPanel.TextCenaDemolice.NastavTextCeny(cena);
+                
+                //ovladaciPanel.TextCenaUpgrade.NastavTextCeny(75);
                 //ovladaciPanel.TextCenaDemolice.Text = (cena < 0 ? "-" : "+") + "$" + Math.Abs(cena).ToString();
                 //ovladaciPanel.TextCenaDemolice.Barva = (cena < 0 && Zdroje.Aktualni.Level.Konto + cena < 0)
                 //    ? Color.Red : Color.Lime;
@@ -213,9 +216,6 @@ namespace ToDe
                     AkutalizovatPlanUtoku(gameTime.TotalGameTime.TotalSeconds);
                 }
             }
-
-            // Aktualizace nabídky (ještě před pauzou, aby se dala odpauzovat)
-            ovladaciPanel.Update(casOdMinule, poziceKliknuti);
 
             // Pauzování (zapnout/vyponout pauzu)
             var oznacenaPolozkaNabidky = ovladaciPanel.KliknutoNa?.TypPolozky;
@@ -325,8 +325,19 @@ namespace ToDe
                         prekazky.Remove(vybranyObjekt as Prekazka);
                         Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.CenikPrekazek[((Prekazka)vybranyObjekt).ZnakPrekazky];
                         vybranyObjekt = null;
-                    }
+                    }                   
+                }
 
+                // Upgrade
+                if (ovladaciPanel.KliknutoNa?.TypPolozky == TypPolozkyNabidky.Upgrade && vybranyObjekt != null &&
+                    vybranyObjekt?.GetType().IsSubclassOf(typeof(Vez)) == true)
+                {
+                    var cfg = ((Vez)vybranyObjekt).KonfiguraceDalsiUrovne;
+                    if (cfg != null && cfg.Cena <= Zdroje.Aktualni.Level.Konto)
+                    {
+                        ((Vez)vybranyObjekt).ZvysUroven();
+                        Zdroje.Aktualni.Level.Konto -= cfg.Cena;
+                    }
                 }
             }
 
@@ -336,10 +347,12 @@ namespace ToDe
             else if (vybranyObjekt is VybranaDlazdice)
                 ovladaciPanel.PrepniNabidku(TypNabidky.ProDlazdici);
             else if (vybranyObjekt.GetType().IsSubclassOf(typeof(Vez)))
-                ovladaciPanel.PrepniNabidku(TypNabidky.ProVez);
+                ovladaciPanel.PrepniNabidku(TypNabidky.ProVez, (Vez)vybranyObjekt);
             else if (vybranyObjekt is Prekazka)
                 ovladaciPanel.PrepniNabidku(TypNabidky.ProPrekazku);
 
+            // Aktualizace nabídky (ještě před pauzou, aby se dala odpauzovat)
+            ovladaciPanel.Update(casOdMinule, poziceKliknuti);
 
             // Aktualizace ostatních herních objektů
             nepratele.ForEach(x => x.Update(casOdMinule));

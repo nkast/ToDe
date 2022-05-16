@@ -1,83 +1,42 @@
-Dira
-Mapa_Hlina-SPAD
-Mapa_Kameni-SPAD
-Mapa_Pisek-SPAD
-Mapa_Trava-SPAD
-Nabidka_Kos
-Nabidka_Pauza
-Nabidka_Pokracovat
-Ohen_Kulomet
-Plocha_Prekazka_Kamen_1
-Plocha_Prekazka_Kamen_2
-Plocha_Prekazka_Kamen_3
-Plocha_Prekazka_Ker_1
-Plocha_Prekazka_Ker_2
-Plocha_Prekazka_Ker_3
-Plocha_Prekazka_Ker_4
-Plocha_Prekazka_Ker_5
-Raketa_1
-Raketa_2
-Tank_Poustni_Spodek
-Tank_Poustni_Vrsek
-Tank_Spodek
-Tank_Vrsek
-Vez_Elektrika_1
-Vez_Elektrika_2
-Vez_Kulomet_1
-Vez_Kulomet_2
-Vez_Raketa_1_Stred
-Vez_Raketa_1_Vrsek
-Vez_Raketa_2_Stred
-Vez_Raketa_2_Vrsek
-Vez_Raketa_3_Stred
-Vez_Raketa_3_Vrsek
-Vez_Zakladna_1
-Vez_Zakladna_2
-Vez_Zakladna_3
-Vez_Zakladna_4
-Vojak_Parasutista
-Vojak_Robot
-Vojak_Ufon
-Vojak_Vojak
-
 Dira = 0,
-Mapa_Hlina-SPAD = 1,
-Mapa_Kameni-SPAD = 2,
-Mapa_Pisek-SPAD = 3,
-Mapa_Trava-SPAD = 4,
+Mapa_Hlina = 1,
+Mapa_Kameni = 2,
+Mapa_Pisek = 3,
+Mapa_Trava = 4,
 Nabidka_Kos = 5,
 Nabidka_Pauza = 6,
-Nabidka_Pokracovat = 7,
+Nabidka_Pauza_Konec = 7,
 Ohen_Kulomet = 8,
-Plocha_Prekazka_Kamen_1 = 9,
-Plocha_Prekazka_Kamen_2 = 10,
-Plocha_Prekazka_Kamen_3 = 11,
-Plocha_Prekazka_Ker_1 = 12,
-Plocha_Prekazka_Ker_2 = 13,
-Plocha_Prekazka_Ker_3 = 14,
-Plocha_Prekazka_Ker_4 = 15,
-Plocha_Prekazka_Ker_5 = 16,
+Plocha_Prekazka_1 = 9,
+Plocha_Prekazka_2 = 10,
+Plocha_Prekazka_3 = 11,
+Plocha_Prekazka_4 = 12,
+Plocha_Prekazka_5 = 13,
+Plocha_Prekazka_6 = 14,
+Plocha_Prekazka_7 = 15,
+Plocha_Prekazka_8 = 16,
 Raketa_1 = 17,
 Raketa_2 = 18,
 Tank_Poustni_Spodek = 19,
 Tank_Poustni_Vrsek = 20,
 Tank_Spodek = 21,
 Tank_Vrsek = 22,
-Vez_Elektrika_1 = 23,
-Vez_Elektrika_2 = 24,
-Vez_Kulomet_1 = 25,
-Vez_Kulomet_2 = 26,
-Vez_Raketa_1_Stred = 27,
-Vez_Raketa_1_Vrsek = 28,
-Vez_Raketa_2_Stred = 29,
-Vez_Raketa_2_Vrsek = 30,
-Vez_Raketa_3_Stred = 31,
-Vez_Raketa_3_Vrsek = 32,
-Vez_Zakladna_1 = 33,
-Vez_Zakladna_2 = 34,
-Vez_Zakladna_3 = 35,
-Vez_Zakladna_4 = 36,
-Vojak_Parasutista = 37,
-Vojak_Robot = 38,
-Vojak_Ufon = 39,
-Vojak_Vojak = 40,
+Upgrade = 23,
+Vez_Elektrika_1 = 24,
+Vez_Elektrika_2 = 25,
+Vez_Kulomet_1 = 26,
+Vez_Kulomet_2 = 27,
+Vez_Raketa_1_Stred = 28,
+Vez_Raketa_1_Vrsek = 29,
+Vez_Raketa_2_Stred = 30,
+Vez_Raketa_2_Vrsek = 31,
+Vez_Raketa_3_Stred = 32,
+Vez_Raketa_3_Vrsek = 33,
+Vez_Zakladna_1 = 34,
+Vez_Zakladna_2 = 35,
+Vez_Zakladna_3 = 36,
+Vez_Zakladna_4 = 37,
+Vojak_Parasutista = 38,
+Vojak_Robot = 39,
+Vojak_Ufon = 40,
+Vojak_Vojak = 41,
