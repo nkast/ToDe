@@ -33,6 +33,7 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * Pozadí u panelu s nabídkou
 * Menu s dalšími možnostmi (např. restart levlu, konec hry, hlasitost...)
 * Další typy věží
+* Dvě střílny
 * Letadlo pouští parašutisty v půlce cesty
 * Protiútok jednotek (tanky střílí na věže, nálety...)
 * Mapa levelů
@@ -40,8 +41,12 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * Jiná textura na explozi
 * Ozdobné okraje cesty
 * Lepší SplashScreen
-* Hudba
+* Zvuky pro umístění věže, zboření věže, upgrade věže, zboření překážky...
+* Hudba (doporučené zdroje: [gamesounds](https://gamesounds.xyz), [game-resources](https://blog.felgo.com/game-resources/free-music-for-games))
 * Store
+* Editor levelů (včetně vlastností a cen všeho)
+* Možnost kola a jejich sady sdílet
+* Cloudové počítání top skóre za daný level/sadu
 
 
 <p align="center">
