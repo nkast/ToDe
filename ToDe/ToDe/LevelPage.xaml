@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:solid="clr-namespace:FontAwesome.Solid;assembly=FontAwesome.Solid"
+             x:Class="ToDe.LevelPage">
+    
+    <ContentPage.ToolbarItems>
+        
+        <ToolbarItem x:Name="bUlozit" Text="Uložit" Order="Primary" Priority="0" Clicked="bUlozit_Clicked">
+            <ToolbarItem.IconImageSource>
+                <solid:IconSource Icon="Save" Size="100" Color="{AppThemeBinding Light=Black, Dark=White}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+        <ToolbarItem x:Name="bHrat" Text="Hrát" Order="Primary" Priority="1" Clicked="bHrat_Clicked">
+            <ToolbarItem.IconImageSource>
+                <solid:IconSource Icon="Play" Size="100" Color="{AppThemeBinding Light=Black, Dark=White}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+        <ToolbarItem x:Name="bUlozitJako" Text="Uložit jako" Order="Secondary" Priority="1" Clicked="bUlozitJako_Clicked">
+            <ToolbarItem.IconImageSource>
+                <solid:IconSource Icon="Copy" Size="100" Color="{AppThemeBinding Light=Black, Dark=White}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+        <ToolbarItem x:Name="bPrejmenovat" Text="Přejmenovat" Order="Secondary" Priority="2" Clicked="bPrejmenovat_Clicked">
+            <ToolbarItem.IconImageSource>
+                <solid:IconSource Icon="Edit" Size="100" Color="{AppThemeBinding Light=Black, Dark=White}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+        <ToolbarItem x:Name="bFormatovat" Text="Naformátovat XML" Order="Secondary" Priority="3" Clicked="bFormatovat_Clicked">
+            <ToolbarItem.IconImageSource>
+                <solid:IconSource Icon="Code" Size="100" Color="{AppThemeBinding Light=Black, Dark=White}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+        <ToolbarItem x:Name="bVelikostPisma" Text="Velikost písma" Order="Secondary" Priority="4" Clicked="bVelikostPisma_Clicked">
+            <ToolbarItem.IconImageSource>
+                <solid:IconSource Icon="Font" Size="100" Color="{AppThemeBinding Light=Black, Dark=White}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+        <ToolbarItem x:Name="bSdilet" Text="Sdílet" Order="Secondary" Priority="5" Clicked="bSdilet_Clicked">
+            <ToolbarItem.IconImageSource>
+                <solid:IconSource Icon="Share" Size="100" Color="{AppThemeBinding Light=Black, Dark=White}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+        <ToolbarItem x:Name="bVymazat" Text="Vymazat" Order="Secondary" Priority="10" Clicked="bVymazat_Clicked">
+            <ToolbarItem.IconImageSource>
+                <solid:IconSource Icon="Trash" Size="100" Color="{AppThemeBinding Light=Black, Dark=White}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <Grid>
+            <Editor x:Name="eLevel" 
+                    IsSpellCheckEnabled="False"
+                    Keyboard="Plain"
+                    FontSize="Small"
+                    FontFamily="Consolas"
+                    TextChanged="eLevel_TextChanged" />
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

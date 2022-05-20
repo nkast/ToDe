@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:solid="clr-namespace:FontAwesome.Solid;assembly=FontAwesome.Solid"
+             x:Class="ToDe.LevelyPage"
+             Title="Seznam levelů">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem x:Name="bPridat" Text="Nový" Order="Primary" Priority="0" Clicked="bPridat_Clicked">
+            <ToolbarItem.IconImageSource>
+                <solid:IconSource Icon="Plus" Size="100" Color="{AppThemeBinding Light=Black, Dark=White}" />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+    
+    <ContentPage.Content>
+        <Grid>
+            <ListView x:Name="lvSeznamLevelu" ItemTapped="lvSeznamLevelu_ItemTapped">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Label Margin="20,10" Text="{Binding Path=., StringFormat='{0}'}" />
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

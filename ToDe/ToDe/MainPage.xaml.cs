@@ -17,7 +17,13 @@ namespace ToDe
 
         private void bNovaHra_Clicked(object sender, EventArgs e)
         {
+            TDGame.SouborLevelu = "";
             Navigation.PushAsync(new HraPage());
+        }
+
+        private void bEditorLevelu_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new LevelyPage());
         }
     }
 }

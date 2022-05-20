@@ -10,14 +10,28 @@ using System.Text;
 
 namespace ToDe
 {
+    public class OvladacHry
+    {
+        public static void VypnoutHru()
+        {
+            TDGame.AktualniHra?.Exit();
+            TDGame.AktualniHra = null;
+            //Zdroje.Obsah = null;
+        }
+    }
+
     public class TDGame : Game
     {
+        public static string SouborLevelu;
+        public static TDGame AktualniHra;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
         public TDGame()
         {
-            IsMouseVisible = true;
+            AktualniHra = this;
+            IsMouseVisible = true; 
             graphics = new GraphicsDeviceManager(this);
         }
 
@@ -79,10 +93,13 @@ namespace ToDe
             rakety.Clear();
             exploze.Clear();
             prekazky.Clear();
-            vybranyObjekt = null;
+            vybranyObjekt = null; 
 
             // Načtení levelu
-            aktualniMapa = Zdroje.NactiLevel(ref Zdroje.CisloLevelu);
+            if (String.IsNullOrEmpty(SouborLevelu))
+                aktualniMapa = Zdroje.NactiLevel(ref Zdroje.CisloLevelu);
+            else
+                aktualniMapa = Zdroje.NactiLevel(SouborLevelu);
 
             // Přidání překážek na mapě
             foreach (var prekazka in aktualniMapa.Level.Mapa.Prekzaky)

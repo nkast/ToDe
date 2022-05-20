@@ -26,8 +26,14 @@ namespace ToDe
 
         public static Zdroje NactiLevel(ref int cisloMapy)
         {
-            // Načtení streamu
             string soubor = string.Format("Content/Levels/Level{0}.xml", cisloMapy);
+            return NactiLevel(soubor);
+        }
+
+        public static Zdroje NactiLevel(string soubor, int cisloMapy = -1)
+        {
+            // Načtení streamu
+            //string soubor = string.Format("Content/Levels/Level{0}.xml", cisloMapy);
 
             var zdroje = new Zdroje();
             zdroje.Level = new Level();
@@ -37,14 +43,22 @@ namespace ToDe
             XDocument doc;
             try
             {
-                using (Stream fileStream = TitleContainer.OpenStream(soubor))
-                    doc = XDocument.Load(fileStream);
+                if (cisloMapy >= 0)
+                    using (Stream fileStream = TitleContainer.OpenStream(soubor))
+                        doc = XDocument.Load(fileStream);
+                else
+                    doc = XDocument.Load(soubor);
                 zdroje.Level = Level.Nacti(doc.Root);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                cisloMapy = 1;
-                zdroje = NactiLevel(ref cisloMapy);
+                if (cisloMapy >= 0)
+                {
+                    cisloMapy = 1;
+                    zdroje = NactiLevel(ref cisloMapy);
+                }
+                else
+                    throw;
             }
 
             return zdroje;

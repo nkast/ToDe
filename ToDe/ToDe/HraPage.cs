@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using Xamarin.Forms;
 
 namespace ToDe
@@ -12,6 +11,12 @@ namespace ToDe
         public HraPage()
         {
             NavigationPage.SetHasNavigationBar(this, false);
+        }
+
+        protected override bool OnBackButtonPressed()
+        {
+            OvladacHry.VypnoutHru();
+            return base.OnBackButtonPressed();
         }
     }
 }

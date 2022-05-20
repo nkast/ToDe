@@ -40,7 +40,7 @@ namespace ToDe.Droid
         Label = "ToDe",
         AlwaysRetainTaskState = false,
         ScreenOrientation = ScreenOrientation.FullUser,
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.ScreenLayout | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden
+        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.ScreenLayout | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden | ConfigChanges.Navigation
         )]
     public class HraActivity : AndroidGameActivity
     {
@@ -52,6 +52,11 @@ namespace ToDe.Droid
             var view = game.Services.GetService(typeof(Android.Views.View)) as Android.Views.View;
             SetContentView(view);
             game.Run();
+        }
+        public override void OnBackPressed()
+        {
+            Finish();
+            base.OnBackPressed();
         }
     }
 }
