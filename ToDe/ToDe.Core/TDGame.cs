@@ -63,6 +63,7 @@ namespace ToDe
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Načtení zdrojů
+            if (Zdroje.Obsah == null)
             Zdroje.Obsah = new Obsah() {
                 Pismo = Content.Load<SpriteFont>(@"Fonts/Pismo"),
                 ZvukKulomet = new Zvuk(Content.Load<SoundEffect>(@"Sounds/vez_kulomet"), 2),

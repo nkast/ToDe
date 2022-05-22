@@ -1,9 +1,10 @@
 ﻿# ToDe - Tower Defense hra v Monogame (C#)
 
 Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _let's program_ streamu v Monogame a jazyce C#.
-* Živé streamy na [Twitch kanále](https://www.twitch.tv/petrvobornik)
-* Archiv streamů v [YouTube playlistu](http://programko.net/tode/yt)
-* Možnost diskuze k projektu mimo stream na [Discord serveru](http://programko.net/discord)
+* Živé streamy na *Twitch* kanále [programko.net/tode/tw](https://www.twitch.tv/petrvobornik)
+* Archiv streamů v *YouTube* playlistu [programko.net/tode/yt](https://www.youtube.com/playlist?list=PLxTqV9i8bnb_BN9k_-W_CjXfumNzqiPEe)
+* Možnost diskuze k projektu mimo stream na *Discord* serveru [programko.net/tode/dc](https://discord.gg/GVgz2a3qd8)
+* A URL alias k tomuto *GitHub* repozitáři je [programko.net/tode/gh](https://github.com/PetrVobornik/ToDe)
 
 ## Roadmap
 * ~~Projekt s NuGety (bez šablony) s VS kompilovaným obsahem~~
@@ -30,6 +31,13 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * ~~Překážky na ploše (+ možnost je za $ odstranit)~~
 * ~~Možnost upgrade věží, možnost definovat i parametry raket~~
 * ~~Možnost nějak zobrazit dosah věží~~
+* ~~Editor levelů~~
+* ~~Možnost kola a jejich sady sdílet~~
+* Vyřešit možnost opětovného zapnutí hry bez nutnosti vypínat aplikaci (v UWP i na Androidu)
+* Možnost v XML levelu definovat úplně vše (včetně všech vlastností věží ve všech levelech, i dostupnost jednotlivých typů)
+* Import souborů s levely
+* Ukládat nastavení editoru do Preferences
+* Možnost větších levelů - jejich posouvání a zoomování dotyky (ale bez ovládacího panelu)
 * Pozadí u panelu s nabídkou
 * Menu s dalšími možnostmi (např. restart levlu, konec hry, hlasitost...)
 * Další typy věží
@@ -44,8 +52,7 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * Zvuky pro umístění věže, zboření věže, upgrade věže, zboření překážky...
 * Hudba (doporučené zdroje: [gamesounds](https://gamesounds.xyz), [game-resources](https://blog.felgo.com/game-resources/free-music-for-games))
 * Store
-* Editor levelů (včetně vlastností a cen všeho)
-* Možnost kola a jejich sady sdílet
+* Grafický editor levelů
 * Cloudové počítání top skóre za daný level/sadu
 
 
