@@ -28,6 +28,6 @@
 	</vlny>
 	<veze>
 		<vez typ="Kulomet" maxUroven="3" />
-		<vez typ="Raketa" maxUroven="3" />
+		<vez typ="Raketa" maxUroven="2" />
 	</veze>
 </level>

@@ -135,16 +135,20 @@ namespace ToDe
             PrepniNabidku(typ);
             ushort novaUroven = (ushort)(vez.Uroven + 1);
             KonfiguraceVeze novaCfg = null, staraCfg = null;
+
+            staraCfg = Zdroje.Aktualni.Level.VezDleTypu(vez.TypVeze).ParametryVeze(vez.Uroven);
+            novaCfg = Zdroje.Aktualni.Level.VezDleTypu(vez.TypVeze).ParametryVeze(novaUroven);
+            
             switch (vez.TypVeze)
             {
                 case TypVeze.Kulomet:
-                    staraCfg = KonfiguraceVezKulomet.ParametryVeze(vez.Uroven);
-                    novaCfg = KonfiguraceVezKulomet.ParametryVeze(novaUroven);
+                    //staraCfg = KonfiguraceVezKulomet.ParametryVeze(vez.Uroven);
+                    //novaCfg = KonfiguraceVezKulomet.ParametryVeze(novaUroven);
                     UpgradeText3.Text = "";
                     break;
                 case TypVeze.Raketa:
-                    staraCfg = KonfiguraceVezRaketa.ParametryVeze(vez.Uroven);
-                    novaCfg = KonfiguraceVezRaketa.ParametryVeze(novaUroven);
+                    //staraCfg = KonfiguraceVezRaketa.ParametryVeze(vez.Uroven);
+                    //novaCfg = KonfiguraceVezRaketa.ParametryVeze(novaUroven);
                     if (novaCfg != null)
                         UpgradeText3.Text = String.Format("Rakety\nRychlost: {0}\nDosah: {1}",
                             UpgradeHodnota(((KonfiguraceVezRaketa)staraCfg).RychlostRakety, ((KonfiguraceVezRaketa)novaCfg).RychlostRakety),

@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using System.Xml.Serialization;
 
 namespace ToDe
 {
@@ -54,7 +55,17 @@ namespace ToDe
     {
         public TypVeze Typ { get; set; }
         public short MaxUroven { get; set; }
-        public float PrijemZaDemolici { get; set; }
+        //public float PrijemZaDemolici { get; set; }
+
+        public Dictionary<ushort, KonfiguraceVeze> Vlasntosti { get; set; }
+        public KonfiguraceVeze ParametryVeze(ushort uroven) 
+        {
+            if (Vlasntosti.ContainsKey(uroven))
+                return Vlasntosti[uroven];
+            return null; 
+        }
+        public T ParametryVeze<T>(ushort uroven) where T : KonfiguraceVeze
+            => ParametryVeze(uroven) as T;
     }
 
     public enum TypNepritele
@@ -307,6 +318,7 @@ namespace ToDe
         public LevelVlna[] Vlny { get; set; }
         public List<PolozkaPlanuVln> PlanPosilaniVln { get; set; }
         public LevelVez[] Veze { get; set; }
+
         public LevelMapa Mapa { get; set; }
         public float Konto { get; set; }
         public float RychlostBohatnuti { get; set; } // +$/s
@@ -336,8 +348,9 @@ namespace ToDe
                     jednotka.Zdravi = (float)eJednotka.Attribute("zdravi");
                     jednotka.Sila = (float)eJednotka.Attribute("sila");
                     jednotka.Rychlost = (float)eJednotka.Attribute("rychlost");
-                    jednotka.Odstup = eJednotka.Attribute("odstup") == null ? 0f : (float)eJednotka.Attribute("odstup");
-                    jednotka.Uzdravovani = eJednotka.Attribute("uzdravovani") == null ? 0f : (float)eJednotka.Attribute("uzdravovani");
+                    //jednotka.Odstup = eJednotka.Attribute("odstup") == null ? 0f : (float)eJednotka.Attribute("odstup");
+                    jednotka.Odstup = eJednotka.GetAtt("odstup", 0f);
+                    jednotka.Uzdravovani = eJednotka.GetAtt("uzdravovani", 0f);
                     jednotky.Add(jednotka);
                 }
                 vlna.Jednotky = jednotky.ToArray();
@@ -353,10 +366,36 @@ namespace ToDe
                 var vez = new LevelVez();
                 vez.Typ = (TypVeze)Enum.Parse(typeof(TypVeze), eVez.Attribute("typ").Value);
                 vez.MaxUroven = (short)eVez.Attribute("maxUroven");
-                vez.PrijemZaDemolici = eVez.Attribute("prijemDemolice") != null 
-                    ? (float)eVez.Attribute("prijemDemolice") 
-                    : vez.Typ == TypVeze.Kulomet ? KonfiguraceVezKulomet.VychoziParametry.VychoziPrijemZDemolice
-                                                 : KonfiguraceVezRaketa.VychoziParametry.VychoziPrijemZDemolice;
+                if (vez.Typ == TypVeze.Kulomet)
+                    vez.MaxUroven = (short)Math.Min(vez.MaxUroven, KonfiguraceVezKulomet.MaxUroven);
+                else if (vez.Typ == TypVeze.Raketa)
+                    vez.MaxUroven = (short)Math.Min(vez.MaxUroven, KonfiguraceVezRaketa.MaxUroven);
+
+                // Vlastnosti věže
+                vez.Vlasntosti = new Dictionary<ushort, KonfiguraceVeze>();
+                for (ushort idUrovne = 1; idUrovne <= vez.MaxUroven; idUrovne++)
+                {
+                    switch (vez.Typ)
+                    {
+                        case TypVeze.Kulomet: vez.Vlasntosti[idUrovne] = new KonfiguraceVezKulomet(); break;
+                        case TypVeze.Raketa:  vez.Vlasntosti[idUrovne] = new KonfiguraceVezRaketa(); break;
+                    }
+                    
+                    var eUroven = eVez.Elements().FirstOrDefault(x => Convert.ToInt16(x.Attribute("id").Value) == idUrovne);
+                    TDUtils.NactiParametrVeze(vez, eVez, eUroven, idUrovne, nameof(KonfiguraceVeze.DosahStrelby), Zdroje.VelikostDlazdice);
+                    TDUtils.NactiParametrVeze(vez, eVez, eUroven, idUrovne, nameof(KonfiguraceVeze.SekundMeziVystrely));
+                    TDUtils.NactiParametrVeze(vez, eVez, eUroven, idUrovne, nameof(KonfiguraceVeze.RychlostRotace));
+                    TDUtils.NactiParametrVeze(vez, eVez, eUroven, idUrovne, nameof(KonfiguraceVeze.SilaStrely));
+                    TDUtils.NactiParametrVeze(vez, eVez, eUroven, idUrovne, nameof(KonfiguraceVeze.Cena));
+                    TDUtils.NactiParametrVeze(vez, eVez, eUroven, idUrovne, nameof(KonfiguraceVeze.PrijemZDemolice));
+                    TDUtils.NactiParametrVeze(vez, eVez, eUroven, idUrovne, nameof(KonfiguraceVeze.PocetStrilen));
+                    if (vez.Typ == TypVeze.Raketa)
+                    {
+                        TDUtils.NactiParametrVeze(vez, eVez, eUroven, idUrovne, nameof(KonfiguraceVezRaketa.DosahExploze), Zdroje.VelikostDlazdice);
+                        TDUtils.NactiParametrVeze(vez, eVez, eUroven, idUrovne, nameof(KonfiguraceVezRaketa.RychlostRakety), Zdroje.VelikostDlazdice);
+                    }
+                }
+
                 veze.Add(vez);
             }
             level.Veze = veze.ToArray();

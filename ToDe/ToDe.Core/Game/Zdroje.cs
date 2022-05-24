@@ -27,7 +27,7 @@ namespace ToDe
         public static Zdroje NactiLevel(ref int cisloMapy)
         {
             string soubor = string.Format("Content/Levels/Level{0}.xml", cisloMapy);
-            return NactiLevel(soubor);
+            return NactiLevel(soubor, cisloMapy);
         }
 
         public static Zdroje NactiLevel(string soubor, int cisloMapy = -1)

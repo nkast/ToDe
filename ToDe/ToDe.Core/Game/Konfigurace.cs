@@ -18,8 +18,8 @@ namespace ToDe
         public float SilaStrely { get; set; }
         public float DosahStrelby { get; set; } // Poloměr rádiusu kruhu dostřelu
         public float Cena { get; set; }
-        public float VychoziPrijemZDemolice { get; set; }
-        public ushort PocetStrilen { get; set; }
+        public float PrijemZDemolice { get; set; }
+        public float PocetStrilen { get; set; }
     }
 
     internal class KonfiguraceVezKulomet : KonfiguraceVeze
@@ -27,12 +27,12 @@ namespace ToDe
         public static KonfiguraceVezKulomet VychoziParametry { get; private set; } =
             new KonfiguraceVezKulomet()
             {
-                DosahStrelby = Zdroje.VelikostDlazdice * 2.1f,
+                DosahStrelby = /*Zdroje.VelikostDlazdice */ 2.1f,
                 RychlostRotace = 90,
                 SekundMeziVystrely = 0.75f,
                 SilaStrely = 0.025f,
                 Cena = 100,
-                VychoziPrijemZDemolice = 50,
+                PrijemZDemolice = 50,
                 PocetStrilen = 1,
             };
 
@@ -40,21 +40,21 @@ namespace ToDe
         {
             { 1, VychoziParametry },
             { 2, new KonfiguraceVezKulomet() {
-                DosahStrelby = Zdroje.VelikostDlazdice * 2.5f,
+                DosahStrelby = 2.5f,
                 RychlostRotace = 110,
                 SekundMeziVystrely = 0.65f,
                 SilaStrely = 0.035f,
                 Cena = 70,
-                VychoziPrijemZDemolice = 75, 
+                PrijemZDemolice = 75, 
                 PocetStrilen = 1,
             } },
             { 3, new KonfiguraceVezKulomet() {
-                DosahStrelby = Zdroje.VelikostDlazdice * 3f,
+                DosahStrelby = 3f,
                 RychlostRotace = 130,
                 SekundMeziVystrely = 0.55f,
                 SilaStrely = 0.045f,
                 Cena = 70,
-                VychoziPrijemZDemolice = 90,
+                PrijemZDemolice = 90,
                 PocetStrilen = 1,
             } },
         };
@@ -78,14 +78,14 @@ namespace ToDe
         public static KonfiguraceVezRaketa VychoziParametry { get; private set; } =
             new KonfiguraceVezRaketa()
             {
-                DosahStrelby = Zdroje.VelikostDlazdice * 4f,
+                DosahStrelby = 4f,
                 RychlostRotace = 45,
                 SekundMeziVystrely = 2f,
                 SilaStrely = 0.34f,
                 Cena = 150,
-                DosahExploze = Zdroje.VelikostDlazdice * 1.5f,
-                RychlostRakety = Zdroje.VelikostDlazdice * 2.0f,
-                VychoziPrijemZDemolice = 75,
+                DosahExploze = 1.5f,
+                RychlostRakety =  2.0f,
+                PrijemZDemolice = 75,
                 PocetStrilen = 1,
             };
 
@@ -101,7 +101,7 @@ namespace ToDe
                 Cena = 100,
                 DosahExploze = VychoziParametry.DosahExploze * 1.1f,
                 RychlostRakety = VychoziParametry.RychlostRakety * 1.1f,
-                VychoziPrijemZDemolice = 100,
+                PrijemZDemolice = 100,
                 PocetStrilen = 1,
             } },
         };
