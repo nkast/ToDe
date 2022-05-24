@@ -1,9 +1,9 @@
 ﻿# ToDe - Tower Defense hra v Monogame (C#)
 
 Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _let's program_ streamu v Monogame a jazyce C#.
-* Živé streamy na *Twitch* kanále [programko.net/tode/tw](https://www.twitch.tv/petrvobornik)
-* Archiv streamů v *YouTube* playlistu [programko.net/tode/yt](https://www.youtube.com/playlist?list=PLxTqV9i8bnb_BN9k_-W_CjXfumNzqiPEe)
-* Možnost diskuze k projektu mimo stream na *Discord* serveru [programko.net/tode/dc](https://discord.gg/GVgz2a3qd8)
+* Živé streamy na *Twitch* kanále [programko.net/tode/tw](https://www.twitch.tv/petrvobornik) [![Twitch Status](https://img.shields.io/twitch/status/petrvobornik?label=Twitch&style=social)](https://www.twitch.tv/petrvobornik)
+* Archiv streamů v *YouTube* playlistu [programko.net/tode/yt](https://www.youtube.com/playlist?list=PLxTqV9i8bnb_BN9k_-W_CjXfumNzqiPEe) [![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCpa5E1uKjQ0gGlui9G1wPCg?label=YouTube&style=social)](https://www.youtube.com/user/VobornikPetrCZ/)
+* Možnost diskuze k projektu mimo stream na *Discord* serveru [programko.net/tode/dc](https://discord.gg/GVgz2a3qd8) [![Discord](https://img.shields.io/discord/836206232485232700?color=%237289DA&label=GitHub&logo=discord&logoColor=%23FFF&style=plastic)](https://discord.gg/GVgz2a3qd8)
 * A URL alias k tomuto *GitHub* repozitáři je [programko.net/tode/gh](https://github.com/PetrVobornik/ToDe)
 
 ## Roadmap
@@ -88,8 +88,8 @@ Otevřete okno terminálu (Ctrl+;), a zadejte následující příkazy, které n
 
 
 ## Další odkazy
-* Twitter: [@VobornikPetr](https://twitter.com/VobornikPetr)
-* YouTube: [Programko.NET](http://programko.net)
+* Twitter: [@VobornikPetr](https://twitter.com/VobornikPetr) [![Twitter Follow](https://img.shields.io/twitter/follow/VobornikPetr?label=Twitter&style=social)](https://twitter.com/VobornikPetr)
+* YouTube: [Programko.NET](http://programko.net) [![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCpa5E1uKjQ0gGlui9G1wPCg?label=YouTube&style=social)](https://www.youtube.com/user/VobornikPetrCZ/)
 * GitHub: [ToDe](https://github.com/PetrVobornik/ToDe)
 * Web: [petrvobornik.cz](https://www.petrvobornik.cz)
 * Podpora: [programko.net/podpora](https://programko.net/podpora)
