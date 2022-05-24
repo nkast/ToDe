@@ -2,7 +2,11 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 
 namespace ToDe
 {
@@ -167,10 +171,77 @@ namespace ToDe
     }
 
 
-    //internal static class Rozsireni {
-    //    public static Rectangle Plus(this Rectangle rec, int plusX, int plusY, int plusSirka, int plusVyska)
-    //        => new Rectangle(rec.Left + plusX, rec.Top + plusY, rec.Width + plusSirka, rec.Height + plusVyska);
-    //}
+    internal static class Rozsireni
+    {
+        //public static Rectangle Plus(this Rectangle rec, int plusX, int plusY, int plusSirka, int plusVyska)
+        //    => new Rectangle(rec.Left + plusX, rec.Top + plusY, rec.Width + plusSirka, rec.Height + plusVyska);
+
+        public static T GetAtt<T>(this XElement element, XName attributeName, T defaultValue)
+            => (T)AttributeValue(typeof(T), element, attributeName, defaultValue);
+
+        public static T AttVal<T>(XElement element, XName attributeName, T defaultValue)
+            => (T)AttributeValue(typeof(T), element, attributeName, defaultValue);
+
+
+        public static object AttributeValue(Type type, XElement element, XName attributeName, object defaultValue)
+        {
+            XAttribute attribute = null;
+            if (element != null)
+                attribute = element.Attribute(attributeName);
+            if (attribute == null || String.IsNullOrEmpty(attribute.Value))
+                return defaultValue;
+            if (type == typeof(DateTime))
+                return (DateTime)attribute;
+            return ConvertXmlValue(type, attribute.Value, defaultValue);
+        }
+
+        public static object ConvertXmlValue(Type type, string value, object defaultValue)
+        {
+            try
+            {
+                if (String.IsNullOrEmpty(value))
+                    return defaultValue;
+                if (type == typeof(double))
+                    return Convert.ToDouble(value, CultureInfo.InvariantCulture);
+                if (type == typeof(float))
+                    return Convert.ToSingle(value, CultureInfo.InvariantCulture);
+                if (type == typeof(decimal))
+                    return Convert.ToDecimal(value, CultureInfo.InvariantCulture);
+                if (type == typeof(ushort))
+                    return Convert.ToUInt16(value);
+                if (type == typeof(byte))
+                    return Convert.ToByte(value);
+                if (type == typeof(short))
+                    return Convert.ToInt16(value);
+                if (type == typeof(int))
+                    return Convert.ToInt32(value);
+                if (type == typeof(int?))
+                    return (int?)Convert.ToInt32(value);
+                if (type == typeof(long))
+                    return Convert.ToInt64(value);
+                if (type == typeof(long?))
+                    return (long?)Convert.ToInt64(value);
+                if (type == typeof(DateTime))
+                    return DateTime.Parse(value);
+                //if (type == typeof(Color))
+                //    return Color.FromHex(value.TrimStart('#'));
+                if (type == typeof(bool) || type == typeof(bool?))
+                {
+                    bool result = (!String.IsNullOrEmpty(value) &&
+                        (value == "1" || value.ToLower() == "true"));
+                    if (type == typeof(bool?))
+                        return (bool?)result;
+                    return result;
+                }
+                if (type.GetTypeInfo().IsSubclassOf(typeof(Enum)))
+                    return Enum.Parse(type, value, true);
+                return value;
+            }
+            catch { }
+            return defaultValue;
+        }
+
+    }
 
     internal static class TDUtils
     {
@@ -223,7 +294,42 @@ namespace ToDe
             return rozdil;
         }
 
+        public static void NactiParametrVeze(LevelVez vez, XElement eVez, XElement eUroven, ushort idUrovne, string nazevVlastnosti, int nasobitel = 1) 
+        {
+            Type typ = null;
+            switch (vez.Typ)
+            {
+                case TypVeze.Kulomet: typ = typeof(KonfiguraceVezKulomet); break;
+                case TypVeze.Raketa:  typ = typeof(KonfiguraceVezRaketa); break;
+            }
+            var prop = typ.GetProperty(nazevVlastnosti);
+            string nazevAtributu = nazevVlastnosti[0].ToString().ToLower() + nazevVlastnosti.Substring(1); // Název atributu = název vlasntosti, ale první písmeno je malé
+            var metoda = typ.GetMethod(nameof(KonfiguraceVezKulomet.ParametryVeze));
+            var vlastnostiSVychoziHodnotou = metoda.Invoke(null, new object[] { idUrovne }) as KonfiguraceVeze; // KonfiguraceVezKulomet.ParametryVeze(idUrovne)
 
+            //var eUroven = eVez.Elements().FirstOrDefault(x => Convert.ToInt16(x.Attribute("id").Value) == idUrovne);
+            float hodnota;
+            if (idUrovne == 1)
+                hodnota = eUroven.GetAtt(nazevAtributu,
+                    (float)prop.GetValue(vlastnostiSVychoziHodnotou)) * nasobitel;
+            else
+            {
+                string val = eUroven.GetAtt(nazevAtributu, "");
+                if (String.IsNullOrEmpty(val))
+                    hodnota = (float)prop.GetValue(vlastnostiSVychoziHodnotou) * nasobitel;
+                else
+                {
+                    if (val[0] == '+' || val[0] == '-')
+                        hodnota = (float)prop.GetValue(vez.Vlasntosti[(ushort)(idUrovne - 1)])
+                            * (1 + Convert.ToSingle(val));
+                    else
+                        hodnota = Convert.ToSingle(val) * nasobitel;
+                }
+            }
+
+            prop.SetValue(vez.Vlasntosti[idUrovne], hodnota);
+
+        }
     }
 
 }

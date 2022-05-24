@@ -26,8 +26,12 @@ S*..5..*******E
 		</vlna>
 	</vlny>
 	<veze>
-		<vez typ="Kulomet" maxUroven="3" prijemDemolice="100" />
-		<vez typ="Raketa" maxUroven="3" prijemDemolice="-50" />
+    <vez typ="Kulomet" maxUroven="3">
+      <uroven id="1" dosahStrelby="2.1" rychlostRotace="90" sekundMeziVystrely="0.75" silaStrely="0.025" pocetStrilen="1" cena="90" prijemZDemolice="50" />
+      <uroven id="2" dosahStrelby="2.5" rychlostRotace="110" cena="60" />
+      <uroven id="3" dosahStrelby="+0.1" rychlostRotace="+0.1" cena="80"  />
+    </vez>
+		<vez typ="Raketa" maxUroven="2" />
 	</veze>
   <prekazky>
     <prekazka znak="1" prijemDemolice="-10" />

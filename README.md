@@ -33,10 +33,10 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * ~~Možnost nějak zobrazit dosah věží~~
 * ~~Editor levelů~~
 * ~~Možnost kola a jejich sady sdílet~~
+* ~~Ukládat nastavení editoru do Preferences~~
 * Vyřešit možnost opětovného zapnutí hry bez nutnosti vypínat aplikaci (v UWP i na Androidu)
 * Možnost v XML levelu definovat úplně vše (včetně všech vlastností věží ve všech levelech, i dostupnost jednotlivých typů)
 * Import souborů s levely
-* Ukládat nastavení editoru do Preferences
 * Možnost větších levelů - jejich posouvání a zoomování dotyky (ale bez ovládacího panelu)
 * Pozadí u panelu s nabídkou
 * Menu s dalšími možnostmi (např. restart levlu, konec hry, hlasitost...)

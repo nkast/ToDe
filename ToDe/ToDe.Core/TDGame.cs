@@ -14,7 +14,7 @@ namespace ToDe
     {
         public static void VypnoutHru()
         {
-            TDGame.AktualniHra?.Exit();
+            //TDGame.AktualniHra?.Exit();
             TDGame.AktualniHra = null;
             //Zdroje.Obsah = null;
         }
@@ -129,21 +129,26 @@ namespace ToDe
             ovladaciPanel.TextFinanceAZivotu.Text = String.Format("{0}%\n${1}", 
                 zbytekZivota, Math.Floor(Zdroje.Aktualni.Level.Konto / 10.0) * 10);
 
-            if (novyLevel)
+            if (vybranyObjekt is VybranaDlazdice)
             {
-                //PolozkaNabidky.Vyber.Viditelny = false;
-                ovladaciPanel.TextCenaVezeKluomet.Text = "$" + KonfiguraceVezKulomet.VychoziParametry.Cena.ToString();
-                ovladaciPanel.TextCenaVezeRaketa.Text = "$" + KonfiguraceVezRaketa.VychoziParametry.Cena.ToString();
+                LevelVez v;
+                if ((v = Zdroje.Aktualni.Level.VezDleTypu(TypVeze.Kulomet)) != null)
+                {
+                    ovladaciPanel.TextCenaVezeKluomet.Text = "$" + v.ParametryVeze(1).Cena.ToString();
+                    ovladaciPanel.TextCenaVezeKluomet.Barva = Zdroje.Aktualni.Level.Konto >= v.ParametryVeze(1).Cena
+                        ? Color.Lime : Color.Red;
+                }
+                if ((v = Zdroje.Aktualni.Level.VezDleTypu(TypVeze.Raketa)) != null)
+                {
+                    ovladaciPanel.TextCenaVezeRaketa.Text = "$" + v.ParametryVeze(1).Cena.ToString();
+                    ovladaciPanel.TextCenaVezeRaketa.Barva = Zdroje.Aktualni.Level.Konto >= v.ParametryVeze(1).Cena
+                        ? Color.Lime : Color.Red;
+                }
             }
-
-            ovladaciPanel.TextCenaVezeKluomet.Barva = Zdroje.Aktualni.Level.Konto >= KonfiguraceVezKulomet.VychoziParametry.Cena 
-                ? Color.Lime : Color.Red;
-            ovladaciPanel.TextCenaVezeRaketa.Barva = Zdroje.Aktualni.Level.Konto >= KonfiguraceVezRaketa.VychoziParametry.Cena
-                ? Color.Lime : Color.Red;
 
             if (vybranyObjekt?.GetType().IsSubclassOf(typeof(Vez)) == true)
             {
-                float cena = Zdroje.Aktualni.Level.VezDleTypu(((Vez)vybranyObjekt).TypVeze).PrijemZaDemolici;
+                float cena = Zdroje.Aktualni.Level.VezDleTypu(((Vez)vybranyObjekt).TypVeze).ParametryVeze(((Vez)vybranyObjekt).Uroven).PrijemZDemolice;
                 ovladaciPanel.TextCenaDemolice.NastavTextCeny(cena);
                 
                 //ovladaciPanel.TextCenaUpgrade.NastavTextCeny(75);
@@ -309,19 +314,21 @@ namespace ToDe
                     var typ = ovladaciPanel.KliknutoNa.TypPolozky; // Vybraný typ věže ve spodní nabídce
 
                     // Umístnění kulometné věže
-                    if (typ == TypPolozkyNabidky.VezKulomet &&
-                        KonfiguraceVezKulomet.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
+                    var v = Zdroje.Aktualni.Level.VezDleTypu(TypVeze.Kulomet)?.ParametryVeze(1);
+                    if (typ == TypPolozkyNabidky.VezKulomet && v != null &&
+                        v.Cena <= Zdroje.Aktualni.Level.Konto)
                     {
                         veze.Add((new VezKulomet()).UmistiVez(((VybranaDlazdice)vybranyObjekt).PoziceNaMape));
-                        Zdroje.Aktualni.Level.Konto -= KonfiguraceVezKulomet.VychoziParametry.Cena;
+                        Zdroje.Aktualni.Level.Konto -= v.Cena;
                         vybranyObjekt = null;
                     }
                     // Umístění raketové věže
-                    else if (typ == TypPolozkyNabidky.VezRaketa &&
-                                KonfiguraceVezRaketa.VychoziParametry.Cena <= Zdroje.Aktualni.Level.Konto)
+                    v = Zdroje.Aktualni.Level.VezDleTypu(TypVeze.Raketa)?.ParametryVeze(1);
+                    if (typ == TypPolozkyNabidky.VezRaketa && v != null &&
+                        v.Cena <= Zdroje.Aktualni.Level.Konto)
                     {
                         veze.Add((new VezRaketa()).UmistiVez(((VybranaDlazdice)vybranyObjekt).PoziceNaMape));
-                        Zdroje.Aktualni.Level.Konto -= KonfiguraceVezRaketa.VychoziParametry.Cena;
+                        Zdroje.Aktualni.Level.Konto -= v.Cena;
                         vybranyObjekt = null;
                     }
                 }
@@ -334,7 +341,7 @@ namespace ToDe
                     {
                         veze.Remove(vybranyObjekt as Vez);
                         var typVeze = ((Vez)vybranyObjekt).TypVeze;
-                        Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.VezDleTypu(typVeze)?.PrijemZaDemolici ?? 0;
+                        Zdroje.Aktualni.Level.Konto += Zdroje.Aktualni.Level.VezDleTypu(typVeze)?.ParametryVeze(((Vez)vybranyObjekt).Uroven).PrijemZDemolice ?? 0;
                         vybranyObjekt = null;
                     }
                     // Zboření překážky

@@ -43,6 +43,7 @@ namespace ToDe
             Soubor = soubor;
             eLevel.Text = File.ReadAllText(Soubory.CestaSouboruLevelu(soubor));
             Zmena = false;
+            eLevel.FontSize = Preferences.Get("LevelEditorFontSize", eLevel.FontSize);
         }
 
         protected override bool OnBackButtonPressed()
@@ -125,7 +126,11 @@ namespace ToDe
                 nameof(NamedSize.Medium),
                 nameof(NamedSize.Large));
             if (Enum.TryParse<NamedSize>(velikost, out NamedSize vyber))
-                eLevel.FontSize = Device.GetNamedSize(vyber, eLevel);
+            {
+                double velikostPisma = Device.GetNamedSize(vyber, eLevel);
+                eLevel.FontSize = velikostPisma;
+                Preferences.Set("LevelEditorFontSize", velikostPisma);
+            }
         }
 
         private void bHrat_Clicked(object sender, EventArgs e)

@@ -32,7 +32,10 @@ namespace ToDe
             return this;
         }
 
-        public abstract KonfiguraceVeze KonfiguraceDalsiUrovne {get;}
+        //public abstract KonfiguraceVeze KonfiguraceDalsiUrovne {get;}
+        public KonfiguraceVeze KonfiguraceDalsiUrovne =>
+            Zdroje.Aktualni.Level.VezDleTypu(TypVeze).ParametryVeze((ushort)(Uroven + 1));
+
         public virtual bool ZvysUroven()
         {
             var cfg = KonfiguraceDalsiUrovne;
@@ -101,14 +104,13 @@ namespace ToDe
                 new DlazdiceUrceni(ZakladniDlazdice.Vez_Zakladna_1, 0.1f, false),
                 new DlazdiceUrceni(ZakladniDlazdice.Vez_Kulomet_1, 0.2f, true),
             };
-            var cfg = KonfiguraceVezKulomet.VychoziParametry;
+            var cfg = Zdroje.Aktualni.Level.VezDleTypu(TypVeze).ParametryVeze(1);
             DosahStrelby = cfg.DosahStrelby;
             RychlostRotace = cfg.RychlostRotace;
             SekundMeziVystrely = cfg.SekundMeziVystrely;
             SilaStrely = cfg.SilaStrely;
         }
 
-        public override KonfiguraceVeze KonfiguraceDalsiUrovne => KonfiguraceVezKulomet.ParametryVeze((ushort)(Uroven + 1));
         public override bool ZvysUroven()
         {
             return base.ZvysUroven();
@@ -134,7 +136,7 @@ namespace ToDe
                     new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Stred, 0.2f, true),
                     new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Vrsek, 0.5f, true),
                 };
-            var cfg = KonfiguraceVezRaketa.VychoziParametry;
+            var cfg = Zdroje.Aktualni.Level.VezDleTypu(TypVeze).ParametryVeze<KonfiguraceVezRaketa>(1);
             DosahStrelby = cfg.DosahStrelby;
             RychlostRotace = cfg.RychlostRotace;
             SekundMeziVystrely = cfg.SekundMeziVystrely;
@@ -143,11 +145,10 @@ namespace ToDe
             RychlostRakety = cfg.RychlostRakety;
         }
 
-        public override KonfiguraceVeze KonfiguraceDalsiUrovne => KonfiguraceVezRaketa.ParametryVeze((ushort)(Uroven + 1));
         public override bool ZvysUroven()
         {
             if (!base.ZvysUroven()) return false;
-            var cfg = KonfiguraceVezRaketa.ParametryVeze(Uroven);
+            var cfg = Zdroje.Aktualni.Level.VezDleTypu(TypVeze).ParametryVeze<KonfiguraceVezRaketa>(Uroven);
             if (cfg == null) return false;
             DosahExploze = cfg.DosahExploze;
             RychlostRakety = cfg.RychlostRakety;
