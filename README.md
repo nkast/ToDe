@@ -7,7 +7,7 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * A URL alias k tomuto *GitHub* repozitáři je [programko.net/tode/gh](https://github.com/PetrVobornik/ToDe)
 
 ### Roadmap
-Stará roadmap byla vložena jako issue #10, nevyřešené a nové položky budou přidávány již také pouze touto formou. Máte-li nějaký nápad, klidně můžete issue přidat i vy.
+Stará roadmap byla vložena jako [issue #10](https://github.com/PetrVobornik/ToDe/issues/10), nevyřešené a nové položky budou přidávány již také pouze touto formou. Máte-li nějaký nápad, klidně můžete issue přidat i vy.
 
 
 <p align="center">
