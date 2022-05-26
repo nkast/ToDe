@@ -6,55 +6,8 @@ Průběžně aktualizovaný zdrojový kód ke hře Tower Defense vyvíjené na _
 * Možnost diskuze k projektu mimo stream na *Discord* serveru [programko.net/tode/dc](https://discord.gg/GVgz2a3qd8) &nbsp; [![Discord](https://img.shields.io/discord/836206232485232700?color=%237289DA&label=Discord&logo=discord&logoColor=%23FFF&style=plastic)](https://discord.gg/GVgz2a3qd8)
 * A URL alias k tomuto *GitHub* repozitáři je [programko.net/tode/gh](https://github.com/PetrVobornik/ToDe)
 
-## Roadmap
-* ~~Projekt s NuGety (bez šablony) s VS kompilovaným obsahem~~
-* ~~Vykreslování mapy~~
-* ~~Průchod nepřátel po automaticky vypočtené cestě~~
-* ~~Nabídka a umísťování věží~~
-* ~~Otáčení a střelba věží~~
-* ~~Načítání parametrů levelů a vln ze souboru~~
-* ~~Tankové jednotky~~
-* ~~Zvuky~~
-* ~~Pauza~~
-* ~~Prohra (GameOver)~~
-* ~~Načtení 2 a dalších levlů (výhra)~~
-* ~~Přepínání textur u levelů~~
-* ~~Další typy jednotek~~
-* ~~Upravit texturu, aby každá dlaždice měla okolo sebe z každé strany 1px navíc~~
-* ~~Postupně zpřístupňované věže (počty) / ekonomika~~
-* ~~Ukazatel zdraví nepřátel~~
-* ~~Zdraví nepřátel se pomalu obnovuje~~
-* ~~Při prohře opakovat kolo, ne celou hru~~
-* ~~Transpozice mapy při překlopení displeje~~
-* ~~Lepší ovládací prvek pro panel nabídky~~
-* ~~Možnost zbořit věž~~
-* ~~Překážky na ploše (+ možnost je za $ odstranit)~~
-* ~~Možnost upgrade věží, možnost definovat i parametry raket~~
-* ~~Možnost nějak zobrazit dosah věží~~
-* ~~Editor levelů~~
-* ~~Možnost kola a jejich sady sdílet~~
-* ~~Ukládat nastavení editoru do Preferences~~
-* ~~Možnost v XML levelu definovat úplně vše (včetně všech vlastností věží ve všech levelech, i dostupnost jednotlivých typů)~~
-* Vyřešit možnost opětovného zapnutí hry bez nutnosti vypínat aplikaci (v UWP i na Androidu)
-* V ovládacím panelu nabízet pouze ty věže, na které level podporuje
-* Import souborů s levely
-* Možnost větších levelů - jejich posouvání a zoomování dotyky (ale bez ovládacího panelu)
-* Pozadí u panelu s nabídkou
-* Menu s dalšími možnostmi (např. restart levelu, konec hry, hlasitost...)
-* Další typy věží
-* Dvě střílny
-* Letadlo pouští parašutisty v půlce cesty
-* Protiútok jednotek (tanky střílí na věže, nálety...)
-* Mapa levelů
-* Zvyšovat max. dostupný level věží nákupy mimo levley za ušetřené a vyhrané $
-* Jiná textura na explozi
-* Ozdobné okraje cesty
-* Lepší SplashScreen
-* Zvuky pro umístění věže, zboření věže, upgrade věže, zboření překážky...
-* Hudba (doporučené zdroje: [gamesounds](https://gamesounds.xyz), [game-resources](https://blog.felgo.com/game-resources/free-music-for-games))
-* Store
-* Grafický editor levelů
-* Cloudové počítání top skóre za daný level/sadu
+### Roadmap
+Stará roadmap byla vložena jako issue #10, nevyřešené a nové položky budou přidávány již také pouze touto formou. Máte-li nějaký nápad, klidně můžete issue přidat i vy.
 
 
 <p align="center">
