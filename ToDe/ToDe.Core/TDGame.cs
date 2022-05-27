@@ -77,9 +77,9 @@ namespace ToDe
             Zdroje.Obsah.Ukazatel.Grafika = Content.Load<Texture2D>(@"Sprites/ukazatel");
             Zdroje.Obsah.Kruh.Grafika = Content.Load<Texture2D>(@"Sprites/kruh");
 
-            SpustitHru();
-
             ovladaciPanel = new OvladaciPanel();
+         
+            SpustitHru();
 
             NastavTexty(true);
 
@@ -108,6 +108,12 @@ namespace ToDe
 
             // Nastavení hry
             zdravi = 1;
+            ovladaciPanel.ProDlazdiciVezKulomet.Skryta = aktualniMapa.Level.VezDleTypu(TypVeze.Kulomet) == null;
+            ovladaciPanel.TextCenaVezeKluomet.Text = "";
+            ovladaciPanel.ProDlazdiciVezRaketa.Skryta = aktualniMapa.Level.VezDleTypu(TypVeze.Raketa) == null;
+            ovladaciPanel.TextCenaVezeRaketa.Text = "";
+            ovladaciPanel.ProDlazdiciVezRaketa.PoziceVNabidce = (short)(ovladaciPanel.ProDlazdiciVezKulomet.Skryta ? 0 : 2);
+            ovladaciPanel.TextCenaVezeRaketa.PoziceVNabidce = (short)(ovladaciPanel.ProDlazdiciVezRaketa.PoziceVNabidce + 1);
 
             jeKonecHry = false;
             pauza = false;

@@ -43,6 +43,9 @@ namespace ToDe
 
         public PolozkaNabidky Pauza { get; private set; }
 
+        public PolozkaNabidky ProDlazdiciVezKulomet { get; private set; }
+        public PolozkaNabidky ProDlazdiciVezRaketa { get; private set; }
+
         public PolozkaNabidky UpgradeText1 { get; private set; }
         public PolozkaNabidky UpgradeText2 { get; private set; }
         public PolozkaNabidky UpgradeText3 { get; private set; }
@@ -77,9 +80,9 @@ namespace ToDe
                 { TypNabidky.ProDlazdici, 
                     new List<PolozkaNabidky>()
                     {
-                        new PolozkaNabidky(0, TypPolozkyNabidky.VezKulomet),
+                        (ProDlazdiciVezKulomet = new PolozkaNabidky(0, TypPolozkyNabidky.VezKulomet)),
                         TextCenaVezeKluomet,
-                        new PolozkaNabidky(2, TypPolozkyNabidky.VezRaketa),
+                        (ProDlazdiciVezRaketa = new PolozkaNabidky(2, TypPolozkyNabidky.VezRaketa)),
                         TextCenaVezeRaketa,
                         //TextFinance,
                         Pauza,
@@ -283,12 +286,13 @@ namespace ToDe
         public TypPolozkyNabidky TypPolozky { get; private set; }
         
         public MezeryOdOkraju Okraje { get; set; } = 0; // Mezera obsahu dlaždice od jejího okraje (padding)
+        public bool Skryta { get; set; } = false;
 
         public virtual string Text { get; set; } // Pouze pro typ text
         public virtual ushort SirkaTextu { get; set; } = 1; // Kolik dlaždic může text zabírat maximálně 
         public bool ZarovnatTextHorizontalneNaStred { get; set; } = false;
                 
-        public short PoziceVNabidce { get; private set; } // Záporná pozice = počítáno od konce
+        public short PoziceVNabidce { get; set; } // Záporná pozice = počítáno od konce
         public bool Kliknuto { get; set; }
 
         public PolozkaNabidky(short poziceVNabidce, TypPolozkyNabidky typPolozky)
@@ -338,6 +342,7 @@ namespace ToDe
         public virtual void Update(float sekundOdMinule, Vector2 klik)
         {
             Kliknuto = false;
+            if (Skryta) return;
 
             Update(sekundOdMinule);
 
@@ -363,6 +368,8 @@ namespace ToDe
 
         public override void Update(float sekundOdMinule)
         {
+            if (Skryta) return;
+           
             base.Update(sekundOdMinule);
 
             //if (TypPolozky != TypPolozkyNabidky.Text) return;
@@ -417,6 +424,7 @@ namespace ToDe
 
         public override void Draw(SpriteBatch sb)
         {
+            if (Skryta) return;
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
                 sb.DrawString(Zdroje.Obsah.Pismo, Text??"", Pozice, Barva,
