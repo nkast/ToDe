@@ -50,6 +50,7 @@ namespace ToDe
             rakety = new List<Raketa>();
             exploze = new List<Exploze>();
             prekazky = new List<Prekazka>();
+            //touchData = new TouchData();
 
             base.Initialize();
         }
@@ -179,9 +180,19 @@ namespace ToDe
         bool byloKliknutoMinule = false;
         bool pauza = false, jeKonecHry = false;
         double casPriPauznuti;
+        //int lastMoseWheelPos;
+        //bool mouseWheel;
+        //TouchData touchData;
+        float pozadavekNaZvetseni = 0;
+        Vector2 pozadavekNaPosun = Vector2.Zero;
+        Vector2 minulaPoziceMysi;
         protected override void Update(GameTime gameTime)
         {
             VypocetMeritka();
+
+            // Přepočet časů na sekundy
+            float celkovyHerniCas = (float)gameTime.TotalGameTime.TotalSeconds;
+            float casOdMinule = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             // Kliknutí
             Vector2 poziceKliknuti = Vector2.Zero;
@@ -189,8 +200,9 @@ namespace ToDe
             poziceKliknuti = TouchPanel.GetState().FirstOrDefault(tl => tl.State == TouchLocationState.Pressed).Position;
             // Myš
             var ms = Mouse.GetState();
+            var aktualniPoziceMysi = new Vector2(ms.X, ms.Y);
             if (ms.LeftButton == ButtonState.Pressed)
-                poziceKliknuti = new Vector2(ms.X, ms.Y);
+                poziceKliknuti = aktualniPoziceMysi;
             poziceKliknuti /= globalniMeritko;
             // Jde o nový klik?
             bool kliknutiZahajeno = !byloKliknutoMinule && poziceKliknuti != Vector2.Zero;
@@ -201,10 +213,56 @@ namespace ToDe
             }
             else
                 byloKliknutoMinule = poziceKliknuti != Vector2.Zero;
+            // Posun mapy
+            if (ms.RightButton == ButtonState.Pressed)
+                pozadavekNaPosun = aktualniPoziceMysi - minulaPoziceMysi;
+            else
+                pozadavekNaPosun = Vector2.Zero;
+            // Zoom mapy stisknutým kolečkem a posunem myši
+            pozadavekNaZvetseni = 0;
+            if (ms.MiddleButton == ButtonState.Pressed)
+            {
+                var posun = aktualniPoziceMysi - minulaPoziceMysi;
+                if (Math.Abs(posun.X) > Math.Abs(posun.Y))
+                    pozadavekNaZvetseni = posun.X;
+                else 
+                    pozadavekNaZvetseni = posun.Y;
+                pozadavekNaZvetseni *= 0.0025f;
+            }
+            // Klávesnice - TODO: zkusit předělat na posun myši při stisknutém kolečku
+            var ks = Keyboard.GetState();
+            if (ks.IsKeyDown(Keys.OemPlus))
+                pozadavekNaZvetseni = 0.5f * casOdMinule;
+            if (ks.IsKeyDown(Keys.OemMinus))
+                pozadavekNaZvetseni = -0.5f * casOdMinule;
 
-            // Přepočet časů na sekundy
-            float celkovyHerniCas = (float)gameTime.TotalGameTime.TotalSeconds;
-            float casOdMinule = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            minulaPoziceMysi = aktualniPoziceMysi;
+            // Točení kolečkem na myši
+            //var newMousePos = new Vector2(ms.X, ms.Y); 
+            //if (ms.ScrollWheelValue != lastMoseWheelPos)
+            //{
+            //    mouseWheel = true;
+            //    lastMoseWheelPos = ms.ScrollWheelValue;
+            //    touchData.Touchs.Add(new OneTouch()
+            //    {
+            //        Gesture = GestType.VerticalDrag,
+            //        Position = new Vector2(0, ms.ScrollWheelValue),
+            //        ByMouse = true,
+            //    });
+            //}
+            //else
+            //    if (mouseWheel)
+            //    {
+            //        mouseWheel = false;
+            //        touchData.Touchs.Add(new OneTouch()
+            //        {
+            //            Gesture = GestType.DragComplete,
+            //            Position = newMousePos,
+            //            ByMouse = true,
+            //        });
+            //    }
+
+
 
             // Konec hry - čekání na klik pro zahájení nové hry
             if (zdravi <= 0) // Jsme mrtví...
@@ -461,7 +519,8 @@ namespace ToDe
             base.Update(gameTime);
         }
 
-        float globalniMeritko = 1; // Uložení měřítka grafiky, pro přepočet pozice kliknutí
+        float globalniMeritko = -1; // Uložení měřítka grafiky, pro přepočet pozice kliknutí
+        Vector2 posunMapy = Vector2.Zero;
         void VypocetMeritka()
         {
             Point rozmery;
@@ -480,17 +539,17 @@ namespace ToDe
             // Matice pro měřítko (zoom) vykreslování, aby se vše vešlo do okna
             var scaleX = rozmery.X / (float)(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice);
             var scaleY = rozmery.Y / (float)((aktualniMapa.Level.Mapa.Radku + 1) * Zdroje.VelikostDlazdice);
-            globalniMeritko = MathHelper.Min(scaleX, scaleY); // Použijeme měřítko, aby se vše vždy vešlo do obrazovky
+            float meritko1 = MathHelper.Min(scaleX, scaleY); // Použijeme měřítko, aby se vše vždy vešlo do obrazovky
 
             // Zkusit totéž vypočítat, pro transponovanou mapu, nebude-li to náhodou lepší
             scaleX = rozmery.Y / (float)((aktualniMapa.Level.Mapa.Sloupcu + 1) * Zdroje.VelikostDlazdice);
             scaleY = rozmery.X / (float)(aktualniMapa.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
-            float globalniMeritko2 = MathHelper.Min(scaleX, scaleY);
+            float meritko2 = MathHelper.Min(scaleX, scaleY);
 
             // Výběr lepší varianty
-            if (globalniMeritko2 > globalniMeritko)
+            if (meritko2 > meritko1)
             {
-                globalniMeritko = globalniMeritko2;
+                meritko1 = meritko2;
                 aktualniMapa.Level.Mapa.TranspoziceMapy();
                 nepratele.ForEach(x => x.TranspozicePozice());
                 mizejiciObjekty.ForEach(x => x.TranspozicePozice());
@@ -502,6 +561,33 @@ namespace ToDe
                 if (vybranyObjekt is VybranaDlazdice)
                     vybranyObjekt.TranspozicePozice();
             }
+            if (globalniMeritko < 0)
+                globalniMeritko = meritko1;
+
+            // globalniMeritko je menší z těch dvou a minimum, pod které už zoomovat nepůjde
+            float meritko3 = globalniMeritko;
+            //var posun = touchData.GetTouchByGesture(GestType.VerticalDrag);
+            //if (posun.Gesture != GestType.None && posun.Position.Y != 0)
+            if (pozadavekNaZvetseni != 0)
+            {
+                meritko3 = globalniMeritko + pozadavekNaZvetseni;
+            }
+            meritko3 = MathHelper.Clamp(meritko3, meritko1, 1);
+            globalniMeritko = meritko3;
+
+            // Posun mapy
+            if (pozadavekNaPosun != Vector2.Zero)
+            {
+                posunMapy += pozadavekNaPosun / globalniMeritko;
+                if (posunMapy.X > 0) posunMapy.X = 0;
+                if (posunMapy.Y > 0) posunMapy.Y = 0; 
+                // TODO: výpočet minX a minY vychází menší, než by měl
+                float minX = rozmery.X - Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice * globalniMeritko;
+                if (posunMapy.X < minX) posunMapy.X = Math.Min(minX, 0);
+                float minY = rozmery.Y - (Zdroje.Aktualni.Level.Mapa.Radku+1) * Zdroje.VelikostDlazdice * globalniMeritko;
+                if (posunMapy.Y < minY) posunMapy.Y = Math.Min(minY, 0);
+
+            }
         }
 
         protected override void Draw(GameTime gameTime)
@@ -509,10 +595,11 @@ namespace ToDe
             GraphicsDevice.Clear(Color.Black); // Barva podkladu na pozadí
 
             // Matice pro měřítko (zoom) vykreslování, aby se vše vešlo do okna
-            var screenScale = new Vector3(new Vector2(globalniMeritko), 1.0f);
-            var scaleMatrix = Matrix.CreateScale(screenScale);
+            var maticeMeritka = Matrix.CreateScale(new Vector3(new Vector2(globalniMeritko), 1.0f));
+            var maticePosunu = Matrix.CreateTranslation(new Vector3(posunMapy, 0));
 
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, transformMatrix: scaleMatrix); // Začátek vykreslování
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, 
+                transformMatrix: maticePosunu * maticeMeritka); // Začátek vykreslování
 
             // Vykreslení pozadí mapy
             for (int i = 0; i < aktualniMapa.Level.Mapa.Radku; i++)

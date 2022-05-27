@@ -332,4 +332,210 @@ namespace ToDe
         }
     }
 
+
+    public struct RectangleF
+    {
+        public float X;
+        public float Y;
+        public float Width;
+        public float Height;
+
+        public RectangleF(float x, float y, float width, float height)
+            => (X, Y, Width, Height) = (x, y, width, height);
+
+        public RectangleF(Rectangle rectangle)
+            => (X, Y, Width, Height) = (rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+
+        public bool Contains(float x, float y)
+            => x >= X && y >= Y && x <= X + Width && y <= Y + Height;
+
+        public static RectangleF Empty => new RectangleF(0, 0, 0, 0);
+
+        public static bool operator ==(RectangleF r1, RectangleF r2)
+            => r1.X == r2.X && r1.Y == r2.Y && r1.Width == r2.Width && r1.Height == r2.Height;
+
+        public static bool operator !=(RectangleF r1, RectangleF r2)
+            => r1.X != r2.X || r1.Y != r2.Y || r1.Width != r2.Width || r1.Height != r2.Height;
+
+        public override bool Equals(object obj)
+            => obj is RectangleF && (RectangleF)obj == this;
+
+        public override int GetHashCode()
+            => (Width.GetHashCode()+1) ^ (Y.GetHashCode()+1) ^ (X.GetHashCode()+1) ^ (Height.GetHashCode()+1);
+
+        public Vector2 Size()
+            => new Vector2(Width, Height);
+    }
+
+
+    public class TouchData
+    {
+        public bool ShowCursor;
+        public List<OneTouch> Touchs;
+        public List<MultiTouch> MultiTouchs;
+        public bool BackButton;
+        public Vector2 Offset;
+        public float Scale;
+
+        public TouchData()
+        {
+            Touchs = new List<OneTouch>();
+            MultiTouchs = new List<MultiTouch>();
+        }
+
+        public bool IsGestureTouched(params GestType[] gests)
+        {
+            if (Touchs.Count > 0)
+                foreach (var touch in Touchs)
+                    if (gests.Contains(touch.Gesture))
+                        return true;
+            return false;
+        }
+
+        public OneTouch GetTouchByGesture(GestType gest)
+        {
+            if (Touchs.Count > 0)
+                foreach (var touch in Touchs)
+                    if (touch.Gesture == gest)
+                        return touch;
+            return OneTouch.Empty;
+        }
+
+        public Vector2 GetMultiTouchInArea(RectangleF area, bool recalcPosition)
+        {
+            if (MultiTouchs.Count > 0)
+                for (int i = MultiTouchs.Count - 1; i >= 0; i--)
+                {
+                    var touch = MultiTouchs[i];
+                    if (recalcPosition && area.Contains((int)(touch.Position.X / Scale + Offset.X), (int)(touch.Position.Y / Scale + Offset.Y)) ||
+                        !recalcPosition && area.Contains((int)(touch.Position.X), (int)(touch.Position.Y)))
+                    {
+                        var t = touch.Position;
+                        if (recalcPosition)
+                        {
+                            t.X = (touch.Position.X / Scale + Offset.X) - area.X;
+                            t.Y = (touch.Position.Y / Scale + Offset.Y) - area.Y;
+                        }
+                        return t;
+                    }
+                }
+            return Vector2.Zero;
+        }
+
+        public OneTouch GetTouchInArea(RectangleF area, bool recalcPosition)
+        {
+            if (Touchs.Count > 0)
+                for (int i = Touchs.Count - 1; i >= 0; i--)
+                {
+                    var touch = Touchs[i];
+                    if (touch.Gesture != GestType.Flick && touch.Gesture != GestType.DragComplete)
+                        if (recalcPosition && area.Contains((int)(touch.Position.X / Scale + Offset.X), (int)(touch.Position.Y / Scale + Offset.Y)) ||
+                            !recalcPosition && area.Contains((int)(touch.Position.X), (int)(touch.Position.Y)))
+                        {
+                            var t = touch;
+                            if (recalcPosition)
+                            {
+                                t.Position.X = (touch.Position.X / Scale + Offset.X) - area.X;
+                                t.Position.Y = (touch.Position.Y / Scale + Offset.Y) - area.Y;
+                            }
+                            return t;
+                        }
+                }
+            return OneTouch.Empty;
+        }
+
+        public GestType IsTouched(RectangleF area)
+        {
+            //return GetTouchInArea(area).Gesture;
+            if (Touchs.Count > 0)
+                foreach (var touch in Touchs)
+                    if (area.Contains((int)(touch.Position.X / Scale + Offset.X), (int)(touch.Position.Y / Scale + Offset.Y)))
+                        return touch.Gesture;
+            return GestType.None;
+        }
+
+        public GestType IsTouched(Vector2 pos, float size)
+        {
+            return IsTouched(pos, size, size);
+        }
+
+        public GestType IsTouched(Vector2 pos, float width, float height)
+        {
+            if (Touchs.Count > 0)
+                foreach (var touch in Touchs)
+                    if (touch.Position.X / Scale + Offset.X >= pos.X && touch.Position.Y / Scale + Offset.Y >= pos.Y &&
+                        touch.Position.X / Scale + Offset.X <= pos.X + width && touch.Position.Y / Scale + Offset.Y <= pos.Y + height)
+                        return touch.Gesture;
+            return GestType.None;
+        }
+
+        public bool IsMultiTouched(Vector2 pos, float width, float height)
+        {
+            if (MultiTouchs.Count > 0)
+                foreach (var touch in MultiTouchs)
+                    if (touch.Position.X / Scale + Offset.X >= pos.X && touch.Position.Y / Scale + Offset.Y >= pos.Y &&
+                        touch.Position.X / Scale + Offset.X <= pos.X + width && touch.Position.Y / Scale + Offset.Y <= pos.Y + height)
+                        return true;
+            return false;
+        }
+
+
+        // source: http://microngamestudios.com/files/pinchzoom/PinchZoom.cs
+        public static float PinchScaleFactor(Vector2 position1, Vector2 position2, Vector2 delta1, Vector2 delta2)
+        {
+            Vector2 oldPosition1 = position1 - delta1;
+            Vector2 oldPosition2 = position2 - delta2;
+
+            float distance = Vector2.Distance(position1, position2);
+            float oldDistance = Vector2.Distance(oldPosition1, oldPosition2);
+
+            if (oldDistance == 0 || distance == 0)
+                return 1.0f;
+
+            return distance / oldDistance;
+        }
+    }
+
+    public struct MultiTouch
+    {
+        public Vector2 Position;
+        //public TouchState State;
+
+    }
+
+    public struct OneTouch
+    {
+        public GestType Gesture;
+        public Vector2 Position; // Position u Flicku = Delta
+        public bool ByMouse; // Tento dotek byl vyvolán myší
+
+        public static OneTouch Empty = new OneTouch() { Gesture = GestType.None };
+    }
+
+    public enum GestType
+    {
+        None,
+        Tap,            // Klik
+        DoubleTap,      // Doubleclick
+        Hold,           // Zmáčknout a držet
+        HorizontalDrag, // Sunutí horizontální
+        VerticalDrag,   // Sunutí vertikální
+        FreeDrag,       // Sunutí neurčitým směrem
+        DragComplete,   // Sunutí puštěno
+        Pinch,          // Dva prsty táhnout najednou
+        PinchComplete,  // Sun dvou prstů hotov
+        Flick,          // Posun na další obrazovku 
+    }
+
+    public enum TouchState
+    {
+        Invalid,
+        Pressed,
+        Moved,
+        Released,
+    }
+
+
+
+
 }
