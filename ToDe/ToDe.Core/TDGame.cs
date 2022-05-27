@@ -523,7 +523,7 @@ namespace ToDe
         Vector2 posunMapy = Vector2.Zero;
         void VypocetMeritka()
         {
-            Point rozmery;
+            Point rozmery; // Rozměry obrazovky/okna
             if (Window?.ClientBounds != null)
             {
                 rozmery = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height); // TODO: otestovat jestli to vrací správné rozměry i na ANdoridu
@@ -544,7 +544,7 @@ namespace ToDe
             // Zkusit totéž vypočítat, pro transponovanou mapu, nebude-li to náhodou lepší
             scaleX = rozmery.Y / (float)((aktualniMapa.Level.Mapa.Sloupcu + 1) * Zdroje.VelikostDlazdice);
             scaleY = rozmery.X / (float)(aktualniMapa.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
-            float meritko2 = MathHelper.Min(scaleX, scaleY);
+            float meritko2 = MathHelper.Min(scaleX, scaleY); // Měřítko pro případné otočení (transpozici) mapy
 
             // Výběr lepší varianty
             if (meritko2 > meritko1)
@@ -564,10 +564,8 @@ namespace ToDe
             if (globalniMeritko < 0)
                 globalniMeritko = meritko1;
 
-            // globalniMeritko je menší z těch dvou a minimum, pod které už zoomovat nepůjde
-            float meritko3 = globalniMeritko;
-            //var posun = touchData.GetTouchByGesture(GestType.VerticalDrag);
-            //if (posun.Gesture != GestType.None && posun.Position.Y != 0)
+            // globalniMeritko je menší z těch dvou a zároveň minimum, pod které už zoomovat nepůjde
+            float meritko3 = globalniMeritko; // Měřítko se započtenými uživatelkými zoomy
             if (pozadavekNaZvetseni != 0)
             {
                 meritko3 = globalniMeritko + pozadavekNaZvetseni;
@@ -576,15 +574,15 @@ namespace ToDe
             globalniMeritko = meritko3;
 
             // Posun mapy
-            if (pozadavekNaPosun != Vector2.Zero)
+            if (pozadavekNaPosun != Vector2.Zero || pozadavekNaZvetseni != 0)
             {
                 posunMapy += pozadavekNaPosun / globalniMeritko;
                 if (posunMapy.X > 0) posunMapy.X = 0;
                 if (posunMapy.Y > 0) posunMapy.Y = 0; 
                 // TODO: výpočet minX a minY vychází menší, než by měl
-                float minX = rozmery.X - Zdroje.Aktualni.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice * globalniMeritko;
+                float minX = rozmery.X - aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice * globalniMeritko;
                 if (posunMapy.X < minX) posunMapy.X = Math.Min(minX, 0);
-                float minY = rozmery.Y - (Zdroje.Aktualni.Level.Mapa.Radku+1) * Zdroje.VelikostDlazdice * globalniMeritko;
+                float minY = rozmery.Y - (aktualniMapa.Level.Mapa.Radku+1) * Zdroje.VelikostDlazdice * globalniMeritko;
                 if (posunMapy.Y < minY) posunMapy.Y = Math.Min(minY, 0);
 
             }
@@ -596,7 +594,7 @@ namespace ToDe
 
             // Matice pro měřítko (zoom) vykreslování, aby se vše vešlo do okna
             var maticeMeritka = Matrix.CreateScale(new Vector3(new Vector2(globalniMeritko), 1.0f));
-            var maticePosunu = Matrix.CreateTranslation(new Vector3(posunMapy, 0));
+            var maticePosunu = Matrix.CreateTranslation(new Vector3(posunMapy/ globalniMeritko, 0));
 
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, 
                 transformMatrix: maticePosunu * maticeMeritka); // Začátek vykreslování
