@@ -76,7 +76,7 @@ namespace ToDe
             VelikostDlazdice = new Point(128, 13),
             Okraj = 1,
             Sloupcu = 1,
-            Radku = 2,
+            Radku = 1,
         };
 
         public Textura Kruh { get; internal set; } = new Textura()

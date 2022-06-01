@@ -226,6 +226,13 @@ namespace ToDe
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 BackButtonPressed?.Invoke(this, EventArgs.Empty);
+            
+            var ks = Keyboard.GetState();
+            if (ks.IsKeyDown(Keys.D0)) // Reset zobrazení
+            {
+                globalniMeritko = -1; 
+                posunMapy = Vector2.Zero;
+            }
 
             VypocetMeritka();
 
@@ -274,13 +281,20 @@ namespace ToDe
             var aktualniPoziceMysi = new Vector2(ms.X, ms.Y);
             if (ms.LeftButton == ButtonState.Pressed)
                 poziceKliknuti = aktualniPoziceMysi;
+
+            var poziceKliknutiMenu = Vector2.Zero;
             if (poziceKliknuti != Vector2.Zero)
-                poziceKliknuti = poziceKliknuti / globalniMeritko + new Vector2(aktualniVyrez.X, aktualniVyrez.Y);
+            {
+                var aktualniLevyHorni = new Vector2(aktualniVyrez.X, aktualniVyrez.Y);
+                poziceKliknutiMenu = poziceKliknuti / ovladaciPanel.Meritko + aktualniLevyHorni;
+                poziceKliknuti = poziceKliknuti / globalniMeritko + aktualniLevyHorni;
+            }
             // Jde o nový klik?
             //bool kliknutiZahajeno = !byloKliknutoMinule && poziceKliknuti != Vector2.Zero;
             if (byloKliknutoMinule && poziceKliknuti != Vector2.Zero)
             {
                 //byloKliknutoMinule = true;
+                poziceKliknutiMenu = Vector2.Zero;
                 poziceKliknuti = Vector2.Zero;
             }
             else
@@ -299,7 +313,6 @@ namespace ToDe
                 pozadavekNaZvetseni *= 0.0025f;
             }
             // Klávesnice - TODO: zkusit předělat na posun myši při stisknutém kolečku
-            var ks = Keyboard.GetState();
             if (ks.IsKeyDown(Keys.OemPlus))
                 pozadavekNaZvetseni = 0.5f * casOdMinule;
             if (ks.IsKeyDown(Keys.OemMinus))
@@ -349,7 +362,8 @@ namespace ToDe
             }
 
             // Aktualizace nabídky (ještě před pauzou, aby se dala odpauzovat)
-            ovladaciPanel.Update(casOdMinule, poziceKliknuti, aktualniVyrez);
+            ovladaciPanel.Update(casOdMinule, poziceKliknutiMenu, 
+                new Rectangle(aktualniVyrez.X, aktualniVyrez.Y, rozmery.X, rozmery.Y));
             if (ovladaciPanel.KliknutoDoNabidky) // Při kliknutí do nabídky nepouštět klinutí dál (pod ní)
                 poziceKliknuti = Vector2.Zero;
 
@@ -567,10 +581,10 @@ namespace ToDe
 
         float globalniMeritko = -1; // Uložení měřítka grafiky, pro přepočet pozice kliknutí
         Vector2 posunMapy = Vector2.Zero;
+        Point rozmery; // Rozměry obrazovky/okna
         Rectangle aktualniVyrez; // Obdélník výřezu aktuálního pohledu na scénu
         void VypocetMeritka()
         {
-            Point rozmery; // Rozměry obrazovky/okna
             if (Window?.ClientBounds != null)
             {
                 rozmery = new Point(Window.ClientBounds.Width, Window.ClientBounds.Height); // TODO: otestovat jestli to vrací správné rozměry i na ANdoridu
@@ -585,11 +599,11 @@ namespace ToDe
 
             // Matice pro měřítko (zoom) vykreslování, aby se vše vešlo do okna
             var scaleX = rozmery.X / (float)(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice);
-            var scaleY = rozmery.Y / (float)((aktualniMapa.Level.Mapa.Radku + 1) * Zdroje.VelikostDlazdice);
+            var scaleY = (rozmery.Y - Zdroje.VelikostDlazdice * ovladaciPanel.Meritko) / (float)(aktualniMapa.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
             float meritko1 = MathHelper.Min(scaleX, scaleY); // Použijeme měřítko, aby se vše vždy vešlo do obrazovky
 
             // Zkusit totéž vypočítat, pro transponovanou mapu, nebude-li to náhodou lepší
-            scaleX = rozmery.Y / (float)((aktualniMapa.Level.Mapa.Sloupcu + 1) * Zdroje.VelikostDlazdice);
+            scaleX = (rozmery.Y - Zdroje.VelikostDlazdice * ovladaciPanel.Meritko) / (float)(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice);
             scaleY = rozmery.X / (float)(aktualniMapa.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
             float meritko2 = MathHelper.Min(scaleX, scaleY); // Měřítko pro případné otočení (transpozici) mapy
 
@@ -630,7 +644,8 @@ namespace ToDe
                 
                 float minX = rozmery.X - aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice * globalniMeritko;
                 if (posunMapy.X < minX) posunMapy.X = Math.Min(minX, 0);
-                float minY = rozmery.Y - (aktualniMapa.Level.Mapa.Radku+1) * Zdroje.VelikostDlazdice * globalniMeritko;
+                float minY = rozmery.Y - aktualniMapa.Level.Mapa.Radku * Zdroje.VelikostDlazdice * globalniMeritko 
+                    - Zdroje.VelikostDlazdice * ovladaciPanel.Meritko;
                 if (posunMapy.Y < minY) posunMapy.Y = Math.Min(minY, 0);
             }
 
@@ -640,7 +655,7 @@ namespace ToDe
                                           (int)Math.Ceiling(rozmery.Y / globalniMeritko));
 
             if (ovladaciPanel != null)
-                ovladaciPanel.Meritko = rozmery.X / (float)(OvladaciPanel.SirkaNabidky * Zdroje.VelikostDlazdice);
+                ovladaciPanel.Meritko = Math.Min(rozmery.X / (float)(OvladaciPanel.SirkaNabidky * Zdroje.VelikostDlazdice), 0.75f);
 
         }
 
@@ -665,6 +680,18 @@ namespace ToDe
                                                ((VybranaDlazdice)vybranyObjekt).PoziceNaMape.X == j)
                                                ? Color.LightSalmon : (Color?)null);
 
+            // Překrytí po pravé straně mapy
+            if (aktualniVyrez.X + aktualniVyrez.Width > aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice)
+                spriteBatch.Draw(Zdroje.Obsah.Ukazatel.Grafika,
+                    new Rectangle(aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice,
+                    aktualniVyrez.Y - 1,
+                    aktualniVyrez.X + aktualniVyrez.Width - aktualniMapa.Level.Mapa.Sloupcu * Zdroje.VelikostDlazdice + 2,
+                    aktualniVyrez.Height + 2),
+                    new Rectangle(Zdroje.Obsah.Ukazatel.Okraj, Zdroje.Obsah.Ukazatel.Okraj,
+                       Zdroje.Obsah.Ukazatel.VelikostDlazdice.X, Zdroje.Obsah.Ukazatel.VelikostDlazdice.Y),
+                    OvladaciPanel.Pozadi, 0, Vector2.Zero, SpriteEffects.None, 0.899f);
+
+
             // Vykreslování seznamů herních objektů
             nepratele.ForEach(x => x.Draw(spriteBatch));
             mizejiciObjekty.ForEach(x => x.Draw(spriteBatch));
@@ -685,8 +712,10 @@ namespace ToDe
             spriteBatch.End();
 
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend,
-             transformMatrix: Matrix.CreateScale(new Vector3(new Vector2(ovladaciPanel.Meritko), 1.0f)) *
-                              Matrix.CreateTranslation(new Vector3(posunMapy / ovladaciPanel.Meritko, 0)));
+             transformMatrix: 
+                Matrix.CreateTranslation(new Vector3(posunMapy / globalniMeritko, 0)) *
+                Matrix.CreateScale(new Vector3(new Vector2(ovladaciPanel.Meritko), 1.0f)) 
+            );
             
             // Ovládací panel
             ovladaciPanel.Draw(spriteBatch);

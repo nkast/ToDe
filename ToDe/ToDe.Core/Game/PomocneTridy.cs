@@ -173,8 +173,8 @@ namespace ToDe
 
     internal static class Rozsireni
     {
-        //public static Rectangle Plus(this Rectangle rec, int plusX, int plusY, int plusSirka, int plusVyska)
-        //    => new Rectangle(rec.Left + plusX, rec.Top + plusY, rec.Width + plusSirka, rec.Height + plusVyska);
+        public static Rectangle Plus(this Rectangle rec, int plusX=0, int plusY=0, int plusSirka=0, int plusVyska=0)
+            => new Rectangle(rec.Left + plusX, rec.Top + plusY, rec.Width + plusSirka, rec.Height + plusVyska);
 
         public static T GetAtt<T>(this XElement element, XName attributeName, T defaultValue)
             => (T)AttributeValue(typeof(T), element, attributeName, defaultValue);

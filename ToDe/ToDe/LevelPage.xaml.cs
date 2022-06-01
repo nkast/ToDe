@@ -136,8 +136,7 @@ namespace ToDe
         private void bHrat_Clicked(object sender, EventArgs e)
         {
             Uloz();
-            TDGame.SouborLevelu = Soubory.CestaSouboruLevelu(Soubor);
-            Navigation.PushAsync(new HraPage());
+            Navigace.SpustitHru(Soubory.CestaSouboruLevelu(Soubor), this);
         }
 
         private void bSdilet_Clicked(object sender, EventArgs e)

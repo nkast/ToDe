@@ -40,7 +40,7 @@ namespace ToDe
                     break;
             }
             sirkaUkazatele = (ushort)(Zdroje.VelikostDlazdice * sirkaUkazateleJakoProcentoZeSirkyDlazdice);
-            vyskaUkazatele = (ushort)(Zdroje.Obsah.Ukazatel.VelikostDlazdice.Y * 0.5f);
+            vyskaUkazatele = (ushort)(Zdroje.Obsah.Ukazatel.VelikostDlazdice.Y);
             vzdalenostUkazatele = vzdalenostUkazateleJakoProcentoZeSirkyDlazdice * Zdroje.VelikostDlazdice;
             Stred = new Vector2(0, vyskaUkazatele);
             Pozice = nepritel.Pozice + new Vector2(-sirkaUkazatele * 0.5f, -vzdalenostUkazatele);
@@ -61,15 +61,15 @@ namespace ToDe
                 sb.Kresli(Pozice,
                     new Rectangle(Zdroje.Obsah.Ukazatel.Okraj, Zdroje.Obsah.Ukazatel.Okraj,
                         sirkaZelene, vyskaUkazatele), 
-                    Vector2.Zero, 
-                    textura: Zdroje.Obsah.Ukazatel, Z: 0.911f);
+                    Vector2.Zero, barva: Color.Lime,
+                    textura: Zdroje.Obsah.Ukazatel, Z: 0.811f);
             // Červená
             if (nepritel.ProcentoZdravi < 1)
                 sb.Kresli(Pozice + new Vector2(sirkaZelene - 1, 0),
-                    new Rectangle(Zdroje.Obsah.Ukazatel.Okraj, 
-                        Zdroje.Obsah.Ukazatel.VelikostDlazdice.Y + 3 * Zdroje.Obsah.Ukazatel.Okraj,
+                    new Rectangle(Zdroje.Obsah.Ukazatel.Okraj, Zdroje.Obsah.Ukazatel.Okraj,
                         sirkaUkazatele - sirkaZelene + 1, vyskaUkazatele),
-                    Vector2.Zero, textura: Zdroje.Obsah.Ukazatel, Z: 0.91f);
+                    Vector2.Zero, barva: Color.Red,
+                    textura: Zdroje.Obsah.Ukazatel, Z: 0.81f);
         }
     }
 }
