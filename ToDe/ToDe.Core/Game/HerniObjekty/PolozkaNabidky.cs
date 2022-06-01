@@ -21,12 +21,16 @@ namespace ToDe
 
     internal class OvladaciPanel
     {
+        public const int SirkaNabidky = 10; // vyjádřeno v počtu dlaždic
+
         List<PolozkaNabidky> nabidka;
         Dictionary<TypNabidky, List<PolozkaNabidky>> nabidky;
 
         public TypNabidky AktualniNabidka { get; set; }
 
         public PolozkaNabidky KliknutoNa { get; private set; }
+        public bool KliknutoDoNabidky { get; private set; }
+        public float Meritko { get; set; }
 
         //public PolozkaNabidky TextZivotu { get; private set; }
         //public PolozkaNabidky TextFinance { get; private set; }
@@ -195,12 +199,14 @@ namespace ToDe
         }
 
 
-        public void Update(float sekundOdMinule, Vector2 klik)
+        public void Update(float sekundOdMinule, Vector2 klik, Rectangle vyrez)
         {
             KliknutoNa = null;
+            KliknutoDoNabidky = new Rectangle(vyrez.X, vyrez.Y + vyrez.Height - Zdroje.VelikostDlazdice, vyrez.Width, Zdroje.VelikostDlazdice).Contains(klik);
+
             foreach (var polozka in nabidka)
             {
-                polozka.Update(sekundOdMinule, klik);
+                polozka.Update(sekundOdMinule, klik, vyrez);
                 if (polozka.Kliknuto)
                     KliknutoNa = polozka;
             }
@@ -253,10 +259,10 @@ namespace ToDe
             TextovaCast.ZarovnatTextHorizontalneNaStred = true;
         }
 
-        public override void Update(float sekundOdMinule, Vector2 klik)
+        public override void Update(float sekundOdMinule, Vector2 klik, Rectangle vyrez)
         {
             if (Viditelne)
-                base.Update(sekundOdMinule, klik);
+                base.Update(sekundOdMinule, klik, vyrez);
         }
 
         public override void Update(float sekundOdMinule)
@@ -306,29 +312,29 @@ namespace ToDe
             // Grafika netextových typů
             if (TypPolozky == TypPolozkyNabidky.VezKulomet)
                 Dlazdice = new[] {
-                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Zakladna_1, 0.0f, false),
-                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Kulomet_1, 0.1f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Zakladna_1, 0.90f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Kulomet_1, 0.91f, false),
                 };
             else if (TypPolozky == TypPolozkyNabidky.VezRaketa)
                 Dlazdice = new[] {
-                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Zakladna_2, 0.0f, false),
-                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Stred, 0.2f, false),
-                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Vrsek, 0.5f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Zakladna_2, 0.90f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Stred, 0.92f, false),
+                    new DlazdiceUrceni(ZakladniDlazdice.Vez_Raketa_1_Vrsek, 0.95f, false),
                 };
             else if (TypPolozky == TypPolozkyNabidky.Vymazat)
             {
-                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Kos, 0.0f, false), };
+                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Kos, 0.90f, false), };
                 Barva = Color.Silver;
                 Okraje = 24;
             }
             else if (TypPolozky == TypPolozkyNabidky.Upgrade)
             {
-                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Upgrade, 0.0f, false), };
+                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Upgrade, 0.90f, false), };
                 Okraje = 24;
             }
             else if (TypPolozky == TypPolozkyNabidky.Pauza)
             {
-                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Pauza, 0.0f, false), };
+                Dlazdice = new[] { new DlazdiceUrceni(ZakladniDlazdice.Nabidka_Pauza, 0.90f, false), };
                 Okraje = 24;
 
             }
@@ -339,31 +345,27 @@ namespace ToDe
             }
         }
 
-        public virtual void Update(float sekundOdMinule, Vector2 klik)
+        Rectangle vyrez;
+        public virtual void Update(float sekundOdMinule, Vector2 klik, Rectangle vyrez)
         {
+            this.vyrez = vyrez;
             Kliknuto = false;
             if (Skryta) return;
 
             Update(sekundOdMinule);
 
-            //if (TypPolozky == TypPolozkyNabidky.Text) return; // Text se řeší v předchozím příkazu
-
             //// Pozice - levý horní roh dlaždice
-            var pozice = new Point((PoziceVNabidce >= 0 ? PoziceVNabidce :
-                                Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce) * Zdroje.VelikostDlazdice,
-                                Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
+            //var pozice = new Point((PoziceVNabidce >= 0 ? PoziceVNabidce :
+            //                    Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce) * Zdroje.VelikostDlazdice,
+            //                    Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
 
-            //// Pozice netextových položek nabídky - střed dlaždice
-            //Pozice = new Vector2(pozice.X + 0.5f * Zdroje.VelikostDlazdice, pozice.Y + 0.5f * Zdroje.VelikostDlazdice);
+            var pozice = new Point((PoziceVNabidce >= 0 ? PoziceVNabidce :
+                                OvladaciPanel.SirkaNabidky + PoziceVNabidce) * Zdroje.VelikostDlazdice + vyrez.X,
+                                vyrez.Y + vyrez.Height - Zdroje.VelikostDlazdice);
 
             if (klik != Vector2.Zero)
                 if (new Rectangle(pozice.X, pozice.Y, Zdroje.VelikostDlazdice, Zdroje.VelikostDlazdice).Contains(klik))
                     Kliknuto = true;
-
-            //// Výpočet měřítka vzhledem k okrajům
-            //Meritko = (Zdroje.VelikostDlazdice
-            //           - Math.Min(Okraje.Vlevo + Okraje.Vpravo, Okraje.Nahore + Okraje.Dole))
-            //           / (float)Zdroje.VelikostDlazdice;
         }
 
         public override void Update(float sekundOdMinule)
@@ -371,8 +373,6 @@ namespace ToDe
             if (Skryta) return;
            
             base.Update(sekundOdMinule);
-
-            //if (TypPolozky != TypPolozkyNabidky.Text) return;
 
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
@@ -385,12 +385,13 @@ namespace ToDe
                     x = PoziceVNabidce * Zdroje.VelikostDlazdice + Okraje.Vlevo 
                         + (SirkaTextu * Zdroje.VelikostDlazdice - Okraje.Horizontalne) * 0.5f;
                 else if (PoziceVNabidce < 0) // Zarovnat doprava
-                    x = (Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce + 1) * Zdroje.VelikostDlazdice - Okraje.Vpravo;
+                    x = (OvladaciPanel.SirkaNabidky + PoziceVNabidce + 1) * Zdroje.VelikostDlazdice - Okraje.Vpravo;
                 else // Zarovnat doleva
                     x = PoziceVNabidce * Zdroje.VelikostDlazdice + Okraje.Vlevo;
 
-                Pozice = new Vector2(x,
-                                     Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice 
+                Pozice = new Vector2(x + vyrez.X,
+                                     //Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice 
+                                     vyrez.Y + vyrez.Height - Zdroje.VelikostDlazdice
                                      + Okraje.Nahore 
                                      + (Zdroje.VelikostDlazdice - Okraje.Vertikalne) * 0.5f);
 
@@ -403,12 +404,10 @@ namespace ToDe
             }
             else
             {
-                //if (TypPolozky == TypPolozkyNabidky.Text) return; // Text se řeší v předchozím příkazu
-
                 // Pozice - levý horní roh dlaždice
                 var pozice = new Point((PoziceVNabidce >= 0 ? PoziceVNabidce :
-                                    Zdroje.Aktualni.Level.Mapa.Sloupcu + PoziceVNabidce) * Zdroje.VelikostDlazdice,
-                                    Zdroje.Aktualni.Level.Mapa.Radku * Zdroje.VelikostDlazdice);
+                                    OvladaciPanel.SirkaNabidky + PoziceVNabidce) * Zdroje.VelikostDlazdice + vyrez.X, // * Zdroje.VelikostDlazdice,
+                                    vyrez.Y + vyrez.Height - Zdroje.VelikostDlazdice);
 
                 // Pozice netextových položek nabídky - střed dlaždice
                 Pozice = new Vector2(pozice.X + 0.5f * (Zdroje.VelikostDlazdice - Okraje.Horizontalne) + Okraje.Vlevo,
@@ -422,13 +421,14 @@ namespace ToDe
         }
 
 
+
         public override void Draw(SpriteBatch sb)
         {
             if (Skryta) return;
             if (TypPolozky == TypPolozkyNabidky.Text)
             {
-                sb.DrawString(Zdroje.Obsah.Pismo, Text??"", Pozice, Barva,
-                    0, Stred, Meritko, SpriteEffects.None, 0);
+                sb.DrawString(Zdroje.Obsah.Pismo, Text ?? "", Pozice, Barva,
+                    0, Stred, Meritko, SpriteEffects.None, 0.9f);
             }
             else
                 base.Draw(sb);

@@ -4,6 +4,7 @@ using Android.App;
 using Android.Content.PM;
 using Android.Runtime;
 using Android.OS;
+using Android.Content;
 
 namespace ToDe.Droid
 {
@@ -21,8 +22,19 @@ namespace ToDe.Droid
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            LoadApplication(new App());
+            // #GM
+            var app = new ToDe.App();
+            app.PrepnoutNaHru += App_PrepnoutNaHru;
+            LoadApplication(app);
         }
+
+        // #GM
+        private void App_PrepnoutNaHru(object sender, EventArgs e)
+        {
+            Intent intent = new Intent(this, typeof(HraActivity));
+            StartActivity(intent);
+        }
+
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);

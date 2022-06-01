@@ -18,7 +18,13 @@ namespace ToDe
         private void bNovaHra_Clicked(object sender, EventArgs e)
         {
             TDGame.SouborLevelu = "";
-            Navigation.PushAsync(new HraPage());
+
+            // #GM
+            OvladacHry.NastavCisloLevelu(1);
+            if (Device.RuntimePlatform == Device.Android)
+                ((App)App.Current).SpustPrepnoutNaHru();
+            else
+                Navigation.PushAsync(new HraPage());
         }
 
         private void bEditorLevelu_Clicked(object sender, EventArgs e)

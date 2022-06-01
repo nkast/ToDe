@@ -44,19 +44,37 @@ namespace ToDe.Droid
         )]
     public class HraActivity : AndroidGameActivity
     {
+        TDGame hra;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
-            var game = new TDGame();
-            var view = game.Services.GetService(typeof(Android.Views.View)) as Android.Views.View;
+            hra = OvladacHry.SpustitHru(); // new TDGame();
+            hra.BackButtonPressed += Game_BackButtonPressed;
+            var view = hra.Services.GetService(typeof(Android.Views.View)) as Android.Views.View;
             SetContentView(view);
-            game.Run();
+            hra.Run();
         }
-        public override void OnBackPressed()
+
+        private void Game_BackButtonPressed(object sender, EventArgs e)
         {
             Finish();
-            base.OnBackPressed();
+        }
+
+        //public override void OnBackPressed()
+        //{
+        //    Finish();
+        //    base.OnBackPressed();
+        //}
+
+        public override void Finish()
+        {
+            hra.BackButtonPressed -= Game_BackButtonPressed;
+            OvladacHry.VypnoutHru();
+            hra = null;
+            base.Finish();
+            //((App)App.Current).SpustPrepnoutNaXF(false);
         }
     }
+
 }
