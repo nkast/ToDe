@@ -127,6 +127,7 @@ namespace ToDe
         public void HrajZvuk(float aktualniCasHry)
         {
             ZacatkyPrehravani.RemoveAll(x => x + ZvukovyEfekt.Duration.TotalSeconds * ChranenaCastZvuku < aktualniCasHry);
+            if (!Zdroje.Nastaveni.PrehravatZvuky) return;
             if (ZacatkyPrehravani.Count < PocetSoubeznychPrehrani)
             {
                 ZvukovyEfekt.Play();

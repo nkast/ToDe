@@ -15,6 +15,9 @@ namespace ToDe
 
         public static Obsah Obsah { get; internal set; }
 
+        public static NastaveniHry Nastaveni { get; internal set; } = new NastaveniHry();
+        
+
         public static int VelikostDlazdice { get => (int)Obsah.Zakladni.VelikostDlazdice.X; }
         
         public static int CisloLevelu = 1;

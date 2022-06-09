@@ -332,6 +332,11 @@ namespace ToDe
         }
     }
 
+    public class NastaveniHry
+    {
+        public bool PrehravatZvuky { get; set; } = true;
+    }
+
 
     public struct RectangleF
     {

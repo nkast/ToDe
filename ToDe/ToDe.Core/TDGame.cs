@@ -38,6 +38,11 @@ namespace ToDe
             TDGame.AktualniHra = null;
             Zdroje.Obsah = null;
         }
+
+        public static void NastavHru(NastaveniHry nastaveni)
+        {
+            Zdroje.Nastaveni = nastaveni;
+        }
     }
 
     public class TDGame : Game

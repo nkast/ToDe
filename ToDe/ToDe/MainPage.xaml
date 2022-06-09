@@ -6,6 +6,7 @@
     <Grid>
         <StackLayout Spacing="10" HorizontalOptions="Center" VerticalOptions="Center">
             <Button Text="Nová hra" x:Name="bNovaHra" Clicked="bNovaHra_Clicked" />
+            <Button Text="Nastavení" x:Name="bNastaveni" Clicked="bNastaveni_Clicked" />
             <Button Text="Editor levelů" x:Name="bEditorLevelu" Clicked="bEditorLevelu_Clicked" />
         </StackLayout>
     </Grid>

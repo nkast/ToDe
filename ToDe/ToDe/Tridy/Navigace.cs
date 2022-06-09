@@ -23,6 +23,7 @@ namespace ToDe
 
         private static void SpustitHru(Page stranka)
         {
+            OvladacHry.NastavHru(Nastaveni.Aktualni.NastavHru());
             if (Device.RuntimePlatform == Device.Android)
                 ((App)App.Current).SpustPrepnoutNaHru();
             else

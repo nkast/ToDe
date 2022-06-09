@@ -24,5 +24,10 @@ namespace ToDe
         {
             Navigation.PushAsync(new LevelyPage());
         }
+
+        private void bNastaveni_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new NastaveniPage());
+        }
     }
 }
