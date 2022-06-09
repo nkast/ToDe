@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
@@ -11,6 +12,8 @@ namespace ToDe
 {
     internal static class Soubory
     {
+        public const string KoncovkaSouboru = ".tode";
+
         static string slozkaLevelu;
         public static string SlozkaLevelu
         {
@@ -27,7 +30,7 @@ namespace ToDe
         }
 
         public static string CestaSouboruLevelu(string nazevLevelu)
-            => Path.Combine(SlozkaLevelu, nazevLevelu + ".xml");
+            => Path.Combine(SlozkaLevelu, nazevLevelu + KoncovkaSouboru);
 
         public static string[] SeznamLevelu()
             => Directory.GetFiles(SlozkaLevelu).Select(x => Path.GetFileNameWithoutExtension(x)).ToArray();
@@ -46,6 +49,19 @@ namespace ToDe
                     "Přepsat", "Zrušit")))
                 return String.Empty;
             return nazev;
+        }
+
+        public static string ImportLevelu(string nazevSuboru, Stream obsah)
+        {
+            if (obsah == null) return String.Empty;
+            string cil = CestaSouboruLevelu(Path.GetFileNameWithoutExtension(nazevSuboru));
+            int i = 2;
+            while (File.Exists(cil))
+                cil = CestaSouboruLevelu(Path.GetFileNameWithoutExtension(nazevSuboru) + $" ({i++})");
+            
+            var doc = XDocument.Load(obsah);
+            doc.Save(cil);
+            return cil;
         }
     }
 }

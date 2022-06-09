@@ -9,12 +9,12 @@
   <Identity
     Name="F4F6C8F1-EBFD-4F9C-987F-7E8724F83634"
     Publisher="CN=F825D5D2-F46B-46DC-ABB6-D46ACF1475C0"
-    Version="1.0.0.0" />
+    Version="0.1.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>ToDe.UWP</DisplayName>
+    <DisplayName>ToDe</DisplayName>
     <PublisherDisplayName>F825D5D2-F46B-46DC-ABB6-D46ACF1475C0</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -35,7 +35,7 @@
         DisplayName="ToDe"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="ToDe.UWP"
+        Description="Open-source Tower Defense hra se streamovaným vývojem."
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="Assets\LargeTile.png" Square71x71Logo="Assets\SmallTile.png">
           <uap:ShowNameOnTiles>
@@ -45,7 +45,24 @@
           </uap:ShowNameOnTiles>
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png"  BackgroundColor="#2ECC71"/>
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/>
+          <uap:Rotation Preference="portrait"/>
+          <uap:Rotation Preference="landscapeFlipped"/>
+          <uap:Rotation Preference="portraitFlipped"/></uap:InitialRotationPreference>
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="tode">
+            <uap:SupportedFileTypes>
+              <uap:FileType ContentType="application/x-tode">.tode</uap:FileType>
+            </uap:SupportedFileTypes>
+            <uap:EditFlags OpenIsSafe="true"/>
+            <uap:DisplayName>ToDe</uap:DisplayName>
+            <uap:Logo>Assets\LargeTitle.png</uap:Logo>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
 

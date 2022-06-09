@@ -5,8 +5,10 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace ToDe
 {
@@ -42,6 +44,12 @@ namespace ToDe
         public static void NastavHru(NastaveniHry nastaveni)
         {
             Zdroje.Nastaveni = nastaveni;
+        }
+
+        public static XDocument VychoziLevel()
+        {
+            using (Stream fileStream = TitleContainer.OpenStream("Content/Levels/VychoziLevel.xml"))
+                return XDocument.Load(fileStream);
         }
     }
 

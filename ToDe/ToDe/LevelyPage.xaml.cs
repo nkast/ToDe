@@ -40,46 +40,11 @@ namespace ToDe
         {
             string nazev = await Soubory.ZeptejSeNaNovyNazevSoboru(this, "Nový level");
             if (String.IsNullOrEmpty(nazev))
-                return;
+                return;         
 
-            XDocument doc = new XDocument(
-                new XElement("level",
-                    new XElement("finance", 
-                        new XAttribute("vychozi", 1000),
-                        new XAttribute("prirustek", 10)
-                    ),
-                     new XElement("mapa",
-                        new XAttribute("texturaPlochy", "Trava"),
-                        new XAttribute("texturaCesty", "Hlina"),
-                        "..............." + Environment.NewLine +
-                        "..............." + Environment.NewLine +
-                        "..............." + Environment.NewLine +
-                        "..............." + Environment.NewLine +
-                        "S*************E" + Environment.NewLine +
-                        "..............." + Environment.NewLine +
-                        "..............." + Environment.NewLine +
-                        "..............." + Environment.NewLine +
-                        "..............."
-                    ),
-                     new XElement("vlny",
-                        new XElement("vlna",
-                            new XElement("jednotka",
-                                new XAttribute("typ", "Vojak"),
-                                new XAttribute("pocet", 5),
-                                new XAttribute("rozestup", 2),
-                                new XAttribute("zdravi", 1),
-                                new XAttribute("rychlost", 0.5),
-                                new XAttribute("sila", 0.1),
-                                new XAttribute("uzdravovani", 0.01),
-                                new XAttribute("odstup", 0)
-                            )
-                        )
-                     ),
-                     new XElement("veze"),
-                     new XElement("prekazky")
-                )
-            );
+            var doc = OvladacHry.VychoziLevel();
             doc.Save(Soubory.CestaSouboruLevelu(nazev));
+
             OtevriLevel(nazev);
         }
 

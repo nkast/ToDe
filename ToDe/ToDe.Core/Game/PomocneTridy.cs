@@ -321,9 +321,9 @@ namespace ToDe
                 {
                     if (val[0] == '+' || val[0] == '-')
                         hodnota = (float)prop.GetValue(vez.Vlasntosti[(ushort)(idUrovne - 1)])
-                            * (1 + Convert.ToSingle(val));
+                            * (1 + Convert.ToSingle(val, CultureInfo.InvariantCulture));
                     else
-                        hodnota = Convert.ToSingle(val) * nasobitel;
+                        hodnota = Convert.ToSingle(val, CultureInfo.InvariantCulture) * nasobitel;
                 }
             }
 

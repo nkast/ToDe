@@ -7,6 +7,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -76,6 +77,30 @@ namespace ToDe.UWP
             }
             // Ensure the current window is active
             Window.Current.Activate();
+        }
+
+        public StorageFile TodeFileForImport { get; private set; }
+
+        // Spuštěno kliknutím na soubor s koncovkou .OMS
+        protected override void OnFileActivated(FileActivatedEventArgs e)
+        {
+            base.OnFileActivated(e);
+            Frame rootFrame = Window.Current.Content as Frame;
+            if (rootFrame == null)
+            {
+                rootFrame = new Frame();
+                rootFrame.NavigationFailed += OnNavigationFailed;
+                Xamarin.Forms.Forms.Init(e);
+                Window.Current.Content = rootFrame;
+            }
+            if (e.Files.Count >= 1)
+                TodeFileForImport = e.Files[0] as StorageFile;
+            //ReadVersion();
+            if (rootFrame.Content == null)
+                rootFrame.Navigate(typeof(MainPage), e);
+            Window.Current.Activate();
+            // http://grogansoft.com/blog/?p=1197
+            // http://thatcsharpguy.com/post/opening-files-xamarin-forms/
         }
 
         /// <summary>

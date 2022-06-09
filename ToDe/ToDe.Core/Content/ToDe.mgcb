@@ -26,6 +26,9 @@
 #begin Levels/Level2.xml
 /copy:Levels/Level2.xml
 
+#begin Levels/VychoziLevel.xml
+/copy:Levels/VychoziLevel.xml
+
 #begin Sounds/konec_prohra.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

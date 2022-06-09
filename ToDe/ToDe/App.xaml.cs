@@ -1,9 +1,13 @@
 ﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace ToDe
 {
+    public delegate Task<Stream> OpenImportedFileDelegate();
+
     public partial class App : Application
     {
         // #GM
@@ -28,6 +32,17 @@ namespace ToDe
 
             MainPage = new NavigationPage(new MainPage());
         }
+
+        public App(string todeFileName, OpenImportedFileDelegate todeOpen)
+        {
+            InitializeComponent();
+
+            var mainPage = new MainPage();
+            mainPage.TodeImportedFileName = todeFileName;
+            mainPage.OpenImportedFile = todeOpen;
+            MainPage = new NavigationPage(mainPage);
+        }
+
 
         protected override void OnStart()
         {
