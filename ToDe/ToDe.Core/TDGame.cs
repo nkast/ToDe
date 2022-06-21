@@ -38,7 +38,7 @@ namespace ToDe
             //TDGame.AktualniHra?.Exit();
             //TDGame.AktualniHra?.Dispose();
             TDGame.AktualniHra = null;
-            Zdroje.Obsah = null;
+            //Zdroje.Obsah = null;
         }
 
         public static void NastavHru(NastaveniHry nastaveni)
@@ -106,7 +106,7 @@ namespace ToDe
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Načtení zdrojů
-            if (Zdroje.Obsah == null)
+            //if (Zdroje.Obsah == null)
             Zdroje.Obsah = new Obsah() {
                 Pismo = Content.Load<SpriteFont>(@"Fonts/Pismo"),
                 ZvukKulomet = new Zvuk(Content.Load<SoundEffect>(@"Sounds/vez_kulomet"), 2),
@@ -133,8 +133,8 @@ namespace ToDe
         {
             Content.Unload();
             Content.Dispose();
-            Zdroje.Obsah = null;
-            graphics.Dispose();
+            //Zdroje.Obsah = null;
+            //graphics.Dispose();
         }
 
         internal void SpustitHru()
