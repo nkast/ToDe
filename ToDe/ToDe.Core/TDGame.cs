@@ -236,10 +236,15 @@ namespace ToDe
         float pozadavekNaZvetseni = 0, pinchInitialDistance = 0;
         Vector2 pozadavekNaPosun = Vector2.Zero;
         Vector2 minulaPoziceMysi;
+        GamePadState prevgps;
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            var gps = GamePad.GetState(PlayerIndex.One);
+
+            if (prevgps.Buttons.Back == ButtonState.Pressed && gps.Buttons.Back == ButtonState.Released)
                 BackButtonPressed?.Invoke(this, EventArgs.Empty);
+
+            prevgps = gps;
             
             var ks = Keyboard.GetState();
             if (ks.IsKeyDown(Keys.D0)) // Reset zobrazení
