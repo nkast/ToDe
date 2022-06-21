@@ -39,7 +39,7 @@ namespace ToDe.Droid
     [Activity(
         Label = "ToDe",
         AlwaysRetainTaskState = false,
-        ScreenOrientation = ScreenOrientation.FullUser,
+        ScreenOrientation = ScreenOrientation.FullSensor,
         ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.ScreenLayout | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden | ConfigChanges.Navigation
         )]
     public class HraActivity : AndroidGameActivity

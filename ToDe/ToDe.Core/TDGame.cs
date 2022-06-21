@@ -67,6 +67,7 @@ namespace ToDe
             AktualniHra = this;
             IsMouseVisible = true; 
             graphics = new GraphicsDeviceManager(this);
+            graphics.SupportedOrientations = DisplayOrientation.Portrait;
         }
 
         List<Nepritel> nepratele;
